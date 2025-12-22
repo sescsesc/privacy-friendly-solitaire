@@ -45,7 +45,6 @@ import com.badlogic.gdx.backends.android.AndroidApplication;
 import com.badlogic.gdx.backends.android.AndroidApplicationConfiguration;
 import com.badlogic.gdx.backends.android.surfaceview.GLSurfaceView20;
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.utils.StringBuilder;
 
 import org.secuso.privacyfriendlysolitaire.CallBackListener;
 import org.secuso.privacyfriendlysolitaire.R;

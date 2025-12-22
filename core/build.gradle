@@ -1,6 +1,6 @@
 apply plugin: "java"
 
-sourceCompatibility = JavaVersion.VERSION_11
+sourceCompatibility = JavaVersion.VERSION_21
 [compileJava, compileTestJava]*.options*.encoding = 'UTF-8'
 
 sourceSets.main.java.srcDirs = [ "src/" ]
@@ -10,15 +10,15 @@ eclipse.project {
 }
 
 dependencies {
-    implementation 'junit:junit:4.12'
+    implementation 'junit:junit:4.13.2'
 
     // https://mvnrepository.com/artifact/com.badlogicgames.gdx/gdx-platform
-    testImplementation group: 'com.badlogicgames.gdx', name: 'gdx-platform', version: '1.9.9'
+    testImplementation group: 'com.badlogicgames.gdx', name: 'gdx-platform', version: '1.14.0'
     // https://mvnrepository.com/artifact/com.badlogicgames.gdx/gdx-box2d
-    implementation group: 'com.badlogicgames.gdx', name: 'gdx-box2d', version: '1.9.9'
+    implementation group: 'com.badlogicgames.gdx', name: 'gdx-box2d', version: '3.1.1-0'
     // https://mvnrepository.com/artifact/com.badlogicgames.gdx/gdx
-    implementation group: 'com.badlogicgames.gdx', name: 'gdx', version: '1.9.9'
+    implementation group: 'com.badlogicgames.gdx', name: 'gdx', version: '1.14.0'
     // https://mvnrepository.com/artifact/com.badlogicgames.gdx/gdx-backend-android
-    implementation group: 'com.badlogicgames.gdx', name: 'gdx-backend-android', version: '1.9.9'
+    implementation group: 'com.badlogicgames.gdx', name: 'gdx-backend-android', version: '1.14.0'
 
 }

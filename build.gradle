@@ -3,12 +3,11 @@ buildscript {
         mavenLocal()
         mavenCentral()
         maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
-        jcenter()
         google()
     }
-    ext.kotlin_version = "1.7.20"
+    ext.kotlin_version = "2.2.0"
     dependencies {
-        classpath 'com.android.tools.build:gradle:7.4.2'
+        classpath 'com.android.tools.build:gradle:8.13.2'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
 
         // NOTE: Do not place your application dependencies here; they belong
@@ -23,7 +22,7 @@ allprojects {
     version = '1.0'
     ext {
         appName = "Solitaire"
-        gdxVersion = '1.9.9'
+        gdxVersion = '1.14.0'
         roboVMVersion = '2.3.0'
         box2DLightsVersion = '1.4'
         ashleyVersion = '1.7.0'
@@ -36,7 +35,6 @@ allprojects {
         maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
         maven { url "https://oss.sonatype.org/content/repositories/releases/" }
         google()
-        jcenter()
     }
 }
 
@@ -64,7 +62,7 @@ project(":core") {
 
     dependencies {
         // Required -- JUnit 4 framework
-        testImplementation 'junit:junit:4.12'
+        testImplementation 'junit:junit:4.13.2'
 
         implementation "com.badlogicgames.gdx:gdx:$gdxVersion"
     }
