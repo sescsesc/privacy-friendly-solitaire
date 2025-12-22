@@ -7,6 +7,7 @@ import org.secuso.privacyfriendlysolitaire.model.Suit;
 import org.secuso.privacyfriendlysolitaire.model.Tableau;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -28,6 +29,7 @@ This program is free software: you can redistribute it and/or modify
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 /**
  * @author I. Dix
  * <p>
@@ -67,6 +69,8 @@ public class GeneratorSolitaireInstance {
         for (Card c : allCards) {
             scrambledCardList.add(c);
         }
+
+        Collections.shuffle(scrambledCardList);
 
         // generate data container to store the deck and tableaus
         Vector<Card> deck = new Vector<Card>(24);
