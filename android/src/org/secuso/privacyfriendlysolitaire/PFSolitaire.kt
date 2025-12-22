@@ -23,14 +23,9 @@ import android.os.Build
 import android.util.Log
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.work.Configuration
-import org.secuso.privacyfriendlysolitaire.backup.BackupCreator
-import org.secuso.privacyfriendlysolitaire.backup.BackupRestorer
-import org.secuso.privacyfriendlybackup.api.pfa.BackupManager
 
 class PFSolitaire : Application(), Configuration.Provider {
     override fun onCreate() {
-        BackupManager.backupCreator = BackupCreator()
-        BackupManager.backupRestorer = BackupRestorer()
         super.onCreate()
     }
 
