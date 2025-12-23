@@ -1,3 +1,5 @@
+configurations { natives }
+
 android {
     namespace = "org.secuso.privacyfriendlysolitaire";
 
@@ -32,6 +34,9 @@ android {
         sourceCompatibility JavaVersion.VERSION_21
         targetCompatibility JavaVersion.VERSION_21
     }
+    kotlinOptions {
+        jvmTarget = '21'
+    }
     buildFeatures {
         renderScript true
         aidl true
@@ -39,6 +44,9 @@ android {
 }
 
 dependencies {
+    implementation project(':core')
+    implementation group: 'com.badlogicgames.gdx', name: 'gdx', version: '1.14.0'
+    implementation group: 'com.badlogicgames.gdx', name: 'gdx-backend-android', version: '1.14.0'
     implementation fileTree(include: ['*.jar'], dir: 'libs')
 //    testCompile 'junit:junit:4.12'
     implementation 'androidx.appcompat:appcompat:1.7.1'
@@ -60,6 +68,13 @@ dependencies {
     implementation "androidx.work:work-runtime-ktx:$work_version"
     androidTestImplementation "androidx.work:work-testing:$work_version"
     implementation 'androidx.sqlite:sqlite-ktx:2.6.2'
+
+    def gdxVersion = '1.14.0'
+//    natives "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-armeabi"
+//    natives "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-armeabi-v7a"
+    natives "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-arm64-v8a"
+    natives "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-x86"
+    natives "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-x86_64"
 }
 
 
@@ -68,8 +83,8 @@ dependencies {
 // so they get packed with the APK.
 task copyAndroidNatives {
     doFirst {
-        file("libs/armeabi/").mkdirs();
-        file("libs/armeabi-v7a/").mkdirs();
+//        file("libs/armeabi/").mkdirs();
+//        file("libs/armeabi-v7a/").mkdirs();
         file("libs/arm64-v8a/").mkdirs();
         file("libs/x86_64/").mkdirs();
         file("libs/x86/").mkdirs();
@@ -77,8 +92,8 @@ task copyAndroidNatives {
         configurations.natives.files.each { jar ->
             def outputDir = null
             if (jar.name.endsWith("natives-arm64-v8a.jar")) outputDir = file("libs/arm64-v8a")
-            if (jar.name.endsWith("natives-armeabi-v7a.jar")) outputDir = file("libs/armeabi-v7a")
-            if (jar.name.endsWith("natives-armeabi.jar")) outputDir = file("libs/armeabi")
+//            if (jar.name.endsWith("natives-armeabi-v7a.jar")) outputDir = file("libs/armeabi-v7a")
+//            if (jar.name.endsWith("natives-armeabi.jar")) outputDir = file("libs/armeabi")
             if (jar.name.endsWith("natives-x86_64.jar")) outputDir = file("libs/x86_64")
             if (jar.name.endsWith("natives-x86.jar")) outputDir = file("libs/x86")
             if (outputDir != null) {
