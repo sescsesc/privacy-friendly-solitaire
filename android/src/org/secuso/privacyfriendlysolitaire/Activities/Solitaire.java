@@ -27,12 +27,6 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceManager;
-import com.google.android.material.navigation.NavigationView;
-import androidx.core.app.TaskStackBuilder;
-import androidx.core.view.GravityCompat;
-import androidx.drawerlayout.widget.DrawerLayout;
-import androidx.appcompat.app.ActionBarDrawerToggle;
-import androidx.appcompat.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -41,10 +35,17 @@ import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import androidx.appcompat.app.ActionBarDrawerToggle;
+import androidx.appcompat.widget.Toolbar;
+import androidx.core.app.TaskStackBuilder;
+import androidx.core.view.GravityCompat;
+import androidx.drawerlayout.widget.DrawerLayout;
+
 import com.badlogic.gdx.backends.android.AndroidApplication;
 import com.badlogic.gdx.backends.android.AndroidApplicationConfiguration;
 import com.badlogic.gdx.backends.android.surfaceview.GLSurfaceView20;
 import com.badlogic.gdx.graphics.Color;
+import com.google.android.material.navigation.NavigationView;
 
 import org.secuso.privacyfriendlysolitaire.CallBackListener;
 import org.secuso.privacyfriendlysolitaire.R;
@@ -216,6 +217,7 @@ public class Solitaire extends AndroidApplication implements
 
         //undo Button in game panel
         ImageButton undo = (ImageButton) findViewById(R.id.undo);
+        undo.setVisibility(View.GONE);
         undo.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -225,6 +227,7 @@ public class Solitaire extends AndroidApplication implements
 
         //redo button in game panel
         ImageButton redo = (ImageButton) findViewById(R.id.redo);
+        redo.setVisibility(View.GONE);
         redo.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -504,6 +507,11 @@ public class Solitaire extends AndroidApplication implements
             @Override
             public void run() {
                 //change undo-button and redo-button images here so that user knows if action is possible
+                ImageButton undo = (ImageButton) findViewById(R.id.undo);
+                undo.setVisibility(canUndo ? View.VISIBLE : View.GONE);
+
+                ImageButton redo = (ImageButton) findViewById(R.id.redo);
+                redo.setVisibility(canRedo ? View.VISIBLE : View.GONE);
             }
         });
     }
@@ -528,6 +536,7 @@ public class Solitaire extends AndroidApplication implements
         private boolean countTime;
         private boolean showPoints;
         private Solitaire game;
+
         public WonDialog(Solitaire game, boolean countTime, boolean showPoints) {
             this.countTime = countTime;
             this.showPoints = showPoints;

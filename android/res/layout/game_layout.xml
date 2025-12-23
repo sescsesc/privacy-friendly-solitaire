@@ -47,7 +47,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:clickable="true"
-                        android:src="@drawable/ic_undo_white_game_36dp"
+                        android:src="@android:drawable/ic_media_rew"
                         android:background="@null"/>
 
                     <RelativeLayout
@@ -93,7 +93,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:clickable="true"
-                        android:src="@drawable/ic_lightbulb_outline_white_game_36dp"
+                        android:src="@android:drawable/ic_menu_view"
                         android:layout_centerInParent="true"
                         android:background="@null"/>
 
@@ -105,7 +105,7 @@
                         android:layout_height="wrap_content"
                         android:layout_gravity="start"
                         android:clickable="true"
-                        android:src="@drawable/ic_redo_white_game_36dp"
+                        android:src="@android:drawable/ic_media_ff"
                         android:layout_alignParentEnd="true"
                         android:background="@null"
                         />
