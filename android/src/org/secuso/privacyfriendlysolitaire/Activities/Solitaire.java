@@ -15,6 +15,7 @@ This program is free software: you can redistribute it and/or modify
  */
 
 import android.annotation.SuppressLint;
+import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.DialogFragment;
 import android.content.Context;
@@ -57,8 +58,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 
-public class Solitaire extends AndroidApplication implements
-        NavigationView.OnNavigationItemSelectedListener, CallBackListener {
+public class Solitaire extends AndroidApplication implements NavigationView.OnNavigationItemSelectedListener, CallBackListener {
 
     //set color values for backgroundcolor of game field, which can be selected in the settings of the App
     public static final Color GRAY_SOL = new Color(0.75f, 0.75f, 0.75f, 1);
@@ -66,7 +66,7 @@ public class Solitaire extends AndroidApplication implements
     public static final Color BLUE_SOL = new Color(176 / 255.0f, 196 / 255.0f, 222 / 255.0f, 1);
     public static final Color LILA_SOL = new Color(216 / 255.0f, 191 / 255.0f, 216 / 255.0f, 1);
     public static final Color WHITE_SOL = new Color(255 / 255.0f, 255 / 255.0f, 255 / 255.0f, 1);
-    com.badlogic.gdx.graphics.Color c;
+    com.badlogic.gdx.graphics.Color backgroundColor;
 
     // The following are used for the shake detection
     private SensorManager mSensorManager;
@@ -118,8 +118,7 @@ public class Solitaire extends AndroidApplication implements
         application.registerCallBackListener(this);
 
         //initialize game view an functions, which are implemented in th core package with LibGDX
-        final GLSurfaceView20 gameView =
-                (GLSurfaceView20) initializeForView(application, new AndroidApplicationConfiguration());
+        final GLSurfaceView20 gameView = (GLSurfaceView20) initializeForView(application, new AndroidApplicationConfiguration());
 
         LinearLayout outerLayout = (LinearLayout) findViewById(R.id.outer);
         outerLayout.addView(gameView);
@@ -134,16 +133,11 @@ public class Solitaire extends AndroidApplication implements
 
         // ShakeDetector initialization
         mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
-        mAccelerometer = mSensorManager
-                .getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+        mAccelerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
         mShakeDetector = new ShakeDetector();
-        mShakeDetector.setOnShakeListener(new ShakeDetector.OnShakeListener() {
-
-            @Override
-            public void onShake(int count) {
-                if (shake) {
-                    application.autoFoundations();
-                }
+        mShakeDetector.setOnShakeListener(count -> {
+            if (shake) {
+                application.autoFoundations();
             }
         });
 
@@ -154,101 +148,77 @@ public class Solitaire extends AndroidApplication implements
             startTimer();
         } else {
             // hide timer
-            timerView.setVisibility(View.INVISIBLE);
+            timerView.setVisibility(View.GONE);
         }
-
 
         // default modes for cardDraw and score
-        int scoreMode = Constants.MODE_STANDARD;
-        int cardDrawMode = Constants.MODE_ONE_CARD_DEALT;
-
-        String waste_sel = mSharedPreferences.getString(getString(R.string.pref_waste), "1");
-
-        // settings-> waste
-        if (waste_sel.equals("1")) {
-            cardDrawMode = Constants.MODE_ONE_CARD_DEALT;
-        } else if (waste_sel.equals("2")) {
-            cardDrawMode = Constants.MODE_THREE_CARDS_DEALT;
-        }
+        int cardDrawMode = getCardDrawMode();
 
         //pointsView && select point counting mode in settings
         pointsView = (TextView) findViewById(R.id.points);
-        String point_count = mSharedPreferences.getString(getString(R.string.pref_count_point), "1");
-
-        switch (point_count) {
-            case "1":
-                scoreMode = Constants.MODE_NONE;
-                // hide points text and value
-                pointsView.setVisibility(View.INVISIBLE);
-                findViewById(R.id.point).setVisibility(View.INVISIBLE);
-                break;
-            case "2":
-                scoreMode = Constants.MODE_STANDARD;
-                showPoints = true;
-                break;
-            case "3":
-                scoreMode = Constants.MODE_VEGAS;
-                showPoints = true;
-                break;
+        final int scoreMode = getScoreMode();
+        if (scoreMode == Constants.MODE_NONE) {
+            pointsView.setVisibility(View.GONE);
+            showPoints = false;
+        } else {
+            pointsView.setVisibility(View.VISIBLE);
+            showPoints = true;
         }
 
         // Set the background color of the game panel
-        String color = mSharedPreferences.getString(getString(R.string.sp_key_background_color), "1");
-
-        switch (color) {
-            case "1":
-                c = GREEN_SOL;
-                break;
-            case "2":
-                c = BLUE_SOL;
-                break;
-            case "3":
-                c = GRAY_SOL;
-                break;
-            case "4":
-                c = LILA_SOL;
-                break;
-            case "5":
-                c = WHITE_SOL;
-                break;
-            default:
-                c = GREEN_SOL;
-        }
+        updateBackroundColorFromPreferences();
 
         //undo Button in game panel
-        ImageButton undo = (ImageButton) findViewById(R.id.undo);
+        final ImageButton undo = (ImageButton) findViewById(R.id.undo);
         undo.setVisibility(View.GONE);
-        undo.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                application.undo();
-            }
-        });
+        undo.setOnClickListener(v -> application.undo());
 
         //redo button in game panel
-        ImageButton redo = (ImageButton) findViewById(R.id.redo);
+        final ImageButton redo = (ImageButton) findViewById(R.id.redo);
         redo.setVisibility(View.GONE);
-        redo.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                application.redo();
-            }
-        });
+        redo.setOnClickListener(v -> application.redo());
 
         //hint button in game panel
-        ImageButton hint = (ImageButton) findViewById(R.id.hint);
-        hint.setOnClickListener(new View.OnClickListener() {
-
-            @Override
-            public void onClick(View v) {
-                application.autoMove();
-            }
-        });
+        final ImageButton hint = (ImageButton) findViewById(R.id.hint);
+        hint.setOnClickListener(v -> application.autoMove());
 
         // start game
-        application.customConstructor(cardDrawMode, scoreMode, sound, c, draganddrop);
+        application.customConstructor(cardDrawMode, scoreMode, sound, this.backgroundColor, draganddrop);
     }
 
+    private void updateBackroundColorFromPreferences() {
+        final String setting = mSharedPreferences.getString(getString(R.string.sp_key_background_color), "1");
+        this.backgroundColor = switch (setting) {
+            case "1" -> GREEN_SOL;
+            case "2" -> BLUE_SOL;
+            case "3" -> GRAY_SOL;
+            case "4" -> LILA_SOL;
+            case "5" -> WHITE_SOL;
+            default -> GREEN_SOL;
+        };
+    }
+
+    private int getCardDrawMode() {
+        final String setting = mSharedPreferences.getString(getString(R.string.pref_waste), "1");
+
+        // settings-> waste
+        return switch (setting) {
+            case "1" -> Constants.MODE_ONE_CARD_DEALT;
+            case "2" -> Constants.MODE_THREE_CARDS_DEALT;
+            default -> Constants.MODE_ONE_CARD_DEALT;
+        };
+    }
+
+    private int getScoreMode() {
+        final String setting = mSharedPreferences.getString(getString(R.string.pref_count_point), "1");
+
+        return switch (setting) {
+            case "1" -> Constants.MODE_NONE;
+            case "2" -> Constants.MODE_STANDARD;
+            case "3" -> Constants.MODE_VEGAS;
+            default -> Constants.MODE_STANDARD;
+        };
+    }
 
     @Override
     public void onResume() {
@@ -281,15 +251,13 @@ public class Solitaire extends AndroidApplication implements
         timerTask = new TimerTask() {
             public void run() {
                 //use a handler to run a toast that shows the current timestamp
-                handler.post(new Runnable() {
-                    public void run() {
+                handler.post((Runnable) () -> {
 
-                        time = (time + 1);
-                        if (((time % 60) < 10)) {
-                            timerView.setText(String.valueOf(time / 60) + ":" + "0" + String.valueOf(time % 60));
-                        } else {
-                            timerView.setText(String.valueOf(time / 60) + ":" + String.valueOf(time % 60));
-                        }
+                    time = (time + 1);
+                    if (((time % 60) < 10)) {
+                        timerView.setText(String.valueOf(time / 60) + ":" + "0" + String.valueOf(time % 60));
+                    } else {
+                        timerView.setText(String.valueOf(time / 60) + ":" + String.valueOf(time % 60));
                     }
                 });
             }
@@ -457,8 +425,7 @@ public class Solitaire extends AndroidApplication implements
 
 
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
-        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
-                this, mDrawerLayout, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, mDrawerLayout, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         mDrawerLayout.addDrawerListener(toggle);
         toggle.syncState();
 
@@ -481,51 +448,36 @@ public class Solitaire extends AndroidApplication implements
 
     @Override
     public void onWon() {
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                stoptimertask(timerView);
-                alertBoxWonMessage();
-            }
+        runOnUiThread((Runnable) () -> {
+            stoptimertask(timerView);
+            alertBoxWonMessage();
         });
     }
 
     @Override
     public void onLost() {
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                stoptimertask(timerView);
-                alertBoxLostMessage();
-            }
+        runOnUiThread((Runnable) () -> {
+            stoptimertask(timerView);
+            alertBoxLostMessage();
         });
     }
 
     @Override
     public void isUndoRedoPossible(final boolean canUndo, final boolean canRedo) {
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                //change undo-button and redo-button images here so that user knows if action is possible
-                ImageButton undo = (ImageButton) findViewById(R.id.undo);
-                undo.setVisibility(canUndo ? View.VISIBLE : View.GONE);
+        runOnUiThread((Runnable) () -> {
+            //change undo-button and redo-button images here so that user knows if action is possible
+            ImageButton undo = (ImageButton) findViewById(R.id.undo);
+            undo.setVisibility(canUndo ? View.VISIBLE : View.GONE);
 
-                ImageButton redo = (ImageButton) findViewById(R.id.redo);
-                redo.setVisibility(canRedo ? View.VISIBLE : View.GONE);
-            }
+            ImageButton redo = (ImageButton) findViewById(R.id.redo);
+            redo.setVisibility(canRedo ? View.VISIBLE : View.GONE);
         });
     }
 
 
     @Override
     public void score(final int score) {
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                pointsView.setText(String.valueOf(score));
-
-            }
-        });
+        runOnUiThread((Runnable) () -> pointsView.setText(String.valueOf(score)));
     }
 
 
@@ -562,12 +514,8 @@ public class Solitaire extends AndroidApplication implements
 
 
             LayoutInflater i = getActivity().getLayoutInflater();
-            android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(getActivity());
-            builder.setView(i.inflate(R.layout.custom_dialog, null))
-                    .setIcon(R.mipmap.ic_launcher)
-                    .setTitle(getActivity().getString(R.string.alert_box_won))
-                    .setMessage(message)
-                    .setCancelable(false)
+            AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+            builder.setView(i.inflate(R.layout.custom_dialog, null)).setIcon(R.mipmap.ic_launcher).setTitle(getActivity().getString(R.string.alert_box_won)).setMessage(message).setCancelable(false)
                     // go back to main menu
                     .setNegativeButton(getString(R.string.alert_box_won_lost_main), new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int id) {
@@ -615,12 +563,8 @@ public class Solitaire extends AndroidApplication implements
 
 
             //warning message, if player wants to leave game
-            android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(getActivity());
-            builder.setView(view)
-                    .setIcon(R.mipmap.ic_launcher)
-                    .setTitle(getActivity().getString(R.string.warning_box_title))
-                    .setMessage(getString(R.string.warning_box_message))
-                    .setCancelable(false)
+            AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+            builder.setView(view).setIcon(R.mipmap.ic_launcher).setTitle(getActivity().getString(R.string.warning_box_title)).setMessage(getString(R.string.warning_box_message)).setCancelable(false)
                     // stay
                     .setNegativeButton(getString(R.string.warning_box_negative_answer), new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int id) {
@@ -660,12 +604,8 @@ public class Solitaire extends AndroidApplication implements
 
 
             LayoutInflater i = getActivity().getLayoutInflater();
-            android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(getActivity());
-            builder.setView(i.inflate(R.layout.custom_dialog, null))
-                    .setIcon(R.mipmap.ic_launcher)
-                    .setTitle(getActivity().getString(R.string.alert_box_lost))
-                    .setMessage(message)
-                    .setCancelable(false)
+            AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+            builder.setView(i.inflate(R.layout.custom_dialog, null)).setIcon(R.mipmap.ic_launcher).setTitle(getActivity().getString(R.string.alert_box_lost)).setMessage(message).setCancelable(false)
                     // go back to main menu
                     .setNegativeButton(getString(R.string.alert_box_won_lost_main), new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int id) {
