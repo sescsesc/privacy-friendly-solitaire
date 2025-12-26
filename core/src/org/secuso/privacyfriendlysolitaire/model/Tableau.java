@@ -59,8 +59,8 @@ public class Tableau {
         return faceUp;
     }
 
-    public int getNrOfAllCards(){
-        return faceDown.size()+faceUp.size();
+    public int getNrOfAllCards() {
+        return faceDown.size() + faceUp.size();
     }
 
     /**
@@ -103,10 +103,12 @@ public class Tableau {
      * @param vecCards the vector of cards that should be added to this tableau pile
      * @return true if the cards could be added to the tableau
      */
-    public boolean addFaceUpVector(Vector<Card> vecCards) {
+    public boolean addFaceUpVector(final Vector<Card> vecCards) {
+        if (vecCards == null || vecCards.isEmpty()) {
+            return true;
+        }
 
         return this.faceUp.addAll(vecCards);
-
 
 
     }
@@ -119,12 +121,12 @@ public class Tableau {
         if (!vecCards.isEmpty()) {
             if (this.faceDown.isEmpty() && this.faceUp.isEmpty()) {
                 //empty tableau piles can be filled with a stack starting with a king
-                return vecCards.firstElement().getRank() == Rank.KING;
+                return vecCards.firstElement().rank() == Rank.KING;
             } else if (!this.faceDown.isEmpty() && this.faceUp.isEmpty()) {
                 //cannot add cards, face down card has to be turned over first
                 return false;
             } else
-                return this.faceUp.lastElement().getColor() != vecCards.firstElement().getColor() && vecCards.firstElement().getRank().isPredecessor(this.faceUp.lastElement().getRank());
+                return this.faceUp.lastElement().suit().getColor() != vecCards.firstElement().suit().getColor() && vecCards.firstElement().rank().isPredecessor(this.faceUp.lastElement().rank());
         } else {
             return true;
         }

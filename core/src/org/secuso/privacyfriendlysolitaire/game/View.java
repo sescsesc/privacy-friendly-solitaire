@@ -1502,7 +1502,7 @@ public class View implements GameListener {
          * @return a string containing the card's rank and suit
          */
         private String getCardTextureName(Card card) {
-            return card.getRank().toString().toLowerCase() + "_" + card.getSuit().toString().toLowerCase();
+            return card.rank().toString().toLowerCase() + "_" + card.suit().toString().toLowerCase();
         }
 
         /**
