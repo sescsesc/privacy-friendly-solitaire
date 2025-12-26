@@ -34,6 +34,6 @@ public enum Rank {
      * @return true if this is the successor of r
      */
     public boolean isSuccessor(final Rank r) {
-        return r.isPredecessor(this);
+        return r != null && r.isPredecessor(this);
     }
 }
