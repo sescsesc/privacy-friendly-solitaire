@@ -10,7 +10,7 @@ eclipse.project {
 }
 
 dependencies {
-    implementation 'junit:junit:4.13.2'
+//    implementation 'junit:junit:4.13.2'
 
     // https://mvnrepository.com/artifact/com.badlogicgames.gdx/gdx-platform
     testImplementation group: 'com.badlogicgames.gdx', name: 'gdx-platform', version: '1.14.0'
@@ -18,5 +18,7 @@ dependencies {
     implementation group: 'com.badlogicgames.gdx', name: 'gdx-box2d', version: '3.1.1-0'
     // https://mvnrepository.com/artifact/com.badlogicgames.gdx/gdx
     implementation group: 'com.badlogicgames.gdx', name: 'gdx', version: '1.14.0'
+
+    testImplementation 'org.junit.jupiter:junit-jupiter:6.0.1'
 
 }
