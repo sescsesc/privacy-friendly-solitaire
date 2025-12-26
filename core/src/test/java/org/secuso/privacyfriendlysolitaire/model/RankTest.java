@@ -2,6 +2,7 @@ package org.secuso.privacyfriendlysolitaire.model;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.secuso.privacyfriendlysolitaire.model.Rank.*;
 
 import org.junit.Test;
 
@@ -9,18 +10,18 @@ public class RankTest {
 
     @Test
     public void isPredecessorTests() {
-        assertTrue("failure - ACE is predecessor to TWO", Rank.ACE.isPredecessor(Rank.TWO));
-        assertTrue("JACK should be predecessor to QUEEN", Rank.JACK.isPredecessor(Rank.QUEEN));
-        assertFalse("failure - TWO is not predecessor to ACE", Rank.TWO.isPredecessor(Rank.ACE));
-        assertFalse("NINE should not be predecessor to FIVE", Rank.NINE.isPredecessor(Rank.FIVE));
+        assertTrue("failure - ACE is predecessor to TWO", ACE.isPredecessor(TWO));
+        assertTrue("JACK should be predecessor to QUEEN", JACK.isPredecessor(QUEEN));
+        assertFalse("failure - TWO is not predecessor to ACE", TWO.isPredecessor(ACE));
+        assertFalse("NINE should not be predecessor to FIVE", NINE.isPredecessor(FIVE));
     }
 
     @Test
     public void isSuccessorTests() {
-        assertFalse("TEN is not successor to THREE", Rank.TEN.isSuccessor(Rank.THREE));
-        assertFalse("failure - ACE is not successor to TWO", Rank.ACE.isSuccessor(Rank.TWO));
-        assertTrue("failure - TWO is successor to ACE", Rank.TWO.isSuccessor(Rank.ACE));
-        assertTrue("EIGHT should be successor to SEVEN", Rank.EIGHT.isSuccessor(Rank.SEVEN));
+        assertFalse("TEN is not successor to THREE", TEN.isSuccessor(THREE));
+        assertFalse("failure - ACE is not successor to TWO", ACE.isSuccessor(TWO));
+        assertTrue("failure - TWO is successor to ACE", TWO.isSuccessor(ACE));
+        assertTrue("EIGHT should be successor to SEVEN", EIGHT.isSuccessor(SEVEN));
     }
 
 
