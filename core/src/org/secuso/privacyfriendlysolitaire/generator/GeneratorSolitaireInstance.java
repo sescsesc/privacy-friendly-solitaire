@@ -140,7 +140,7 @@ public class GeneratorSolitaireInstance {
             Card c = instance.getTableauAtPos(i).getFaceUp().lastElement();
 
             // whether they are an ace
-            if (c.getRank() == Rank.ACE) {
+            if (c.rank() == Rank.ACE) {
                 nrOfAces++;
             }
 
@@ -157,7 +157,7 @@ public class GeneratorSolitaireInstance {
             Card c = instance.getDeckWaste().getDeck().get(i);
 
             // whether they are an ace
-            if (c.getRank() == Rank.ACE) {
+            if (c.rank() == Rank.ACE) {
                 nrOfAces++;
             }
 

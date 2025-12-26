@@ -63,15 +63,15 @@ public class Foundation {
      */
     public boolean addCard(Card card) {
         if (this.getSuit() == null && this.getCards().isEmpty()) { //foundation empty --> only ace can be added, this defines the suit of the foundation
-            if (card.getRank() == Rank.ACE) {
+            if (card.rank() == Rank.ACE) {
                 this.getCards().add(card);
-                this.suit = card.getSuit();
+                this.suit = card.suit();
                 return true;
             } else {
                 return false;
             }
-        } else if (this.getSuit() == card.getSuit()) { //foundation not empty --> suit must fit
-            if (this.getCards().lastElement().getRank().isPredecessor(card.getRank())) { // suit fits --> card must be successor of top card
+        } else if (this.getSuit() == card.suit()) { //foundation not empty --> suit must fit
+            if (this.getCards().lastElement().rank().isPredecessor(card.rank())) { // suit fits --> card must be successor of top card
                 this.getCards().add(card);
                 return true;
             } else {
@@ -88,10 +88,10 @@ public class Foundation {
      */
     public boolean canAddCard(Card card) {
         if (this.getSuit() == null && this.getCards().isEmpty()) { //foundation empty --> only ace can be added, this defines the suit of the foundation
-            return card.getRank() == Rank.ACE;
-        } else if (this.getSuit() == card.getSuit()) { //foundation not empty --> suit must fit
+            return card.rank() == Rank.ACE;
+        } else if (this.getSuit() == card.suit()) { //foundation not empty --> suit must fit
             // suit fits --> card must be successor of top card
-            return this.getCards().lastElement().getRank().isPredecessor(card.getRank());
+            return this.getCards().lastElement().rank().isPredecessor(card.rank());
         } else { // foundation not empty and suit does not fit --> cannot add card here
             return false;
         }

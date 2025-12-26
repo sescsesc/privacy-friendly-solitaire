@@ -14,10 +14,23 @@ This program is free software: you can redistribute it and/or modify
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import static org.secuso.privacyfriendlysolitaire.model.Color.BLACK;
+import static org.secuso.privacyfriendlysolitaire.model.Color.RED;
+
+import java.util.Collections;
+import java.util.EnumSet;
+import java.util.Set;
+
 /**
  * @author M. Fischer
  */
 
 public enum Suit {
-    CLUBS, DIAMONDS, HEARTS, SPADES
+    CLUBS, DIAMONDS, HEARTS, SPADES;
+
+    private static final Set<Suit> BLACK_SUITS = Collections.unmodifiableSet(EnumSet.of(CLUBS, SPADES));
+
+    public Color getColor() {
+        return BLACK_SUITS.contains(this) ? BLACK : RED;
+    }
 }

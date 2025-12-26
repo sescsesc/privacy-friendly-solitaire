@@ -1,4 +1,4 @@
-package org.secuso.privacyfriendlysolitaire.test;
+package org.secuso.privacyfriendlysolitaire.model;
 /*
 This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -14,26 +14,27 @@ This program is free software: you can redistribute it and/or modify
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.secuso.privacyfriendlysolitaire.game.Constants.MAX_NR_IN_DECK;
+import static org.secuso.privacyfriendlysolitaire.game.Constants.MODE_ONE_CARD_DEALT;
+import static org.secuso.privacyfriendlysolitaire.game.Constants.MODE_STANDARD;
+import static org.secuso.privacyfriendlysolitaire.game.Constants.MODE_THREE_CARDS_DEALT;
+import static org.secuso.privacyfriendlysolitaire.game.Constants.NR_CARDS;
+import static org.secuso.privacyfriendlysolitaire.game.Constants.NR_OF_FOUNDATIONS;
+import static org.secuso.privacyfriendlysolitaire.game.Constants.NR_OF_TABLEAUS;
+
 import org.junit.Test;
+import org.secuso.privacyfriendlysolitaire.game.SolitaireGame;
 import org.secuso.privacyfriendlysolitaire.generator.GeneratorSolitaireInstance;
 import org.secuso.privacyfriendlysolitaire.generator.GeneratorUtils;
-import org.secuso.privacyfriendlysolitaire.game.SolitaireGame;
-import org.secuso.privacyfriendlysolitaire.model.Card;
-import org.secuso.privacyfriendlysolitaire.model.DeckWaste;
-import org.secuso.privacyfriendlysolitaire.model.Foundation;
-import org.secuso.privacyfriendlysolitaire.model.Rank;
-import org.secuso.privacyfriendlysolitaire.model.Tableau;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Vector;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-import static org.secuso.privacyfriendlysolitaire.game.Constants.*;
 
 /**
  * @author I. Dix
@@ -46,18 +47,18 @@ public class GeneratorTest {
         HashSet<Card> allCards = GeneratorSolitaireInstance.generateAllCards();
 
         // check that there are 52 cards
-        assertEquals(allCards.size(), NR_CARDS);
+        assertEquals(NR_CARDS, allCards.size());
 
         // and not card is equal to another (meaning that we must have all 52 different cards)
         for (Card c : allCards) {
             int nrOfEquals = 0;
             for (Card anotherCard : allCards) {
-                if (c.getSuit() == anotherCard.getSuit() &&
-                        c.getRank() == anotherCard.getRank()) {
+                if (c.suit() == anotherCard.suit() &&
+                        c.rank() == anotherCard.rank()) {
                     nrOfEquals++;
                 }
             }
-            assertEquals(nrOfEquals, 1);
+            assertEquals(1, nrOfEquals);
         }
     }
 
@@ -71,21 +72,21 @@ public class GeneratorTest {
 
             // assert all cards are in the deck and none in the waste
             DeckWaste d = instance.getDeckWaste();
-            assertEquals(d.getDeck().size(), MAX_NR_IN_DECK);
-            assertEquals(d.getWaste().size(), 0);
+            assertEquals(MAX_NR_IN_DECK, d.getDeck().size());
+            assertEquals(0, d.getWaste().size());
             allCards.addAll(d.getDeck());
 
             // assert all foundations are empty
             for (int i = 0; i < NR_OF_FOUNDATIONS; i++) {
                 Foundation f = instance.getFoundationAtPos(i);
-                assertEquals(f.getCards().size(), 0);
+                assertEquals(0, f.getCards().size());
                 assertNull(f.getSuit());
             }
 
             // assert all tableaus have the correct number of cards face-up and face-down
             for (int i = 0; i < NR_OF_TABLEAUS; i++) {
                 Tableau t = instance.getTableauAtPos(i);
-                assertEquals(t.getFaceUp().size(), 1);
+                assertEquals(1, t.getFaceUp().size());
                 assertEquals(t.getFaceDown().size(), i);    // for 0th row are no face-down, for 1st 1, ...
             }
         }
@@ -144,9 +145,9 @@ public class GeneratorTest {
 
             for (Card currentCard : allCards) {
                 // get new card same as card in set, because sets don't like concurrent changes :P
-                Card c = new Card(currentCard.getRank(), currentCard.getSuit());
+                Card c = new Card(currentCard.rank(), currentCard.suit());
 
-                if (c.getRank() == Rank.ACE) {
+                if (c.rank() == Rank.ACE) {
                     unplayableCards.add(c);
                 } else {
                     boolean playable = true;
@@ -158,9 +159,9 @@ public class GeneratorTest {
                         // and the color is reverse
                         Card otherCard = playableCards.get(i);
 
-                        if ((c.getRank().isPredecessor(otherCard.getRank()) ||
-                                c.getRank().isSuccessor(otherCard.getRank())) &&
-                                c.getColor() != otherCard.getColor()) {
+                        if ((c.rank().isPredecessor(otherCard.rank()) ||
+                                c.rank().isSuccessor(otherCard.rank())) &&
+                                c.suit().getColor() != otherCard.suit().getColor()) {
                             unplayableCards.add(c);
                             // set playable false so card will not be added to playable-list as well
                             playable = false;

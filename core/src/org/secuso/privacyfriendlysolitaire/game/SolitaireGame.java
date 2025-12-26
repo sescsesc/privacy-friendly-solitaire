@@ -489,17 +489,7 @@ public class SolitaireGame {
      * @return true if the game is won
      */
     boolean isWon() {
-        boolean allKings = true;
-        for (Foundation f : foundations) {
-            if (!f.isEmpty()) {
-                if (f.getFoundationTop().getRank() != Rank.KING) {
-                    allKings = false;
-                }
-            } else {
-                allKings = false;
-            }
-        }
-        return allKings;
+        return foundations.stream().allMatch(f -> !f.isEmpty() && f.getFoundationTop().rank() == Rank.KING);
     }
 
     /**
