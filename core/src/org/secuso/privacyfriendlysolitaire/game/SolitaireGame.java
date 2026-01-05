@@ -412,11 +412,11 @@ public class SolitaireGame {
         //get card to be moved from the foundation
         if (!this.getFoundationAtPos(prevAction.getStackIndex()).isEmpty()) {
             Vector<Card> toBeMoved = new Vector<Card>();
-            toBeMoved.add(this.getFoundationAtPos(prevAction.getStackIndex()).getFoundationTop());
+            toBeMoved.add(this.getFoundationAtPos(prevAction.getStackIndex()).getTopCard());
             //check if it can be added to the tableau
             if (this.getTableauAtPos(action.getStackIndex()).isAddingFaceUpVectorPossible(toBeMoved)) {
                 this.getTableauAtPos(action.getStackIndex()).addFaceUpVector(toBeMoved);
-                this.getFoundationAtPos(prevAction.getStackIndex()).removeFoundationTop();
+                this.getFoundationAtPos(prevAction.getStackIndex()).removeTopCard();
                 return true;
             }
         }
@@ -489,7 +489,7 @@ public class SolitaireGame {
      * @return true if the game is won
      */
     boolean isWon() {
-        return foundations.stream().allMatch(f -> !f.isEmpty() && f.getFoundationTop().rank() == Rank.KING);
+        return foundations.stream().allMatch(f -> !f.isEmpty() && f.getTopCard().rank() == Rank.KING);
     }
 
     /**
@@ -660,7 +660,7 @@ public class SolitaireGame {
             sourceT.undoturnOver();
             turnedOverTableau--;
         }
-        sourceT.addFaceUp(targetF.removeFoundationTop());
+        sourceT.addFaceUp(targetF.removeTopCard());
     }
 
     /**
@@ -670,7 +670,7 @@ public class SolitaireGame {
      */
     private void undoFoundationWaste(Move toUndo) {
         Foundation targetF = getFoundationAtPos(toUndo.getAction2().getStackIndex());
-        deckAndWaste.getWaste().add(targetF.removeFoundationTop());
+        deckAndWaste.getWaste().add(targetF.removeTopCard());
         deckAndWaste.setFanSize(toUndo.getOldfanSize());
     }
 

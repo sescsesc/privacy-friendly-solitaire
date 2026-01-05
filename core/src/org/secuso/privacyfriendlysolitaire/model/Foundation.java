@@ -14,7 +14,8 @@ This program is free software: you can redistribute it and/or modify
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.util.Vector;
+import java.util.Comparator;
+import java.util.TreeSet;
 
 /**
  * @author M. Fischer
@@ -23,100 +24,85 @@ import java.util.Vector;
 public class Foundation {
 
     /**
-     * the Suit of this Foundation
-     */
-    private Suit suit;
-    /**
      * the cards in this Foundation
      */
-    private Vector<Card> cards;
+    private final TreeSet<Card> cards = new TreeSet<>(Comparator.comparing(Card::rank));
 
-    /**
-     * Constructs a new Foundation that contains no cards and has a null suit
-     */
-    public Foundation() {
-        this.suit = null;
-        this.cards = new Vector<Card>(13);
-    }
 
     /**
      * @return the Suit of the Foundation
      */
     public Suit getSuit() {
-        return suit;
+        return cards.isEmpty() ? null : cards.first().suit();
     }
 
     /**
-     * @return the Vector of Cards in this Foundation
+     * @return the Cards in this Foundation
      */
-    public Vector<Card> getCards() {
+    public TreeSet<Card> getCards() {
         return cards;
     }
 
     public boolean isEmpty() {
-        return this.cards.isEmpty();
-    }
-
-    /**
-     * @param card the Card that should be added to this Foundation
-     * @return true if the card could be added to the Foundation, false if suit did not fit or card is not the successor of the top card of the Foundation
-     */
-    public boolean addCard(Card card) {
-        if (this.getSuit() == null && this.getCards().isEmpty()) { //foundation empty --> only ace can be added, this defines the suit of the foundation
-            if (card.rank() == Rank.ACE) {
-                this.getCards().add(card);
-                this.suit = card.suit();
-                return true;
-            } else {
-                return false;
-            }
-        } else if (this.getSuit() == card.suit()) { //foundation not empty --> suit must fit
-            if (this.getCards().lastElement().rank().isPredecessor(card.rank())) { // suit fits --> card must be successor of top card
-                this.getCards().add(card);
-                return true;
-            } else {
-                return false;
-            }
-        } else { // foundation not empty and suit does not fit --> cannot add card here
-            return false;
-        }
+        return cards.isEmpty();
     }
 
     /**
      * @param card the card that will be checked in regard to adding
      * @return true if adding the card would be possible
      */
-    public boolean canAddCard(Card card) {
-        if (this.getSuit() == null && this.getCards().isEmpty()) { //foundation empty --> only ace can be added, this defines the suit of the foundation
-            return card.rank() == Rank.ACE;
-        } else if (this.getSuit() == card.suit()) { //foundation not empty --> suit must fit
-            // suit fits --> card must be successor of top card
-            return this.getCards().lastElement().rank().isPredecessor(card.rank());
-        } else { // foundation not empty and suit does not fit --> cannot add card here
+    public boolean canAddCard(final Card card) {
+        if (card == null) {
             return false;
         }
+
+        if (cards.isEmpty()) {
+            //foundation empty --> only ace can be added, this defines the suit of the foundation
+            return card.rank() == Rank.ACE;
+        } else if (cards.last().suit() == card.suit()) {
+            //foundation not empty --> suit must fit --> suit fits --> card must be successor of top card
+            return cards.last().rank().isPredecessor(card.rank());
+        }
+
+        // foundation not empty and suit does not fit --> cannot add card here
+        return false;
+    }
+
+    /**
+     * @param card the Card that should be added to this Foundation
+     * @return true if the card could be added to the Foundation, false if suit did not fit or card is not the successor of the top card of the Foundation
+     */
+    public boolean addCard(final Card card) {
+        if (canAddCard(card)) {
+            cards.add(card);
+            return true;
+        }
+
+        return false;
     }
 
     /**
      * @return the Card on top of this foundation
      */
-    public Card getFoundationTop() {
-        return this.cards.lastElement();
+    public Card getTopCard() {
+        return cards.isEmpty() ? null : cards.last();
     }
 
     /**
      * @return the card that was removed from the top of this foundation
      */
-    public Card removeFoundationTop() {
-        if (this.cards.size() == 1) {
-            this.suit = null;
+    public Card removeTopCard() {
+        if (cards.isEmpty()) {
+            return null;
         }
-        return this.cards.remove(this.cards.size() - 1);
+
+        final Card last = cards.last();
+        cards.remove(last);
+        return last;
     }
 
-
+    @Override
     public String toString() {
         return cards.toString();
     }
-
 }

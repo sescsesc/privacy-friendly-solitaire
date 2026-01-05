@@ -79,7 +79,7 @@ public class GeneratorTest {
             // assert all foundations are empty
             for (int i = 0; i < NR_OF_FOUNDATIONS; i++) {
                 Foundation f = instance.getFoundationAtPos(i);
-                assertEquals(0, f.getCards().size());
+                assertTrue(f.isEmpty());
                 assertNull(f.getSuit());
             }
 
