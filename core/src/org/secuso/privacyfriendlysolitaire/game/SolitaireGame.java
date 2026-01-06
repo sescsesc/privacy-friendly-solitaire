@@ -14,13 +14,17 @@ This program is free software: you can redistribute it and/or modify
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import static org.secuso.privacyfriendlysolitaire.model.Location.DECK;
+import static org.secuso.privacyfriendlysolitaire.model.Location.FOUNDATION;
+import static org.secuso.privacyfriendlysolitaire.model.Location.TABLEAU;
+import static org.secuso.privacyfriendlysolitaire.model.Location.WASTE;
+
 import org.secuso.privacyfriendlysolitaire.CallBackListener;
 import org.secuso.privacyfriendlysolitaire.GameListener;
 import org.secuso.privacyfriendlysolitaire.model.Action;
 import org.secuso.privacyfriendlysolitaire.model.Card;
 import org.secuso.privacyfriendlysolitaire.model.DeckWaste;
 import org.secuso.privacyfriendlysolitaire.model.Foundation;
-import org.secuso.privacyfriendlysolitaire.model.Location;
 import org.secuso.privacyfriendlysolitaire.model.Move;
 import org.secuso.privacyfriendlysolitaire.model.Rank;
 import org.secuso.privacyfriendlysolitaire.model.Tableau;
@@ -163,16 +167,12 @@ public class SolitaireGame {
      */
     boolean handleAction(Action action, boolean redoMove) {
         if (action != null) {
-            switch (action.getLocation()) {
-                case DECK:
-                    return handleDeck(action, redoMove);
-                case WASTE:
-                    return handleWaste(action);
-                case TABLEAU:
-                    return handleTableau(action, redoMove);
-                case FOUNDATION:
-                    return handleFoundation(action, redoMove);
-            }
+            return switch (action.getLocation()) {
+                case DECK -> handleDeck(action, redoMove);
+                case WASTE -> handleWaste(action);
+                case TABLEAU -> handleTableau(action, redoMove);
+                case FOUNDATION -> handleFoundation(action, redoMove);
+            };
         }
         failMove();
         return false;
@@ -220,24 +220,24 @@ public class SolitaireGame {
      * @return true if the action was valid and succesfully handled
      */
     private boolean handleTableau(Action action, boolean redoMove) {
-        if (this.prevAction == null) {
+        if (prevAction == null) {
             if (action.getCardIndex() != -1) {
                 saveAction(action);
                 notifyListeners();
                 return true;
             }
-        } else if (this.prevAction.getLocation() == Location.TABLEAU) {
+        } else if (prevAction.getLocation() == TABLEAU) {
             if (handleTableauToTableau(action)) {
                 makeMove(action, redoMove);
                 return true;
             }
-        } else if (this.prevAction.getLocation() == Location.WASTE) {
+        } else if (prevAction.getLocation() == WASTE) {
             int oldFanSize = deckAndWaste.getFanSize();
             if (handleWasteToTableau(action)) {
                 makeMove(action, redoMove, oldFanSize, deckAndWaste.getFanSize());
                 return true;
             }
-        } else if (this.prevAction.getLocation() == Location.FOUNDATION) {
+        } else if (prevAction.getLocation() == FOUNDATION) {
             if (handleFoundationToTableau(action)) {
                 makeMove(action, redoMove);
                 return true;
@@ -252,19 +252,19 @@ public class SolitaireGame {
      * @return true if the action was valid and succesfully handled
      */
     private boolean handleFoundation(Action action, boolean redoMove) {
-        if (this.prevAction == null) {
+        if (prevAction == null) {
             if (!foundations.get(action.getStackIndex()).isEmpty()) {
                 saveAction(action);
                 notifyListeners();
                 return true;
             }
             return false;
-        } else if (this.prevAction.getLocation() == Location.TABLEAU) {
+        } else if (prevAction.getLocation() == TABLEAU) {
             if (handleTableauToFoundation(action)) {
                 makeMove(action, redoMove);
                 return true;
             }
-        } else if (this.prevAction.getLocation() == Location.WASTE) {
+        } else if (prevAction.getLocation() == WASTE) {
             int oldFanSize = deckAndWaste.getFanSize();
             if (handleWasteToFoundation(action)) {
                 makeMove(action, redoMove, oldFanSize, deckAndWaste.getFanSize());
@@ -294,7 +294,7 @@ public class SolitaireGame {
     private void makeMove(Action action, boolean redoMove) {
         lastMoveturnedOverTableau = false;
         //if source of move was a tableau, try to turn over this tableau
-        if (prevAction.getLocation() == Location.TABLEAU) {
+        if (prevAction.getLocation() == TABLEAU) {
             if (getTableauAtPos(prevAction.getStackIndex()).turnover()) {
                 turnedOverTableau++;
                 lastMoveturnedOverTableau = true;
@@ -323,7 +323,7 @@ public class SolitaireGame {
     private void makeMove(Action action, boolean redoMove, int oldFanSize, int newFanSize) {
         lastMoveturnedOverTableau = false;
         //if source of move was a tableau, try to turn over this tableau
-        if (prevAction.getLocation() == Location.TABLEAU) {
+        if (prevAction.getLocation() == TABLEAU) {
             if (getTableauAtPos(prevAction.getStackIndex()).turnover()) {
                 turnedOverTableau++;
                 lastMoveturnedOverTableau = true;
@@ -550,11 +550,11 @@ public class SolitaireGame {
     void undo() {
         if (canUndo()) {
             Move toUndo = moves.elementAt(movePointer);
-            if (toUndo.getAction1().getLocation() == Location.DECK) {
+            if (toUndo.getAction1().getLocation() == DECK) {
                 undoDeck(toUndo);
-            } else if (toUndo.getAction2().getLocation() == Location.TABLEAU) {
+            } else if (toUndo.getAction2().getLocation() == TABLEAU) {
                 undoTableau(toUndo);
-            } else if (toUndo.getAction2().getLocation() == Location.FOUNDATION) {
+            } else if (toUndo.getAction2().getLocation() == FOUNDATION) {
                 undoFoundation(toUndo);
             }
             movePointer--;
@@ -641,9 +641,9 @@ public class SolitaireGame {
      * @param toUndo the move to be reversed
      */
     private void undoFoundation(Move toUndo) {
-        if (toUndo.getAction1().getLocation() == Location.TABLEAU) {
+        if (toUndo.getAction1().getLocation() == TABLEAU) {
             undoFoundationTableau(toUndo);
-        } else if (toUndo.getAction1().getLocation() == Location.WASTE) {
+        } else if (toUndo.getAction1().getLocation() == WASTE) {
             undoFoundationWaste(toUndo);
         }
     }
@@ -683,7 +683,7 @@ public class SolitaireGame {
         if (canRedo()) {
             Move toRedo = moves.elementAt(movePointer + 1);
             handleAction(toRedo.getAction1(), true);
-            if (toRedo.getAction1().getLocation() != Location.DECK) {
+            if (toRedo.getAction1().getLocation() != DECK) {
                 handleAction(toRedo.getAction2(), true);
             }
         }

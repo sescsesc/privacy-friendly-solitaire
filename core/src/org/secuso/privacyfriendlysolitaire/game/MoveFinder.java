@@ -14,10 +14,14 @@ This program is free software: you can redistribute it and/or modify
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import static org.secuso.privacyfriendlysolitaire.model.Location.DECK;
+import static org.secuso.privacyfriendlysolitaire.model.Location.FOUNDATION;
+import static org.secuso.privacyfriendlysolitaire.model.Location.TABLEAU;
+import static org.secuso.privacyfriendlysolitaire.model.Location.WASTE;
+
 import org.secuso.privacyfriendlysolitaire.CallBackListener;
 import org.secuso.privacyfriendlysolitaire.model.Action;
 import org.secuso.privacyfriendlysolitaire.model.Card;
-import org.secuso.privacyfriendlysolitaire.model.Location;
 import org.secuso.privacyfriendlysolitaire.model.Move;
 import org.secuso.privacyfriendlysolitaire.model.Tableau;
 
@@ -105,16 +109,13 @@ class MoveFinder {
                     //check if reversal of previous move
                     if (!game.getMoves().isEmpty()) {
                         Move prevMove = game.getMoves().get(game.getMovePointer());
-                        if (prevMove.getAction1().getLocation() == Location.FOUNDATION &&
-                                prevMove.getAction2().getLocation() == Location.TABLEAU &&
-                                prevMove.getAction1().getStackIndex() == f &&
-                                prevMove.getAction2().getStackIndex() == t) {
+                        if (prevMove.getAction1().getLocation() == FOUNDATION && prevMove.getAction2().getLocation() == TABLEAU && prevMove.getAction1().getStackIndex() == f && prevMove.getAction2().getStackIndex() == t) {
                             continue;
                         }
                     }
                     int tableauCardIndex = game.getTableauAtPos(t).getFaceUpCardsSize() - 1;
-                    Action sourceAction = new Action(Location.TABLEAU, t, tableauCardIndex);
-                    Action targetAction = new Action(Location.FOUNDATION, f, 0);
+                    Action sourceAction = new Action(TABLEAU, t, tableauCardIndex);
+                    Action targetAction = new Action(FOUNDATION, f, 0);
                     return new Move(sourceAction, targetAction);
                 }
             }
@@ -147,16 +148,12 @@ class MoveFinder {
                     //check if reversal of previous move
                     if (!game.getMoves().isEmpty()) {
                         Move prevMove = game.getMoves().get(game.getMovePointer());
-                        if (prevMove.getAction1().getLocation() == Location.TABLEAU &&
-                                prevMove.getAction2().getLocation() == Location.TABLEAU &&
-                                prevMove.getAction1().getStackIndex() == targetT &&
-                                prevMove.getAction2().getStackIndex() == sourceT &&
-                                !game.isLastMoveturnedOverTableau()) {
+                        if (prevMove.getAction1().getLocation() == TABLEAU && prevMove.getAction2().getLocation() == TABLEAU && prevMove.getAction1().getStackIndex() == targetT && prevMove.getAction2().getStackIndex() == sourceT && !game.isLastMoveturnedOverTableau()) {
                             continue;
                         }
                     }
-                    Action sourceAction = new Action(Location.TABLEAU, sourceT, sourceCardIndex);
-                    Action targetAction = new Action(Location.TABLEAU, targetT, 0);
+                    Action sourceAction = new Action(TABLEAU, sourceT, sourceCardIndex);
+                    Action targetAction = new Action(TABLEAU, targetT, 0);
                     return new Move(sourceAction, targetAction);
                 }
 //                }
@@ -177,13 +174,13 @@ class MoveFinder {
                 Tableau targetTab = game.getTableauAtPos(t);
 
                 if (targetTab.isAddToFaceUpCardsPossible(toBeMoved)) {
-                    Action sourceAction = new Action(Location.WASTE, 0, 0);
+                    Action sourceAction = new Action(WASTE, 0, 0);
                     Action targetAction;
                     int nrOfFaceUpInTarget = targetTab.getFaceUpCardsSize();
                     if (nrOfFaceUpInTarget == 0) {
-                        targetAction = new Action(Location.TABLEAU, t, -1);
+                        targetAction = new Action(TABLEAU, t, -1);
                     } else {
-                        targetAction = new Action(Location.TABLEAU, t, nrOfFaceUpInTarget - 1);
+                        targetAction = new Action(TABLEAU, t, nrOfFaceUpInTarget - 1);
                     }
                     return new Move(sourceAction, targetAction);
                 }
@@ -201,8 +198,8 @@ class MoveFinder {
             Card toBeMoved = game.getDeckWaste().getWasteTop();
             for (int f = 0; f < game.getFoundations().size(); f++) {
                 if (game.getFoundationAtPos(f).canAddCard(toBeMoved)) {
-                    Action sourceAction = new Action(Location.WASTE, 0, 0);
-                    Action targetAction = new Action(Location.FOUNDATION, f, 0);
+                    Action sourceAction = new Action(WASTE, 0, 0);
+                    Action targetAction = new Action(FOUNDATION, f, 0);
                     return new Move(sourceAction, targetAction);
                 }
             }
@@ -246,7 +243,7 @@ class MoveFinder {
      */
     private static Move findMoveDeck(SolitaireGame game) {
         Move foundMove = null;
-        Action action = new Action(Location.DECK, 0, 0);
+        Action action = new Action(DECK, 0, 0);
         if (game.getDeckWaste().canTurnover()) {
             foundMove = new Move(action, null);
         } else if (game.getDeckWaste().canReset()) {

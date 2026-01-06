@@ -14,14 +14,15 @@ This program is free software: you can redistribute it and/or modify
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import org.secuso.privacyfriendlysolitaire.model.Location;
+import static org.secuso.privacyfriendlysolitaire.model.Location.FOUNDATION;
+
 import org.secuso.privacyfriendlysolitaire.model.Move;
 
 /**
  * @author M. Fischer
- *         <p>
- *         The vegas scorer starts with -52 points and only adds 5 on moves to the foundation
- *         and -5 on moves from the foundation
+ * <p>
+ * The vegas scorer starts with -52 points and only adds 5 on moves to the foundation
+ * and -5 on moves from the foundation
  */
 
 class VegasScorer extends Scorer {
@@ -36,11 +37,11 @@ class VegasScorer extends Scorer {
             setScore(-52);
             for (int i = 0; i < game.getMovePointer() + 1; i++) {
                 Move m = game.getMoves().get(i);
-                if (m.getAction1().getLocation() == Location.FOUNDATION) {
+                if (m.getAction1().getLocation() == FOUNDATION) {
                     addScore(-5);
                 }
                 if (m.getAction2() != null) {
-                    if (m.getAction2().getLocation() == Location.FOUNDATION) {
+                    if (m.getAction2().getLocation() == FOUNDATION) {
                         addScore(5);
                     }
                 }

@@ -14,12 +14,14 @@ This program is free software: you can redistribute it and/or modify
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import static org.secuso.privacyfriendlysolitaire.model.Location.DECK;
+import static org.secuso.privacyfriendlysolitaire.model.Location.TABLEAU;
+
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.input.GestureDetector;
 import com.badlogic.gdx.math.Vector2;
 
 import org.secuso.privacyfriendlysolitaire.model.Action;
-import org.secuso.privacyfriendlysolitaire.model.Location;
 import org.secuso.privacyfriendlysolitaire.model.Tableau;
 
 /**
@@ -62,8 +64,7 @@ class Controller implements GestureDetector.GestureListener {
 
         Action actionForClick = view.getActionForTap(x, y);
 
-        if (actionForClick != null && actionForClick.getLocation() != null &&
-                actionForClick.getLocation().equals(Location.TABLEAU)) {
+        if (actionForClick != null && TABLEAU == actionForClick.getLocation()) {
             int index = actionForClick.getStackIndex();
             Tableau tableau = game.getTableauAtPos(index);
             int cardIndex = actionForClick.getCardIndex();
@@ -79,9 +80,9 @@ class Controller implements GestureDetector.GestureListener {
                 } else {
                     // View can not distinguish between just one card on the stack and no card
                     if (tableau.isEmpty()) {
-                        actionForClick = new Action(Location.TABLEAU, index, -1);
+                        actionForClick = new Action(TABLEAU, index, -1);
                     } else {
-                        actionForClick = new Action(Location.TABLEAU, index, cardIndexInFaceUp);
+                        actionForClick = new Action(TABLEAU, index, cardIndexInFaceUp);
                     }
                 }
             }
@@ -93,7 +94,7 @@ class Controller implements GestureDetector.GestureListener {
         // by hand, if he wants to see its content, but if he is 'asking the game for help' by
         // invoking the MoveFinder and only gets deck-moves the game is definitely lost
         if (actionForClick != null) {
-            if (actionForClick.getLocation() != Location.DECK) {
+            if (DECK != actionForClick.getLocation()) {
                 MoveFinder.resetNrOfMovesThroughDeck();
             }
         }
