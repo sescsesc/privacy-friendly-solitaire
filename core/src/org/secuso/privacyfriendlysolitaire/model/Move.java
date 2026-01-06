@@ -24,7 +24,7 @@ This program is free software: you can redistribute it and/or modify
 public class Move {
     private Action action1;
     private Action action2;
-    private boolean turnOver = false;
+    private boolean turnover = false;
     private int oldfanSize = -1;
     private int newFanSize = -1;
 
@@ -33,10 +33,10 @@ public class Move {
         this.action2 = action2;
     }
 
-    public Move(Action action1, Action action2, boolean turnOver) {
+    public Move(Action action1, Action action2, boolean turnover) {
         this.action1 = action1;
         this.action2 = action2;
-        this.turnOver = turnOver;
+        this.turnover = turnover;
     }
 
     public Action getAction1() {
@@ -47,8 +47,8 @@ public class Move {
         return action2;
     }
 
-    public boolean isTurnOver() {
-        return turnOver;
+    public boolean isTurnover() {
+        return turnover;
     }
 
     public int getOldfanSize() {
@@ -72,7 +72,7 @@ public class Move {
         return "Move{" +
                 "action1=" + action1 +
                 ", action2=" + action2 +
-                ", turnOver=" + turnOver +
+                ", turnover=" + turnover +
                 ", oldfanSize=" + oldfanSize +
                 ", newFanSize=" + newFanSize +
                 '}';

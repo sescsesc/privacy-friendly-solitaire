@@ -14,6 +14,7 @@ This program is free software: you can redistribute it and/or modify
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import java.util.Objects;
 import java.util.Vector;
 
 /**
@@ -24,50 +25,35 @@ public class DeckWaste {
     /**
      * the vector of cards representing the deck
      */
-    private Vector<Card> deck;
+    private final Vector<Card> deck;
 
     /**
      * the vector of cards representing the waste
      */
-    private Vector<Card> waste;
+    private final Vector<Card> waste;
 
     /**
      * the number of cards that is turned over simultaneously
      */
-    private int numTurnOver;
+    private final int numTurnOver;
 
     /**
      * true if vegas variant is played
      */
-    private boolean vegas;
-
-
-    public void setFanSize(int fanSize) {
-        this.fanSize = fanSize;
-    }
+    private final boolean vegas;
 
     /**
      * the number of cards currently fanned out on the waste
      */
-    private int fanSize = 0;
+    private int fanSize;
 
 
-    /**
-     * @param numTurnOver the number of cards that is turned over simultaneously
-     */
-    public DeckWaste(int numTurnOver) {
-        this.deck = new Vector<Card>();
-        this.waste = new Vector<Card>();
-        this.numTurnOver = numTurnOver;
-    }
-
-    /**
-     */
-    public DeckWaste(int numTurnOver, boolean vegas) {
-        this.deck = new Vector<Card>();
-        this.waste = new Vector<Card>();
+    public DeckWaste(final Vector<Card> deck, final Vector<Card> waste, final int numTurnOver, final boolean vegas, final int fanSize) {
+        this.deck = deck;
+        this.waste = waste;
         this.numTurnOver = numTurnOver;
         this.vegas = vegas;
+        this.fanSize = fanSize;
     }
 
     /**
@@ -78,24 +64,10 @@ public class DeckWaste {
     }
 
     /**
-     * @param deck the vector of cards representing the deck
-     */
-    public void setDeck(Vector<Card> deck) {
-        this.deck = deck;
-    }
-
-    /**
      * @return the vector of cards representing the waste
      */
     public Vector<Card> getWaste() {
         return waste;
-    }
-
-    /**
-     * @param waste the vector of cards representing the waste
-     */
-    public void setWaste(Vector<Card> waste) {
-        this.waste = waste;
     }
 
     public int getNumTurnOver() {
@@ -104,6 +76,10 @@ public class DeckWaste {
 
     public int getFanSize() {
         return fanSize;
+    }
+
+    public void setFanSize(int fanSize) {
+        this.fanSize = fanSize;
     }
 
     public int getSizeOfDeckAndWaste() {
@@ -115,26 +91,28 @@ public class DeckWaste {
      *
      * @return true if cards could be turned over from deck to waste
      */
-    public boolean turnOver() {
-        if (this.canTurnOver()) {
-            int newfanSize = 0;
-            for (int i = 0; i < this.numTurnOver; ++i) {
-                if (this.deck.isEmpty()) {
-                    break;
-                }
-                this.waste.add(this.deck.remove(this.deck.size() - 1));
-                newfanSize++;
-            }
-            this.fanSize = newfanSize;
-            return true;
-        } else {
+    public boolean turnover() {
+        if (!canTurnover()) {
             return false;
         }
+
+        int newfanSize = 0;
+        for (int i = 0; i < numTurnOver; ++i) {
+            if (deck.isEmpty()) {
+                break;
+            }
+            final Card lastCardFromDeck = deck.remove(deck.size() - 1);
+            waste.add(lastCardFromDeck);
+            newfanSize++;
+        }
+        this.fanSize = newfanSize;
+        return true;
     }
 
-    public void undoTurnOver(int oldFanSize) {
+    public void undoTurnover(final int oldFanSize) {
         for (int i = 0; i < fanSize; i++) {
-            deck.add(waste.remove(waste.size() - 1));
+            final Card lastCardFromWaste = waste.remove(waste.size() - 1);
+            deck.add(lastCardFromWaste);
         }
         setFanSize(oldFanSize);
     }
@@ -143,7 +121,7 @@ public class DeckWaste {
      * @return true if the waste is empty
      */
     public boolean isWasteEmpty() {
-        return this.waste.isEmpty();
+        return waste.isEmpty();
     }
 
     /**
@@ -151,8 +129,8 @@ public class DeckWaste {
      *
      * @return true if cards could be turned over from deck to waste
      */
-    public boolean canTurnOver() {
-        return !this.deck.isEmpty();
+    public boolean canTurnover() {
+        return !deck.isEmpty();
     }
 
     /**
@@ -162,15 +140,16 @@ public class DeckWaste {
      * @return true if the deck was succesfully reset from the waste
      */
     public boolean reset() {
-        if (this.deck.isEmpty() && !vegas) {
-            while (!this.waste.isEmpty()) {
-                this.deck.add(this.waste.remove(this.waste.size() - 1));
+        if (deck.isEmpty() && !vegas) {
+            while (!waste.isEmpty()) {
+                final Card lastCardFromWaste = waste.remove(waste.size() - 1);
+                deck.add(lastCardFromWaste);
             }
             fanSize = 0;
             return true;
-        } else {
-            return false;
         }
+
+        return false;
     }
 
     /**
@@ -179,13 +158,13 @@ public class DeckWaste {
      * @return true if the deck is empty and waste is not empty
      */
     public boolean canReset() {
-        return this.deck.isEmpty() && !this.waste.isEmpty();
+        return deck.isEmpty() && !waste.isEmpty();
     }
 
     public void undoReset(int origFansize) {
         if (isWasteEmpty() && !deck.isEmpty()) {
-            while (canTurnOver()) {
-                turnOver();
+            while (canTurnover()) {
+                turnover();
             }
             setFanSize(origFansize);
         }
@@ -195,7 +174,7 @@ public class DeckWaste {
      * @return the card on top of the waste
      */
     public Card getWasteTop() {
-        return this.waste.lastElement();
+        return waste.lastElement();
     }
 
     /**
@@ -207,12 +186,24 @@ public class DeckWaste {
         if (fanSize > 0) {
             fanSize--;
         }
-        return this.waste.remove(this.waste.size() - 1);
+        return waste.remove(waste.size() - 1);
     }
 
+    @Override
+    public boolean equals(final Object o) {
+        if (!(o instanceof DeckWaste deckWaste)) {
+            return false;
+        }
+        return numTurnOver == deckWaste.numTurnOver && vegas == deckWaste.vegas && fanSize == deckWaste.fanSize && Objects.equals(deck, deckWaste.deck) && Objects.equals(waste, deckWaste.waste);
+    }
 
+    @Override
+    public int hashCode() {
+        return Objects.hash(deck, waste, numTurnOver, vegas, fanSize);
+    }
+
+    @Override
     public String toString() {
         return "Deck: " + deck.toString() + ";\nWaste: " + waste.toString();
     }
-
 }

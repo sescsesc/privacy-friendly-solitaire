@@ -46,22 +46,20 @@ public class DeckWasteTest {
         for (final Rank r : values()) {
             clubs.add(new Card(r, CLUBS));
         }
-        deckwaste1 = new DeckWaste(1);
-        deckwaste1.setDeck(clubs);
-        deckwaste3 = new DeckWaste(3);
-        deckwaste3.setDeck(clubs);
+        deckwaste1 = new DeckWaste(clubs, new Vector<>(), 1, false, 0);
+        deckwaste3 = new DeckWaste(clubs, new Vector<>(), 3, false, 0);
     }
 
     @Test
-    public void turnOverAndResetTests() {
+    public void turnoverAndResetTests() {
         assertFalse("deckwaste1 should not be resetable now", deckwaste1.canReset());
         assertFalse("deckwaste1 should not be resetable now", deckwaste1.reset());
-        assertTrue("deckwaste1 should allow turn over now", deckwaste1.canTurnOver());
+        assertTrue("deckwaste1 should allow turn over now", deckwaste1.canTurnover());
         for (int i = 0; i < 13; ++i) {
-            assertTrue("turning over on deckwaste1 should be possible 13 times", deckwaste1.turnOver());
+            assertTrue("turning over on deckwaste1 should be possible 13 times", deckwaste1.turnover());
         }
-        assertFalse("deck of deckwaste1 should now be empty", deckwaste1.canTurnOver());
-        assertFalse("deck of deckwaste1 should now be empty", deckwaste1.turnOver());
+        assertFalse("deck of deckwaste1 should now be empty", deckwaste1.canTurnover());
+        assertFalse("deck of deckwaste1 should now be empty", deckwaste1.turnover());
         for (int j = 0; j < clubs.size(); ++j) {
             assertSame("waste of deckwaste1 should be clubs in reverse order", clubs.get(j).rank(), deckwaste1.getWaste().get(deckwaste1.getWaste().size() - 1 - j).rank());
         }
@@ -73,12 +71,12 @@ public class DeckWasteTest {
 
         assertFalse("deckwaste3 should not be resetable now", deckwaste3.canReset());
         assertFalse("deckwaste3 should not be resetable now", deckwaste3.reset());
-        assertTrue("deckwaste3 should allow turn over now", deckwaste3.canTurnOver());
+        assertTrue("deckwaste3 should allow turn over now", deckwaste3.canTurnover());
         for (int i = 0; i < 5; ++i) {
-            assertTrue("turning over on deckwaste1 should be possible 5 times", deckwaste3.turnOver());
+            assertTrue("turning over on deckwaste1 should be possible 5 times", deckwaste3.turnover());
         }
-        assertFalse("deck of deckwaste3 should now be empty", deckwaste3.canTurnOver());
-        assertFalse("deck of deckwaste3 should now be empty", deckwaste3.turnOver());
+        assertFalse("deck of deckwaste3 should now be empty", deckwaste3.canTurnover());
+        assertFalse("deck of deckwaste3 should now be empty", deckwaste3.turnover());
         for (int j = 0; j < clubs.size(); ++j) {
             assertSame("waste of deckwaste3 should be clubs in reverse order", clubs.get(j).rank(), deckwaste3.getWaste().get(deckwaste3.getWaste().size() - 1 - j).rank());
         }
@@ -91,7 +89,8 @@ public class DeckWasteTest {
 
     @Test
     public void wasteTopTests() {
-        deckwaste1.setWaste(clubs);
+        deckwaste1 = new DeckWaste(clubs, clubs, 1, false, 0);
+
         assertSame("Rank of top card of waste should be KING", KING, deckwaste1.getWasteTop().rank());
         assertSame("Rank of top card of waste should be KING", KING, deckwaste1.removeWasteTop().rank());
         assertSame("Rank of top card of waste should now be QUEEN", QUEEN, deckwaste1.getWasteTop().rank());

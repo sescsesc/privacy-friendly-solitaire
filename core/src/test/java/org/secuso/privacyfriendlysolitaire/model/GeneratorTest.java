@@ -86,8 +86,8 @@ public class GeneratorTest {
             // assert all tableaus have the correct number of cards face-up and face-down
             for (int i = 0; i < NR_OF_TABLEAUS; i++) {
                 Tableau t = instance.getTableauAtPos(i);
-                assertEquals(1, t.getFaceUp().size());
-                assertEquals(t.getFaceDown().size(), i);    // for 0th row are no face-down, for 1st 1, ...
+                assertEquals(1, t.getFaceUpCardsSize());
+                assertEquals(t.getFaceDownCardsSize(), i);    // for 0th row are no face-down, for 1st 1, ...
             }
         }
     }

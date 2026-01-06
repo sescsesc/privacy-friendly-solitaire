@@ -14,7 +14,7 @@ This program is free software: you can redistribute it and/or modify
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import org.secuso.privacyfriendlysolitaire.model.GameObject;
+import org.secuso.privacyfriendlysolitaire.model.Location;
 import org.secuso.privacyfriendlysolitaire.model.Move;
 
 /**
@@ -36,11 +36,11 @@ class VegasScorer extends Scorer {
             setScore(-52);
             for (int i = 0; i < game.getMovePointer() + 1; i++) {
                 Move m = game.getMoves().get(i);
-                if (m.getAction1().getGameObject() == GameObject.FOUNDATION) {
+                if (m.getAction1().getLocation() == Location.FOUNDATION) {
                     addScore(-5);
                 }
                 if (m.getAction2() != null) {
-                    if (m.getAction2().getGameObject() == GameObject.FOUNDATION) {
+                    if (m.getAction2().getLocation() == Location.FOUNDATION) {
                         addScore(5);
                     }
                 }

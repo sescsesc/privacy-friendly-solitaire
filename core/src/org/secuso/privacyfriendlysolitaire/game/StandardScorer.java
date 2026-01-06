@@ -14,7 +14,7 @@ This program is free software: you can redistribute it and/or modify
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import org.secuso.privacyfriendlysolitaire.model.GameObject;
+import org.secuso.privacyfriendlysolitaire.model.Location;
 import org.secuso.privacyfriendlysolitaire.model.Move;
 
 /**
@@ -42,23 +42,23 @@ class StandardScorer extends Scorer {
             setScore(0);
             for (int i = 0; i < game.getMovePointer() + 1; i++) {
                 Move m = game.getMoves().get(i);
-                if (m.getAction1().getGameObject() == GameObject.WASTE) {
-                    if (m.getAction2().getGameObject() == GameObject.TABLEAU) {
+                if (m.getAction1().getLocation() == Location.WASTE) {
+                    if (m.getAction2().getLocation() == Location.TABLEAU) {
                         addScore(5);
-                    } else if (m.getAction2().getGameObject() == GameObject.FOUNDATION) {
+                    } else if (m.getAction2().getLocation() == Location.FOUNDATION) {
                         addScore(10);
                     }
-                } else if (m.getAction1().getGameObject() == GameObject.TABLEAU) {
-                    if (m.getAction2().getGameObject() == GameObject.FOUNDATION) {
+                } else if (m.getAction1().getLocation() == Location.TABLEAU) {
+                    if (m.getAction2().getLocation() == Location.FOUNDATION) {
                         addScore(10);
                     }
-                } else if (m.getAction1().getGameObject() == GameObject.FOUNDATION) {
-                    if (m.getAction2().getGameObject() == GameObject.TABLEAU) {
+                } else if (m.getAction1().getLocation() == Location.FOUNDATION) {
+                    if (m.getAction2().getLocation() == Location.TABLEAU) {
                         addScore(-15);
                     }
                 } else if (game.getDeckWaste().getNumTurnOver() == 1) {
                     if (m.getAction2() != null) {
-                        if (m.getAction1().getGameObject() == GameObject.DECK && m.getAction2().getGameObject() == GameObject.DECK) {
+                        if (m.getAction1().getLocation() == Location.DECK && m.getAction2().getLocation() == Location.DECK) {
                             addScore(-100);
 
                         }

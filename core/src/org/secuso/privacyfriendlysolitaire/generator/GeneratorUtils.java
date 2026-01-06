@@ -13,6 +13,10 @@ This program is free software: you can redistribute it and/or modify
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
+import static org.secuso.privacyfriendlysolitaire.game.Constants.NR_OF_FOUNDATIONS;
+import static org.secuso.privacyfriendlysolitaire.game.Constants.NR_OF_TABLEAUS;
+
 import org.secuso.privacyfriendlysolitaire.game.SolitaireGame;
 import org.secuso.privacyfriendlysolitaire.model.Card;
 import org.secuso.privacyfriendlysolitaire.model.DeckWaste;
@@ -22,9 +26,6 @@ import org.secuso.privacyfriendlysolitaire.model.Tableau;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Vector;
-
-import static org.secuso.privacyfriendlysolitaire.game.Constants.NR_OF_FOUNDATIONS;
-import static org.secuso.privacyfriendlysolitaire.game.Constants.NR_OF_TABLEAUS;
 
 /**
  * @author I. Dix
@@ -87,36 +88,30 @@ public class GeneratorUtils {
      * @return an instance generated from the given lists
      */
     static SolitaireGame constructInstanceFromCardLists(int cardDrawMode, boolean scoreIsVegas,
-                                                               Vector<Card> deck,
-                                                               HashMap<Integer, Vector<Card>> tableaus,
-                                                               HashMap<Integer, Vector<Card>> foundations) {
-        DeckWaste d = new DeckWaste(cardDrawMode, scoreIsVegas);
-        d.setDeck(deck);
+                                                        Vector<Card> deck,
+                                                        HashMap<Integer, Vector<Card>> tableaus,
+                                                        HashMap<Integer, Vector<Card>> foundations) {
+        final DeckWaste d = new DeckWaste(deck, new Vector<>(), cardDrawMode, scoreIsVegas, 0);
 
-        ArrayList<Tableau> tableauList = new ArrayList<Tableau>(NR_OF_TABLEAUS);
+        ArrayList<Tableau> tableauList = new ArrayList<>(NR_OF_TABLEAUS);
         for (int i = 0; i < NR_OF_TABLEAUS; i++) {
             Vector<Card> t = tableaus.get(i);
-            Tableau tableau = new Tableau();
 
-            try {
-                // add last card (with highest index) as face up
-                tableau.addFaceUp(t.lastElement());
+            // add last card (with highest index) as face up
+            final Card lastCard = t.lastElement();
 
-                // remove this card from the interim-list and add the rest as face down
-                t.removeElement(t.lastElement());
-                if (!t.isEmpty()) {
-                    tableau.setFaceDown(t);
-                }
-            } catch (Exception e){
-                e.printStackTrace();
-            }
+            // remove this card from the interim-list and add the rest as face down
+            t.removeElement(lastCard);
+
+            final Vector<Card> lastCardVector = new Vector<>();
+            lastCardVector.add(lastCard);
 
             // add to list
-            tableauList.add(tableau);
+            tableauList.add(new Tableau(t, lastCardVector));
         }
 
 
-        ArrayList<Foundation> foundationList = new ArrayList<Foundation>(NR_OF_FOUNDATIONS);
+        ArrayList<Foundation> foundationList = new ArrayList<>(NR_OF_FOUNDATIONS);
         for (int i = 0; i < NR_OF_FOUNDATIONS; i++) {
             Vector<Card> f = foundations.get(i);
             Foundation foundation = new Foundation();

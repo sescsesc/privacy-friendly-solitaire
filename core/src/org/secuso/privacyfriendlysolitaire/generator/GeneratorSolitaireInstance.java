@@ -137,7 +137,7 @@ public class GeneratorSolitaireInstance {
 
         // check for all playable cards in tableaus
         for (int i = 0; i < NR_OF_TABLEAUS; i++) {
-            Card c = instance.getTableauAtPos(i).getFaceUp().lastElement();
+            Card c = instance.getTableauAtPos(i).faceUp().lastElement();
 
             // whether they are an ace
             if (c.rank() == Rank.ACE) {
@@ -179,7 +179,7 @@ public class GeneratorSolitaireInstance {
         Vector<Card> testingVector = new Vector<Card>(1);
         testingVector.add(c);
 
-        if (t.isAddingFaceUpVectorPossible(testingVector)) {
+        if (t.isAddToFaceUpCardsPossible(testingVector)) {
             return 1;
         }
         return 0;

@@ -20,6 +20,6 @@ This program is free software: you can redistribute it and/or modify
  * enumeration of all the objects in the game
  */
 
-public enum GameObject {
+public enum Location {
     DECK, WASTE, TABLEAU, FOUNDATION
 }
