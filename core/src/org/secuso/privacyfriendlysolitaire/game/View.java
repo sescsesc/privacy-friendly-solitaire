@@ -14,6 +14,8 @@ This program is free software: you can redistribute it and/or modify
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import static org.secuso.privacyfriendlysolitaire.game.Constants.NR_OF_FOUNDATIONS;
+import static org.secuso.privacyfriendlysolitaire.game.Constants.NR_OF_TABLEAUS;
 import static org.secuso.privacyfriendlysolitaire.model.Location.DECK;
 import static org.secuso.privacyfriendlysolitaire.model.Location.FOUNDATION;
 import static org.secuso.privacyfriendlysolitaire.model.Location.TABLEAU;
@@ -69,8 +71,8 @@ public class View implements GameListener {
     private boolean dragStartResult = false;
     private Vector<Actor> originalActors = new Vector<Actor>();
 
-    private final HashMap<String, ImageWrapper> faceUpCards = new HashMap<String, ImageWrapper>(52);
-    private final List<ImageWrapper> faceDownCards = new ArrayList<ImageWrapper>(21);
+    private final HashMap<String, ImageWrapper> faceUpCards = new HashMap<>(52);
+    private final List<ImageWrapper> faceDownCards = new ArrayList<>(21);
     // describes the y at which the given tableau is positioned at the smallest
     private final HashMap<Integer, Float> smallestYForTableau = new HashMap<Integer, Float>(7);
 
@@ -134,7 +136,7 @@ public class View implements GameListener {
     }
 
     private void paintInitialFoundations(ArrayList<Foundation> foundations) {
-        for (int i = 0; i < 4; i++) {
+        for (int i = 0; i < NR_OF_FOUNDATIONS; i++) {
             // paint empty spaces
             ImageWrapper emptySpace = loader.getEmptySpaceImageWithoutLogo();
             setImageScalingAndPositionAndStackCardIndicesAndAddToStage(emptySpace, null, ViewConstants.TableauFoundationX[i], ViewConstants.WasteDeckFoundationY, -1, -1);
@@ -150,7 +152,7 @@ public class View implements GameListener {
     }
 
     private void paintInitialTableaus(ArrayList<Tableau> tableaus) {
-        for (int i = 0; i < Constants.NR_OF_TABLEAUS; i++) {
+        for (int i = 0; i < NR_OF_TABLEAUS; i++) {
             Tableau t = tableaus.get(i);
 
             float x = ViewConstants.TableauFoundationX[i];

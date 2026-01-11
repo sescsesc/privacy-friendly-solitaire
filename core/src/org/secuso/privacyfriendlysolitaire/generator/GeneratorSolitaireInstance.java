@@ -1,10 +1,9 @@
 package org.secuso.privacyfriendlysolitaire.generator;
 
-import static org.secuso.privacyfriendlysolitaire.game.CardDrawMode.ONE;
 import static org.secuso.privacyfriendlysolitaire.game.Constants.MAX_NR_IN_DECK;
-import static org.secuso.privacyfriendlysolitaire.game.Constants.NR_OF_FOUNDATIONS;
 import static org.secuso.privacyfriendlysolitaire.game.Constants.NR_OF_TABLEAUS;
-import static org.secuso.privacyfriendlysolitaire.game.ScoreMode.STANDARD;
+import static org.secuso.privacyfriendlysolitaire.model.Rank.ACE;
+import static org.secuso.privacyfriendlysolitaire.model.Rank.values;
 
 import org.secuso.privacyfriendlysolitaire.game.CardDrawMode;
 import org.secuso.privacyfriendlysolitaire.game.ScoreMode;
@@ -19,7 +18,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.Vector;
 /*
 This program is free software: you can redistribute it and/or modify
@@ -47,16 +45,13 @@ This program is free software: you can redistribute it and/or modify
 public class GeneratorSolitaireInstance {
 
     public static SolitaireGame buildPlayableSolitaireInstance(final CardDrawMode cardDrawMode, final ScoreMode scoreMode) {
-        SolitaireGame instance = generateInstance(cardDrawMode, scoreMode);
-
-        // check for playability
-        boolean playable = false;
-        while (!playable) {
-            instance = generateInstance(cardDrawMode, scoreMode);
-            playable = isInstancePlayable(instance, cardDrawMode);
+        while (true) {
+            final SolitaireGame instance = generateInstance(cardDrawMode, scoreMode);
+            // check for playability
+            if (isInstancePlayable(instance, cardDrawMode)) {
+                return instance;
+            }
         }
-
-        return instance;
     }
 
 
@@ -64,38 +59,30 @@ public class GeneratorSolitaireInstance {
      * @return a random solitaire instance
      */
     public static SolitaireGame generateInstance(final CardDrawMode cardDrawMode, final ScoreMode scoreMode) {
-        Set<Card> allCards = generateAllCards();
-
         // bring generated cards into random order
-        List<Card> scrambledCardList = new ArrayList<Card>();
-        for (Card c : allCards) {
-            scrambledCardList.add(c);
-        }
-
-        Collections.shuffle(scrambledCardList);
+        final List<Card> allCardsInRandomOrder = new ArrayList<>(generateAllCards());
+        Collections.shuffle(allCardsInRandomOrder);
 
         // generate data container to store the deck and tableaus
-        Vector<Card> deck = new Vector<Card>(24);
-        HashMap<Integer, Vector<Card>> tableaus = new HashMap<Integer, Vector<Card>>(7);
+        final Vector<Card> deck = new Vector<>(MAX_NR_IN_DECK);
+        final HashMap<Integer, Vector<Card>> tableaus = new HashMap<>(NR_OF_TABLEAUS);
         for (int i = 0; i < NR_OF_TABLEAUS; i++) {
-            int j = i + 1;
-            tableaus.put(i, new Vector<Card>(j));
+            tableaus.put(i, new Vector<>(i + 1));
         }
 
         // 28 cards in tableaus, 24 in deck
-        for (int i = 0; i < scrambledCardList.size(); i++) {
-            Card c = scrambledCardList.get(i);
+        for (int cardIndex = 0; cardIndex < allCardsInRandomOrder.size(); cardIndex++) {
+            final Card card = allCardsInRandomOrder.get(cardIndex);
 
-            // fill tableaus
-            if (i < 28) {
-                int indexOfTableau = GeneratorUtils.mapIndexToTableau(i);
-                Vector<Card> currentTableau = tableaus.get(indexOfTableau);
-                currentTableau.add(c);
+            if (cardIndex < 28) {
+                // fill tableaus
+                final int indexOfTableau = GeneratorUtils.mapIndexToTableau(cardIndex);
+                final Vector<Card> currentTableau = tableaus.get(indexOfTableau);
+                currentTableau.add(card);
                 tableaus.put(indexOfTableau, currentTableau);
-            }
-            // fill deck
-            else {
-                deck.add(c);
+            } else {
+                // fill deck
+                deck.add(card);
             }
         }
 
@@ -106,10 +93,10 @@ public class GeneratorSolitaireInstance {
      * @return a hash-map of all cards (should be 52)
      */
     public static HashSet<Card> generateAllCards() {
-        HashSet<Card> allCards = new HashSet<Card>();
+        HashSet<Card> allCards = new HashSet<>();
 
         for (Suit suit : Suit.values()) {
-            for (Rank rank : Rank.values()) {
+            for (Rank rank : values()) {
                 allCards.add(new Card(rank, suit));
             }
         }
@@ -131,93 +118,55 @@ public class GeneratorSolitaireInstance {
      * @param instance the instance to be checked
      * @return whether it is playable, meaning that at least one of the conditions given above is false
      */
-    public static boolean isInstancePlayable(SolitaireGame instance, final CardDrawMode cardDrawMode) {
-        int nrOfAces = 0;
-        int nrOfPossibleMoves = 0;
-
+    public static boolean isInstancePlayable(final SolitaireGame instance, final CardDrawMode cardDrawMode) {
         // check for all playable cards in tableaus
         for (int i = 0; i < NR_OF_TABLEAUS; i++) {
-            Card c = instance.getTableauAtPos(i).faceUp().lastElement();
+            final Card c = instance.getTableauAtPos(i).faceUp().lastElement();
 
             // whether they are an ace
-            if (c.rank() == Rank.ACE) {
-                nrOfAces++;
+            if (c.rank() == ACE) {
+                return true;
             }
 
             // whether the upper card can be moved to any other tableau
             for (int j = 0; j < NR_OF_TABLEAUS; j++) {
                 if (i != j) {
-                    nrOfPossibleMoves += isMovingPossible(c, instance.getTableauAtPos(j));
+                    if (isMovingPossible(c, instance.getTableauAtPos(j))) {
+                        return true;
+                    }
                 }
             }
         }
 
+
         // check for all playable cards in deck
         for (int i = 0; i < MAX_NR_IN_DECK; i += cardDrawMode.getNumberOfCards()) {
-            Card c = instance.getDeckWaste().getDeck().get(i);
+            final Card c = instance.getDeckWaste().getDeck().get(i);
 
             // whether they are an ace
-            if (c.rank() == Rank.ACE) {
-                nrOfAces++;
+            if (c.rank() == ACE) {
+                return true;
             }
 
             // whether the upper card can be moved to any other tableau
             for (int j = 0; j < NR_OF_TABLEAUS; j++) {
-                nrOfPossibleMoves += isMovingPossible(c, instance.getTableauAtPos(j));
+                if (isMovingPossible(c, instance.getTableauAtPos(j))) {
+                    return true;
+                }
             }
         }
 
-        return !(nrOfAces == 0 && nrOfPossibleMoves == 0);
+        return false;
     }
 
     /**
-     * @param c the card
-     * @param t the tableau
+     * @param card    the card
+     * @param tableau the tableau
      * @return 1 if the card can be moved to this tableau, else 0
      */
-    private static int isMovingPossible(Card c, Tableau t) {
-        Vector<Card> testingVector = new Vector<Card>(1);
-        testingVector.add(c);
-
-        if (t.isAddToFaceUpCardsPossible(testingVector)) {
-            return 1;
-        }
-        return 0;
-    }
-
-
-    // for testing reasons
-    public static SolitaireGame buildAlmostWonSolitaireInstance() {
-        Vector<Card> deck = new Vector<Card>(2);
-        HashMap<Integer, Vector<Card>> tableaus = new HashMap<Integer, Vector<Card>>(NR_OF_TABLEAUS);
-        HashMap<Integer, Vector<Card>> foundations = new HashMap<Integer, Vector<Card>>(NR_OF_FOUNDATIONS);
-
-        // fill all cards into the foundation
-        int i = 0;
-        for (Suit suit : Suit.values()) {
-            Vector<Card> foundation = new Vector<Card>();
-            Vector<Card> tableau = new Vector<Card>();
-            for (Rank rank : Rank.values()) {
-                Card c = new Card(rank, suit);
-
-                if (rank != Rank.KING || suit != Suit.CLUBS) {
-                    foundation.add(c);
-                } else {
-                    // except for the 4 kings
-                    tableau.add(c);
-                }
-            }
-            foundations.put(i, foundation);
-            tableaus.put(i, tableau);
-            i++;
-        }
-
-        for (int j = 4; j < NR_OF_TABLEAUS; j++) {
-            Vector<Card> tableau = new Vector<Card>();
-            tableaus.put(j, tableau);
-        }
-
-        return GeneratorUtils.constructInstanceFromCardLists(ONE, STANDARD, deck,
-                tableaus, foundations);
+    private static boolean isMovingPossible(final Card card, final Tableau tableau) {
+        final Vector<Card> testingVector = new Vector<>(1);
+        testingVector.add(card);
+        return tableau.isAddToFaceUpCardsPossible(testingVector);
     }
 }
