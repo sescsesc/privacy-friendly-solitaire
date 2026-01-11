@@ -13,6 +13,12 @@ This program is free software: you can redistribute it and/or modify
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
+import static org.secuso.privacyfriendlysolitaire.game.Constants.NR_OF_FOUNDATIONS;
+import static org.secuso.privacyfriendlysolitaire.game.Constants.NR_OF_TABLEAUS;
+
+import org.secuso.privacyfriendlysolitaire.game.CardDrawMode;
+import org.secuso.privacyfriendlysolitaire.game.ScoreMode;
 import org.secuso.privacyfriendlysolitaire.game.SolitaireGame;
 import org.secuso.privacyfriendlysolitaire.model.Card;
 import org.secuso.privacyfriendlysolitaire.model.DeckWaste;
@@ -22,9 +28,6 @@ import org.secuso.privacyfriendlysolitaire.model.Tableau;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Vector;
-
-import static org.secuso.privacyfriendlysolitaire.game.Constants.NR_OF_FOUNDATIONS;
-import static org.secuso.privacyfriendlysolitaire.game.Constants.NR_OF_TABLEAUS;
 
 /**
  * @author I. Dix
@@ -40,8 +43,7 @@ public class GeneratorUtils {
      * @throws IllegalArgumentException if i>27, because this card should not be added into a tableau
      */
     public static int mapIndexToTableau(int i) {
-        int firstUpmost = 0, secondUpmost = 2, thirdUpmost = 5, fourthUpmost = 9,
-                fifthUpmost = 14, sixthUpmost = 20, seventhUpmost = 27;
+        int firstUpmost = 0, secondUpmost = 2, thirdUpmost = 5, fourthUpmost = 9, fifthUpmost = 14, sixthUpmost = 20, seventhUpmost = 27;
         if (i <= firstUpmost) {
             return 0;
         } else if (i <= secondUpmost) {
@@ -68,14 +70,13 @@ public class GeneratorUtils {
      * @param tableaus     a hashmap of int->Vector<Card> containing the tableaus
      * @return an instance generated from the given lists
      */
-    public static SolitaireGame constructInstanceFromCardLists(int cardDrawMode, boolean scoreIsVegas, Vector<Card> deck,
-                                                               HashMap<Integer, Vector<Card>> tableaus) {
-        HashMap<Integer, Vector<Card>> emptyFoundations = new HashMap<Integer, Vector<Card>>(NR_OF_FOUNDATIONS);
+    public static SolitaireGame constructInstanceFromCardLists(final CardDrawMode cardDrawMode, final ScoreMode scoreMode, Vector<Card> deck, HashMap<Integer, Vector<Card>> tableaus) {
+        HashMap<Integer, Vector<Card>> emptyFoundations = new HashMap<>(NR_OF_FOUNDATIONS);
         for (int i = 0; i < NR_OF_FOUNDATIONS; i++) {
-            emptyFoundations.put(i, new Vector<Card>());
+            emptyFoundations.put(i, new Vector<>());
         }
 
-        return constructInstanceFromCardLists(cardDrawMode, scoreIsVegas, deck, tableaus, emptyFoundations);
+        return constructInstanceFromCardLists(cardDrawMode, scoreMode, deck, tableaus, emptyFoundations);
     }
 
 
@@ -86,37 +87,28 @@ public class GeneratorUtils {
      * @param foundations  a hashmap of int->Vector<Card> containing the foundations
      * @return an instance generated from the given lists
      */
-    static SolitaireGame constructInstanceFromCardLists(int cardDrawMode, boolean scoreIsVegas,
-                                                               Vector<Card> deck,
-                                                               HashMap<Integer, Vector<Card>> tableaus,
-                                                               HashMap<Integer, Vector<Card>> foundations) {
-        DeckWaste d = new DeckWaste(cardDrawMode, scoreIsVegas);
-        d.setDeck(deck);
+    static SolitaireGame constructInstanceFromCardLists(final CardDrawMode cardDrawMode, final ScoreMode scoreMode, Vector<Card> deck, HashMap<Integer, Vector<Card>> tableaus, HashMap<Integer, Vector<Card>> foundations) {
+        final DeckWaste d = new DeckWaste(deck, new Vector<>(), cardDrawMode, scoreMode, 0);
 
-        ArrayList<Tableau> tableauList = new ArrayList<Tableau>(NR_OF_TABLEAUS);
+        ArrayList<Tableau> tableauList = new ArrayList<>(NR_OF_TABLEAUS);
         for (int i = 0; i < NR_OF_TABLEAUS; i++) {
             Vector<Card> t = tableaus.get(i);
-            Tableau tableau = new Tableau();
 
-            try {
-                // add last card (with highest index) as face up
-                tableau.addFaceUp(t.lastElement());
+            // add last card (with highest index) as face up
+            final Card lastCard = t.lastElement();
 
-                // remove this card from the interim-list and add the rest as face down
-                t.removeElement(t.lastElement());
-                if (!t.isEmpty()) {
-                    tableau.setFaceDown(t);
-                }
-            } catch (Exception e){
-                e.printStackTrace();
-            }
+            // remove this card from the interim-list and add the rest as face down
+            t.removeElement(lastCard);
+
+            final Vector<Card> lastCardVector = new Vector<>();
+            lastCardVector.add(lastCard);
 
             // add to list
-            tableauList.add(tableau);
+            tableauList.add(new Tableau(t, lastCardVector));
         }
 
 
-        ArrayList<Foundation> foundationList = new ArrayList<Foundation>(NR_OF_FOUNDATIONS);
+        ArrayList<Foundation> foundationList = new ArrayList<>(NR_OF_FOUNDATIONS);
         for (int i = 0; i < NR_OF_FOUNDATIONS; i++) {
             Vector<Card> f = foundations.get(i);
             Foundation foundation = new Foundation();

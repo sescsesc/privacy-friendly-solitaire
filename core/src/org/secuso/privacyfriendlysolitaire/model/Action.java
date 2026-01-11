@@ -14,6 +14,8 @@ This program is free software: you can redistribute it and/or modify
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import java.util.Objects;
+
 /**
  * @author M. Fischer
  * <p>
@@ -22,22 +24,22 @@ This program is free software: you can redistribute it and/or modify
 
 public class Action {
 
-    private GameObject gameObject;
-    private int stackIndex;
+    private final Location location;
+    private final int stackIndex;
     private int cardIndex;
 
-    public Action(GameObject gameObject, int stackIndex, int cardIndex) {
-        this.gameObject = gameObject;
+    public Action(final Location location, final int stackIndex, final int cardIndex) {
+        this.location = location;
         this.stackIndex = stackIndex;
         this.cardIndex = cardIndex;
     }
 
-    public int getStackIndex() {
-        return stackIndex;
+    public Location getLocation() {
+        return location;
     }
 
-    public GameObject getGameObject() {
-        return gameObject;
+    public int getStackIndex() {
+        return stackIndex;
     }
 
     public int getCardIndex() {
@@ -48,8 +50,21 @@ public class Action {
         this.cardIndex = cardIndex;
     }
 
-    public String toString() {
-        return gameObject + ", stack: " + stackIndex + ", card: " + cardIndex;
+    @Override
+    public boolean equals(final Object o) {
+        if (!(o instanceof Action action)) {
+            return false;
+        }
+        return stackIndex == action.stackIndex && cardIndex == action.cardIndex && location == action.location;
     }
 
+    @Override
+    public int hashCode() {
+        return Objects.hash(location, stackIndex, cardIndex);
+    }
+
+    @Override
+    public String toString() {
+        return location + ", stack: " + stackIndex + ", card: " + cardIndex;
+    }
 }

@@ -14,13 +14,18 @@ This program is free software: you can redistribute it and/or modify
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import static org.secuso.privacyfriendlysolitaire.game.CardDrawMode.ONE;
+import static org.secuso.privacyfriendlysolitaire.model.Location.DECK;
+import static org.secuso.privacyfriendlysolitaire.model.Location.FOUNDATION;
+import static org.secuso.privacyfriendlysolitaire.model.Location.TABLEAU;
+import static org.secuso.privacyfriendlysolitaire.model.Location.WASTE;
+
 import org.secuso.privacyfriendlysolitaire.CallBackListener;
 import org.secuso.privacyfriendlysolitaire.GameListener;
 import org.secuso.privacyfriendlysolitaire.model.Action;
 import org.secuso.privacyfriendlysolitaire.model.Card;
 import org.secuso.privacyfriendlysolitaire.model.DeckWaste;
 import org.secuso.privacyfriendlysolitaire.model.Foundation;
-import org.secuso.privacyfriendlysolitaire.model.GameObject;
 import org.secuso.privacyfriendlysolitaire.model.Move;
 import org.secuso.privacyfriendlysolitaire.model.Rank;
 import org.secuso.privacyfriendlysolitaire.model.Tableau;
@@ -30,9 +35,9 @@ import java.util.Vector;
 
 /**
  * @author M. Fischer
- *         <p>
- *         represents the solitaire game
- *         (its current state and all actions to invoke in order to do an action)
+ * <p>
+ * represents the solitaire game
+ * (its current state and all actions to invoke in order to do an action)
  */
 
 public class SolitaireGame {
@@ -163,16 +168,12 @@ public class SolitaireGame {
      */
     boolean handleAction(Action action, boolean redoMove) {
         if (action != null) {
-            switch (action.getGameObject()) {
-                case DECK:
-                    return handleDeck(action, redoMove);
-                case WASTE:
-                    return handleWaste(action);
-                case TABLEAU:
-                    return handleTableau(action, redoMove);
-                case FOUNDATION:
-                    return handleFoundation(action, redoMove);
-            }
+            return switch (action.getLocation()) {
+                case DECK -> handleDeck(action, redoMove);
+                case WASTE -> handleWaste(action);
+                case TABLEAU -> handleTableau(action, redoMove);
+                case FOUNDATION -> handleFoundation(action, redoMove);
+            };
         }
         failMove();
         return false;
@@ -185,9 +186,9 @@ public class SolitaireGame {
     private boolean handleDeck(Action action, boolean redoMove) {
         this.saveAction(action);
         int oldFanSize = deckAndWaste.getFanSize();
-        if (this.deckAndWaste.canTurnOver()) {
+        if (this.deckAndWaste.canTurnover()) {
             int prevWasteSize = deckAndWaste.getWaste().size();
-            if (this.deckAndWaste.turnOver()) {
+            if (this.deckAndWaste.turnover()) {
                 int newFanSize = deckAndWaste.getWaste().size() - prevWasteSize;
                 makeMove(null, redoMove, oldFanSize, newFanSize);
                 return true;
@@ -220,24 +221,24 @@ public class SolitaireGame {
      * @return true if the action was valid and succesfully handled
      */
     private boolean handleTableau(Action action, boolean redoMove) {
-        if (this.prevAction == null) {
+        if (prevAction == null) {
             if (action.getCardIndex() != -1) {
                 saveAction(action);
                 notifyListeners();
                 return true;
             }
-        } else if (this.prevAction.getGameObject() == GameObject.TABLEAU) {
+        } else if (prevAction.getLocation() == TABLEAU) {
             if (handleTableauToTableau(action)) {
                 makeMove(action, redoMove);
                 return true;
             }
-        } else if (this.prevAction.getGameObject() == GameObject.WASTE) {
+        } else if (prevAction.getLocation() == WASTE) {
             int oldFanSize = deckAndWaste.getFanSize();
             if (handleWasteToTableau(action)) {
                 makeMove(action, redoMove, oldFanSize, deckAndWaste.getFanSize());
                 return true;
             }
-        } else if (this.prevAction.getGameObject() == GameObject.FOUNDATION) {
+        } else if (prevAction.getLocation() == FOUNDATION) {
             if (handleFoundationToTableau(action)) {
                 makeMove(action, redoMove);
                 return true;
@@ -252,19 +253,19 @@ public class SolitaireGame {
      * @return true if the action was valid and succesfully handled
      */
     private boolean handleFoundation(Action action, boolean redoMove) {
-        if (this.prevAction == null) {
+        if (prevAction == null) {
             if (!foundations.get(action.getStackIndex()).isEmpty()) {
                 saveAction(action);
                 notifyListeners();
                 return true;
             }
             return false;
-        } else if (this.prevAction.getGameObject() == GameObject.TABLEAU) {
+        } else if (prevAction.getLocation() == TABLEAU) {
             if (handleTableauToFoundation(action)) {
                 makeMove(action, redoMove);
                 return true;
             }
-        } else if (this.prevAction.getGameObject() == GameObject.WASTE) {
+        } else if (prevAction.getLocation() == WASTE) {
             int oldFanSize = deckAndWaste.getFanSize();
             if (handleWasteToFoundation(action)) {
                 makeMove(action, redoMove, oldFanSize, deckAndWaste.getFanSize());
@@ -294,15 +295,15 @@ public class SolitaireGame {
     private void makeMove(Action action, boolean redoMove) {
         lastMoveturnedOverTableau = false;
         //if source of move was a tableau, try to turn over this tableau
-        if (prevAction.getGameObject() == GameObject.TABLEAU) {
-            if (getTableauAtPos(prevAction.getStackIndex()).turnOver()) {
+        if (prevAction.getLocation() == TABLEAU) {
+            if (getTableauAtPos(prevAction.getStackIndex()).turnover()) {
                 turnedOverTableau++;
                 lastMoveturnedOverTableau = true;
             }
         }
         if (!redoMove) {
             cleanUpMoves();
-            this.moves.add(new Move(prevAction, action, lastMoveturnedOverTableau));
+            this.moves.add(new Move(prevAction, action, lastMoveturnedOverTableau, -1, -1));
         }
         movePointer++;
         this.prevAction = null;
@@ -323,17 +324,15 @@ public class SolitaireGame {
     private void makeMove(Action action, boolean redoMove, int oldFanSize, int newFanSize) {
         lastMoveturnedOverTableau = false;
         //if source of move was a tableau, try to turn over this tableau
-        if (prevAction.getGameObject() == GameObject.TABLEAU) {
-            if (getTableauAtPos(prevAction.getStackIndex()).turnOver()) {
+        if (prevAction.getLocation() == TABLEAU) {
+            if (getTableauAtPos(prevAction.getStackIndex()).turnover()) {
                 turnedOverTableau++;
                 lastMoveturnedOverTableau = true;
             }
         }
         if (!redoMove) {
             cleanUpMoves();
-            this.moves.add(new Move(prevAction, action, lastMoveturnedOverTableau));
-            moves.lastElement().setOldfanSize(oldFanSize);
-            moves.lastElement().setNewFanSize(newFanSize);
+            this.moves.add(new Move(prevAction, action, lastMoveturnedOverTableau, oldFanSize, newFanSize));
         }
         movePointer++;
         this.prevAction = null;
@@ -375,9 +374,9 @@ public class SolitaireGame {
             //get cards from source tableau
             Vector<Card> toBeMoved = this.getTableauAtPos(prevAction.getStackIndex()).getCopyFaceUpVector(prevAction.getCardIndex());
             //check if they can be added to the target tableau
-            if (this.getTableauAtPos(action.getStackIndex()).isAddingFaceUpVectorPossible(toBeMoved)) {
-                action.setCardIndex(getTableauAtPos(action.getStackIndex()).getFaceUp().size());
-                this.getTableauAtPos(action.getStackIndex()).addFaceUpVector(this.getTableauAtPos(prevAction.getStackIndex()).removeFaceUpVector(prevAction.getCardIndex()));
+            if (this.getTableauAtPos(action.getStackIndex()).isAddToFaceUpCardsPossible(toBeMoved)) {
+                action.setCardIndex(getTableauAtPos(action.getStackIndex()).getFaceUpCardsSize());
+                this.getTableauAtPos(action.getStackIndex()).addToFaceUpCards(this.getTableauAtPos(prevAction.getStackIndex()).removeFromFaceUpCards(prevAction.getCardIndex()));
                 return true;
             }
         }
@@ -395,8 +394,8 @@ public class SolitaireGame {
             Vector<Card> toBeMoved = new Vector<Card>();
             toBeMoved.add(deckAndWaste.getWasteTop());
             //check if it can be added to the tableau
-            if (this.getTableauAtPos(action.getStackIndex()).isAddingFaceUpVectorPossible(toBeMoved)) {
-                this.getTableauAtPos(action.getStackIndex()).addFaceUpVector(toBeMoved);
+            if (this.getTableauAtPos(action.getStackIndex()).isAddToFaceUpCardsPossible(toBeMoved)) {
+                this.getTableauAtPos(action.getStackIndex()).addToFaceUpCards(toBeMoved);
                 this.deckAndWaste.removeWasteTop();
                 return true;
             }
@@ -414,8 +413,8 @@ public class SolitaireGame {
             Vector<Card> toBeMoved = new Vector<Card>();
             toBeMoved.add(this.getFoundationAtPos(prevAction.getStackIndex()).getTopCard());
             //check if it can be added to the tableau
-            if (this.getTableauAtPos(action.getStackIndex()).isAddingFaceUpVectorPossible(toBeMoved)) {
-                this.getTableauAtPos(action.getStackIndex()).addFaceUpVector(toBeMoved);
+            if (this.getTableauAtPos(action.getStackIndex()).isAddToFaceUpCardsPossible(toBeMoved)) {
+                this.getTableauAtPos(action.getStackIndex()).addToFaceUpCards(toBeMoved);
                 this.getFoundationAtPos(prevAction.getStackIndex()).removeTopCard();
                 return true;
             }
@@ -433,7 +432,7 @@ public class SolitaireGame {
         if (toBeMoved.size() == 1) {
             if (this.getFoundationAtPos(action.getStackIndex()).canAddCard(toBeMoved.firstElement())) {
                 this.getFoundationAtPos(action.getStackIndex()).addCard(toBeMoved.firstElement());
-                this.getTableauAtPos(prevAction.getStackIndex()).removeFaceUpVector(prevAction.getCardIndex());
+                this.getTableauAtPos(prevAction.getStackIndex()).removeFromFaceUpCards(prevAction.getCardIndex());
                 return true;
             }
         }
@@ -496,11 +495,11 @@ public class SolitaireGame {
      * @return true if the game is practically won
      */
     boolean isPracticallyWon() {
-        boolean practicallyWon = deckAndWaste != null && (deckAndWaste.getNumTurnOver() == 1);
+        boolean practicallyWon = deckAndWaste != null && deckAndWaste.getCardDrawMode() == ONE;
 
         for (Tableau tab : tableaus) {
             if (practicallyWon) {
-                practicallyWon = tab.getFaceDown().isEmpty();
+                practicallyWon = tab.isFaceDownEmpty();
             } else {
                 break;
             }
@@ -550,11 +549,11 @@ public class SolitaireGame {
     void undo() {
         if (canUndo()) {
             Move toUndo = moves.elementAt(movePointer);
-            if (toUndo.getAction1().getGameObject() == GameObject.DECK) {
+            if (toUndo.sourceAction().getLocation() == DECK) {
                 undoDeck(toUndo);
-            } else if (toUndo.getAction2().getGameObject() == GameObject.TABLEAU) {
+            } else if (toUndo.targetAction().getLocation() == TABLEAU) {
                 undoTableau(toUndo);
-            } else if (toUndo.getAction2().getGameObject() == GameObject.FOUNDATION) {
+            } else if (toUndo.targetAction().getLocation() == FOUNDATION) {
                 undoFoundation(toUndo);
             }
             movePointer--;
@@ -572,10 +571,10 @@ public class SolitaireGame {
      * @param toUndo the move to be undone
      */
     private void undoDeck(Move toUndo) {
-        if (toUndo.getAction2() != null) {
-            deckAndWaste.undoReset(toUndo.getOldfanSize());
+        if (toUndo.targetAction() != null) {
+            deckAndWaste.undoReset(toUndo.oldFanSize());
         } else {
-            deckAndWaste.undoTurnOver(toUndo.getOldfanSize());
+            deckAndWaste.undoTurnover(toUndo.oldFanSize());
         }
     }
 
@@ -585,7 +584,7 @@ public class SolitaireGame {
      * @param toUndo the move to be reversed
      */
     private void undoTableau(Move toUndo) {
-        switch (toUndo.getAction1().getGameObject()) {
+        switch (toUndo.sourceAction().getLocation()) {
             case TABLEAU:
                 undoTableauTableau(toUndo);
                 break;
@@ -604,13 +603,13 @@ public class SolitaireGame {
      * @param toUndo the move to be reversed
      */
     private void undoTableauTableau(Move toUndo) {
-        Tableau sourceT = getTableauAtPos(toUndo.getAction1().getStackIndex());
-        Tableau targetT = getTableauAtPos(toUndo.getAction2().getStackIndex());
-        if (toUndo.isTurnOver()) {
-            sourceT.undoturnOver();
+        Tableau sourceT = getTableauAtPos(toUndo.sourceAction().getStackIndex());
+        Tableau targetT = getTableauAtPos(toUndo.targetAction().getStackIndex());
+        if (toUndo.turnover()) {
+            sourceT.undoTurnover();
             turnedOverTableau--;
         }
-        sourceT.addFaceUpVector(targetT.removeFaceUpVector(toUndo.getAction2().getCardIndex()));
+        sourceT.addToFaceUpCards(targetT.removeFromFaceUpCards(toUndo.targetAction().getCardIndex()));
     }
 
     /**
@@ -619,9 +618,9 @@ public class SolitaireGame {
      * @param toUndo the move to be reversed
      */
     private void undoTableauWaste(Move toUndo) {
-        Tableau targetT = getTableauAtPos(toUndo.getAction2().getStackIndex());
-        deckAndWaste.getWaste().add(targetT.removeFaceUpVector(targetT.getFaceUp().size() - 1).firstElement());
-        deckAndWaste.setFanSize(toUndo.getOldfanSize());
+        Tableau targetT = getTableauAtPos(toUndo.targetAction().getStackIndex());
+        deckAndWaste.getWaste().add(targetT.removeFromFaceUpCards(targetT.getFaceUpCardsSize() - 1).firstElement());
+        deckAndWaste.setFanSize(toUndo.oldFanSize());
     }
 
     /**
@@ -630,9 +629,9 @@ public class SolitaireGame {
      * @param toUndo the move to be reversed
      */
     private void undoTableauFoundation(Move toUndo) {
-        Tableau targetT = getTableauAtPos(toUndo.getAction2().getStackIndex());
-        Foundation sourceF = getFoundationAtPos(toUndo.getAction1().getStackIndex());
-        sourceF.addCard(targetT.removeFaceUpVector(targetT.getFaceUp().size() - 1).lastElement());
+        Tableau targetT = getTableauAtPos(toUndo.targetAction().getStackIndex());
+        Foundation sourceF = getFoundationAtPos(toUndo.sourceAction().getStackIndex());
+        sourceF.addCard(targetT.removeFromFaceUpCards(targetT.getFaceUpCardsSize() - 1).lastElement());
     }
 
     /**
@@ -641,9 +640,9 @@ public class SolitaireGame {
      * @param toUndo the move to be reversed
      */
     private void undoFoundation(Move toUndo) {
-        if (toUndo.getAction1().getGameObject() == GameObject.TABLEAU) {
+        if (toUndo.sourceAction().getLocation() == TABLEAU) {
             undoFoundationTableau(toUndo);
-        } else if (toUndo.getAction1().getGameObject() == GameObject.WASTE) {
+        } else if (toUndo.sourceAction().getLocation() == WASTE) {
             undoFoundationWaste(toUndo);
         }
     }
@@ -654,13 +653,15 @@ public class SolitaireGame {
      * @param toUndo the move to be reversed
      */
     private void undoFoundationTableau(Move toUndo) {
-        Foundation targetF = getFoundationAtPos(toUndo.getAction2().getStackIndex());
-        Tableau sourceT = getTableauAtPos(toUndo.getAction1().getStackIndex());
-        if (toUndo.isTurnOver()) {
-            sourceT.undoturnOver();
+        Foundation targetF = getFoundationAtPos(toUndo.targetAction().getStackIndex());
+        Tableau sourceT = getTableauAtPos(toUndo.sourceAction().getStackIndex());
+        if (toUndo.turnover()) {
+            sourceT.undoTurnover();
             turnedOverTableau--;
         }
-        sourceT.addFaceUp(targetF.removeTopCard());
+        final Vector<Card> v = new Vector<>();
+        v.add(targetF.removeTopCard());
+        sourceT.addToFaceUpCards(v);
     }
 
     /**
@@ -669,9 +670,9 @@ public class SolitaireGame {
      * @param toUndo the move to be reversed
      */
     private void undoFoundationWaste(Move toUndo) {
-        Foundation targetF = getFoundationAtPos(toUndo.getAction2().getStackIndex());
+        Foundation targetF = getFoundationAtPos(toUndo.targetAction().getStackIndex());
         deckAndWaste.getWaste().add(targetF.removeTopCard());
-        deckAndWaste.setFanSize(toUndo.getOldfanSize());
+        deckAndWaste.setFanSize(toUndo.oldFanSize());
     }
 
     /**
@@ -680,9 +681,9 @@ public class SolitaireGame {
     void redo() {
         if (canRedo()) {
             Move toRedo = moves.elementAt(movePointer + 1);
-            handleAction(toRedo.getAction1(), true);
-            if (toRedo.getAction1().getGameObject() != GameObject.DECK) {
-                handleAction(toRedo.getAction2(), true);
+            handleAction(toRedo.sourceAction(), true);
+            if (toRedo.sourceAction().getLocation() != DECK) {
+                handleAction(toRedo.targetAction(), true);
             }
         }
     }

@@ -14,6 +14,8 @@ This program is free software: you can redistribute it and/or modify
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import static java.lang.Thread.sleep;
+
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Files;
 import com.badlogic.gdx.Gdx;
@@ -32,12 +34,10 @@ import org.secuso.privacyfriendlysolitaire.ScoreListener;
 import org.secuso.privacyfriendlysolitaire.generator.GeneratorSolitaireInstance;
 import org.secuso.privacyfriendlysolitaire.model.Move;
 
-import static java.lang.Thread.*;
-
 /**
  * @author I. Dix
- *         the outer application, holding everything together (model, view, controller)
- *         it is responsible for creating and redrawing the stage and is the contact point from the Android app
+ * the outer application, holding everything together (model, view, controller)
+ * it is responsible for creating and redrawing the stage and is the contact point from the Android app
  */
 public class Application extends ApplicationAdapter implements ScoreListener {
     private Stage stage;
@@ -48,10 +48,8 @@ public class Application extends ApplicationAdapter implements ScoreListener {
     private SolitaireGame game;
     private Controller controller;
 
-    private Scorer scorer;
-
-    private int cardDrawMode;
-    private int scoreMode;
+    private CardDrawMode cardDrawMode;
+    private ScoreMode scoreMode;
     private boolean playSounds;
 
     private Color backgroundColour;
@@ -64,7 +62,7 @@ public class Application extends ApplicationAdapter implements ScoreListener {
 
     private int intervallBetweenAutoMoves = 0;
 
-    public void customConstructor(int cardDrawMode, int scoreMode, boolean playSounds,
+    public void customConstructor(final CardDrawMode cardDrawMode, final ScoreMode scoreMode, boolean playSounds,
                                   Color backgroundColour, boolean dragAndDrop) {
         this.cardDrawMode = cardDrawMode;
         this.scoreMode = scoreMode;
@@ -95,13 +93,7 @@ public class Application extends ApplicationAdapter implements ScoreListener {
         View view = new View(game, stage, playSounds, dragAndDrop);
         game.registerGameListener(view);
 
-        if (scoreMode == Constants.MODE_STANDARD) {
-            scorer = new StandardScorer();
-        } else if (scoreMode == Constants.MODE_VEGAS) {
-            scorer = new VegasScorer();
-        } else if (scoreMode == Constants.MODE_NONE) {
-            scorer = new NoneScorer();
-        }
+        final Scorer scorer = scoreMode.getScorer();
         game.registerGameListener(scorer);
         scorer.registerScoreListener(this);
         scorer.update(game);
@@ -207,8 +199,8 @@ public class Application extends ApplicationAdapter implements ScoreListener {
                         if (move == null) {
                             break;
                         }
-                        game.handleAction(move.getAction1(), false);
-                        game.handleAction(move.getAction2(), false);
+                        game.handleAction(move.sourceAction(), false);
+                        game.handleAction(move.targetAction(), false);
 
                         try {
                             sleep(300);
@@ -235,10 +227,10 @@ public class Application extends ApplicationAdapter implements ScoreListener {
                     try {
                         if (move != null) {
                             //break;
-                            game.handleAction(move.getAction1(), false);
+                            game.handleAction(move.sourceAction(), false);
 
-                            if (move.getAction2() != null) {
-                                game.handleAction(move.getAction2(), false);
+                            if (move.targetAction() != null) {
+                                game.handleAction(move.targetAction(), false);
                             }
 
                             if (!practicallyWon) {

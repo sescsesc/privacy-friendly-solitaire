@@ -14,10 +14,12 @@ This program is free software: you can redistribute it and/or modify
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Vector;
+import static org.secuso.privacyfriendlysolitaire.game.Constants.NR_OF_FOUNDATIONS;
+import static org.secuso.privacyfriendlysolitaire.game.Constants.NR_OF_TABLEAUS;
+import static org.secuso.privacyfriendlysolitaire.model.Location.DECK;
+import static org.secuso.privacyfriendlysolitaire.model.Location.FOUNDATION;
+import static org.secuso.privacyfriendlysolitaire.model.Location.TABLEAU;
+import static org.secuso.privacyfriendlysolitaire.model.Location.WASTE;
 
 import com.badlogic.gdx.Files;
 import com.badlogic.gdx.Gdx;
@@ -36,9 +38,14 @@ import org.secuso.privacyfriendlysolitaire.model.Action;
 import org.secuso.privacyfriendlysolitaire.model.Card;
 import org.secuso.privacyfriendlysolitaire.model.DeckWaste;
 import org.secuso.privacyfriendlysolitaire.model.Foundation;
-import org.secuso.privacyfriendlysolitaire.model.GameObject;
+import org.secuso.privacyfriendlysolitaire.model.Location;
 import org.secuso.privacyfriendlysolitaire.model.Move;
 import org.secuso.privacyfriendlysolitaire.model.Tableau;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Vector;
 
 /**
  * @author I. Dix
@@ -64,8 +71,8 @@ public class View implements GameListener {
     private boolean dragStartResult = false;
     private Vector<Actor> originalActors = new Vector<Actor>();
 
-    private final HashMap<String, ImageWrapper> faceUpCards = new HashMap<String, ImageWrapper>(52);
-    private final List<ImageWrapper> faceDownCards = new ArrayList<ImageWrapper>(21);
+    private final HashMap<String, ImageWrapper> faceUpCards = new HashMap<>(52);
+    private final List<ImageWrapper> faceDownCards = new ArrayList<>(21);
     // describes the y at which the given tableau is positioned at the smallest
     private final HashMap<Integer, Float> smallestYForTableau = new HashMap<Integer, Float>(7);
 
@@ -102,16 +109,12 @@ public class View implements GameListener {
         // fan.size=1
         ViewConstants.WasteX1Fan = (2 + 5 * (1 + 3)) * ViewConstants.widthOneSpace;
         // fan.size=2
-        ViewConstants.WasteX2Fan1 = (2 + 5 * (1 + 3)) * ViewConstants.widthOneSpace -
-                0.3f * ViewConstants.widthOneSpace;
-        ViewConstants.WasteX2Fan2 = (2 + 5 * (1 + 3)) * ViewConstants.widthOneSpace +
-                0.3f * ViewConstants.widthOneSpace;
+        ViewConstants.WasteX2Fan1 = (2 + 5 * (1 + 3)) * ViewConstants.widthOneSpace - 0.3f * ViewConstants.widthOneSpace;
+        ViewConstants.WasteX2Fan2 = (2 + 5 * (1 + 3)) * ViewConstants.widthOneSpace + 0.3f * ViewConstants.widthOneSpace;
         // fan.size=3
-        ViewConstants.WasteX3Fan1 = (2 + 5 * (1 + 3)) * ViewConstants.widthOneSpace -
-                0.6f * ViewConstants.widthOneSpace;
+        ViewConstants.WasteX3Fan1 = (2 + 5 * (1 + 3)) * ViewConstants.widthOneSpace - 0.6f * ViewConstants.widthOneSpace;
         ViewConstants.WasteX3Fan2 = ViewConstants.WasteX1Fan;
-        ViewConstants.WasteX3Fan3 = (2 + 5 * (1 + 3)) * ViewConstants.widthOneSpace +
-                0.6f * ViewConstants.widthOneSpace;
+        ViewConstants.WasteX3Fan3 = (2 + 5 * (1 + 3)) * ViewConstants.widthOneSpace + 0.6f * ViewConstants.widthOneSpace;
 
         ViewConstants.DeckX = (2 + 6 * (1 + 3)) * ViewConstants.widthOneSpace;
         ViewConstants.TableauFoundationX = new float[7];
@@ -133,55 +136,50 @@ public class View implements GameListener {
     }
 
     private void paintInitialFoundations(ArrayList<Foundation> foundations) {
-        for (int i = 0; i < 4; i++) {
+        for (int i = 0; i < NR_OF_FOUNDATIONS; i++) {
             // paint empty spaces
             ImageWrapper emptySpace = loader.getEmptySpaceImageWithoutLogo();
-            setImageScalingAndPositionAndStackCardIndicesAndAddToStage(emptySpace, null,
-                    ViewConstants.TableauFoundationX[i], ViewConstants.WasteDeckFoundationY, -1, -1);
+            setImageScalingAndPositionAndStackCardIndicesAndAddToStage(emptySpace, null, ViewConstants.TableauFoundationX[i], ViewConstants.WasteDeckFoundationY, -1, -1);
 
             // paint foundations
             Foundation foundation = foundations.get(i);
 
             for (final Card c : foundation.getCards()) {
                 ImageWrapper card = loadActorForCardAndSaveInMap(c);
-                setImageScalingAndPositionAndStackCardIndicesAndAddToStage(card, GameObject.FOUNDATION,
-                        ViewConstants.TableauFoundationX[i], ViewConstants.WasteDeckFoundationY,
-                        i, -1);
+                setImageScalingAndPositionAndStackCardIndicesAndAddToStage(card, FOUNDATION, ViewConstants.TableauFoundationX[i], ViewConstants.WasteDeckFoundationY, i, -1);
             }
         }
     }
 
     private void paintInitialTableaus(ArrayList<Tableau> tableaus) {
-        for (int i = 0; i < Constants.NR_OF_TABLEAUS; i++) {
+        for (int i = 0; i < NR_OF_TABLEAUS; i++) {
             Tableau t = tableaus.get(i);
 
             float x = ViewConstants.TableauFoundationX[i];
 
             // add empty space beneath
             ImageWrapper emptySpace = loader.getEmptySpaceImageWithoutLogo();
-            setImageScalingAndPositionAndStackCardIndicesAndAddToStage(emptySpace, null, x,
-                    10.5f * ViewConstants.heightOneSpace, -1, -1);
+            setImageScalingAndPositionAndStackCardIndicesAndAddToStage(emptySpace, null, x, 10.5f * ViewConstants.heightOneSpace, -1, -1);
 
             // add face-down cards
-            int faceDownSize = t.getFaceDown().size();
+            int faceDownSize = t.getFaceDownCardsSize();
             for (int j = 0; j < faceDownSize; j++) {
                 ImageWrapper faceDownCard = loader.getBacksideImage();
                 float y = 10.5f * ViewConstants.heightOneSpace - (j * ViewConstants.offsetHeightBetweenCards);
-                setImageScalingAndPositionAndStackCardIndicesAndAddToStage(faceDownCard, GameObject.TABLEAU, x, y, i, j);
+                setImageScalingAndPositionAndStackCardIndicesAndAddToStage(faceDownCard, TABLEAU, x, y, i, j);
 
                 // add to faceDownCards (so it can be destroyed later, when it the card is turned)
                 faceDownCards.add(faceDownCard);
             }
 
             // add face-up cards
-            int faceUpSize = t.getFaceUp().size();
+            int faceUpSize = t.getFaceUpCardsSize();
             for (int j = 0; j < faceUpSize; j++) {
-                final ImageWrapper faceUpCard = loadActorForCardAndSaveInMap(t.getFaceUp().get(j));
+                final ImageWrapper faceUpCard = loadActorForCardAndSaveInMap(t.faceUp().get(j));
                 // y position is dependant on nr in faceDown-Vector
-                float y = 10.5f * ViewConstants.heightOneSpace -
-                        ((faceDownSize + j) * ViewConstants.offsetHeightBetweenCards);
+                float y = 10.5f * ViewConstants.heightOneSpace - ((faceDownSize + j) * ViewConstants.offsetHeightBetweenCards);
 
-                setImageScalingAndPositionAndStackCardIndicesAndAddToStage(faceUpCard, GameObject.TABLEAU, x, y, i, t.getFaceDown().size());
+                setImageScalingAndPositionAndStackCardIndicesAndAddToStage(faceUpCard, TABLEAU, x, y, i, t.getFaceDownCardsSize());
             }
 
             setNewSmallestY(i, t);
@@ -192,8 +190,7 @@ public class View implements GameListener {
         // ----- waste -----
         // draw empty space card
         ImageWrapper emptySpace = loader.getEmptySpaceImageWithoutLogo();
-        setImageScalingAndPositionAndStackCardIndicesAndAddToStage(emptySpace, null,
-                ViewConstants.WasteX1Fan, ViewConstants.WasteDeckFoundationY, -1, -1);
+        setImageScalingAndPositionAndStackCardIndicesAndAddToStage(emptySpace, null, ViewConstants.WasteX1Fan, ViewConstants.WasteDeckFoundationY, -1, -1);
 
         // then draw the open fan
         paintWaste(deckWaste, true, false);
@@ -201,10 +198,8 @@ public class View implements GameListener {
 
         // ----- deck -----
         ImageWrapper emptySpaceDeck = loader.getEmptySpaceImageWithoutLogo();
-        setImageScalingAndPositionAndStackCardIndicesAndAddToStage(emptySpaceDeck, null,
-                ViewConstants.DeckX, ViewConstants.WasteDeckFoundationY, -1, -1);
-        setImageScalingAndPositionAndStackCardIndicesAndAddToStage(backsideCardOnDeck, GameObject.DECK,
-                ViewConstants.DeckX, ViewConstants.WasteDeckFoundationY, -1, -1);
+        setImageScalingAndPositionAndStackCardIndicesAndAddToStage(emptySpaceDeck, null, ViewConstants.DeckX, ViewConstants.WasteDeckFoundationY, -1, -1);
+        setImageScalingAndPositionAndStackCardIndicesAndAddToStage(backsideCardOnDeck, DECK, ViewConstants.DeckX, ViewConstants.WasteDeckFoundationY, -1, -1);
         if (deckWaste.getDeck().isEmpty()) {
             backsideCardOnDeck.setVisible(false);
         }
@@ -229,9 +224,9 @@ public class View implements GameListener {
 
                 List<Card> cardsToBeMarked = new ArrayList<Card>();
 
-                switch (prevAction.getGameObject()) {
+                switch (prevAction.getLocation()) {
                     case TABLEAU:
-                        Vector<Card> faceUpList = game.getTableauAtPos(stackIndex).getFaceUp();
+                        Vector<Card> faceUpList = game.getTableauAtPos(stackIndex).faceUp();
                         cardsToBeMarked = faceUpList.subList(prevAction.getCardIndex(), faceUpList.size());
                         break;
                     case FOUNDATION:
@@ -296,7 +291,7 @@ public class View implements GameListener {
 
     private void setAllFaceUpCardsToCorrectOrder(SolitaireGame game) {
         for (Tableau t : game.getTableaus()) {
-            for (Card faceUpCard : t.getFaceUp()) {
+            for (Card faceUpCard : t.faceUp()) {
                 ImageWrapper image = faceUpCards.get(loader.getCardTextureName(faceUpCard));
                 image.toFront();
             }
@@ -414,8 +409,8 @@ public class View implements GameListener {
 
     // ---------------------------- MOVES ----------------------------
     private void handleMove(Move move, SolitaireGame game) {
-        Action ac1 = move.getAction1();
-        Action ac2 = move.getAction2();
+        Action ac1 = move.sourceAction();
+        Action ac2 = move.targetAction();
 
         int sourceStack = ac1.getStackIndex();
         int sourceCard = ac1.getCardIndex();
@@ -428,7 +423,7 @@ public class View implements GameListener {
         // in order to understand the following code, it is important to understand, that the model
         // has already performed the change
         // => therefore we find the moved card already at the new position
-        switch (ac1.getGameObject()) {
+        switch (ac1.getLocation()) {
             // possibilities: Deck -> Waste, Deck-Reset
             // both are initiated by a click on the deck and therefore have the deck as ac1
             case DECK:
@@ -446,17 +441,16 @@ public class View implements GameListener {
             case WASTE:
                 // ------------------------ W -> T ------------------------
                 if (ac2 != null) {
-                    if (ac2.getGameObject().equals(GameObject.TABLEAU)) {
+                    if (ac2.getLocation() == TABLEAU) {
                         Tableau tab = game.getTableauAtPos(targetStack);
-                        String textureStringOldWasteTop =
-                                loader.getCardTextureName(tab.getFaceUp().get(targetCard + 1));
+                        String textureStringOldWasteTop = loader.getCardTextureName(tab.faceUp().get(targetCard + 1));
 
                         Card targetOldTopCard = null;
                         // after moving the waste-card here, this is no more the top
                         // this can be null, if the waste-card was moved to an empty tableau
                         String textureStringOldTableauTop = null;
                         try {
-                            targetOldTopCard = game.getTableauAtPos(targetStack).getFaceUp().get(targetCard);
+                            targetOldTopCard = game.getTableauAtPos(targetStack).faceUp().get(targetCard);
                         } catch (Exception e) {
                             // leave at null
                         }
@@ -464,18 +458,16 @@ public class View implements GameListener {
                         if (targetOldTopCard != null) {
                             textureStringOldTableauTop = loader.getCardTextureName(targetOldTopCard);
                         }
-                        int nrOfFaceDownInTargetTableau = game.getTableauAtPos(targetStack).getFaceDown().size();
+                        int nrOfFaceDownInTargetTableau = game.getTableauAtPos(targetStack).getFaceDownCardsSize();
 
-                        makeMoveWasteToTableau(textureStringOldWasteTop, textureStringOldTableauTop,
-                                targetStack, targetCard, nrOfFaceDownInTargetTableau);
+                        makeMoveWasteToTableau(textureStringOldWasteTop, textureStringOldTableauTop, targetStack, targetCard, nrOfFaceDownInTargetTableau);
 
                         // set new smallestY for target
                         setNewSmallestY(targetStack, tab);
                     }
                     // ------------------------ W -> F ------------------------
-                    else if (ac2.getGameObject().equals(GameObject.FOUNDATION)) {
-                        String textureStringOldWasteTop =
-                                loader.getCardTextureName(game.getFoundationAtPos(targetStack).getTopCard());
+                    else if (ac2.getLocation() == FOUNDATION) {
+                        String textureStringOldWasteTop = loader.getCardTextureName(game.getFoundationAtPos(targetStack).getTopCard());
 
                         makeMoveWasteToFoundation(textureStringOldWasteTop, targetStack);
                     }
@@ -487,24 +479,23 @@ public class View implements GameListener {
             case TABLEAU:
                 Tableau tabAtSourceStack = game.getTableauAtPos(sourceStack);
 
-                nrOfFaceDownInSourceTableauAfterChange =
-                        tabAtSourceStack.getFaceDown().size();
+                nrOfFaceDownInSourceTableauAfterChange = tabAtSourceStack.getFaceDownCardsSize();
                 // the card beneath the sourceCard,
                 // it may be null if after the move, the tableau has become empty
                 Card cardBeneathSource = null;
                 try {
-                    cardBeneathSource = tabAtSourceStack.getFaceUp().get(ac1.getCardIndex());
+                    cardBeneathSource = tabAtSourceStack.faceUp().get(ac1.getCardIndex());
                 } catch (ArrayIndexOutOfBoundsException e) {
                     // leave at null
                 }
 
                 // ------------------------ T -> T ------------------------
                 if (ac2 != null) {
-                    if (ac2.getGameObject().equals(GameObject.TABLEAU)) {
+                    if (ac2.getLocation() == TABLEAU) {
                         Tableau tabAtTargetStack = game.getTableauAtPos(targetStack);
-                        Vector<Card> faceUpAtTargetStack = tabAtTargetStack.getFaceUp();
+                        Vector<Card> faceUpAtTargetStack = tabAtTargetStack.faceUp();
 
-                        int nrOfFaceDownInTargetTableau = tabAtTargetStack.getFaceDown().size();
+                        int nrOfFaceDownInTargetTableau = tabAtTargetStack.getFaceDownCardsSize();
                         // distinguish empty target tab from tab with exactly one card
                         targetCard--;
 
@@ -526,20 +517,16 @@ public class View implements GameListener {
                             textureStringOldTableauTop = loader.getCardTextureName(targetOldTopCard);
                         }
 
-                        makeMoveTableauToTableau(textureStringsMovedCards, textureStringOldTableauTop,
-                                cardBeneathSource, sourceStack, sourceCard, targetStack, targetCard,
-                                nrOfFaceDownInSourceTableauAfterChange, nrOfFaceDownInTargetTableau);
+                        makeMoveTableauToTableau(textureStringsMovedCards, textureStringOldTableauTop, cardBeneathSource, sourceStack, sourceCard, targetStack, targetCard, nrOfFaceDownInSourceTableauAfterChange, nrOfFaceDownInTargetTableau);
 
                         // set new smallestY for target
                         setNewSmallestY(targetStack, tabAtTargetStack);
                     }
                     // ------------------------ T -> F ------------------------
-                    else if (ac2.getGameObject().equals(GameObject.FOUNDATION)) {
-                        String textureStringTableauSource = loader.getCardTextureName(
-                                game.getFoundationAtPos(targetStack).getTopCard());
+                    else if (ac2.getLocation() == FOUNDATION) {
+                        String textureStringTableauSource = loader.getCardTextureName(game.getFoundationAtPos(targetStack).getTopCard());
 
-                        makeMoveTableauToFoundation(textureStringTableauSource, cardBeneathSource,
-                                sourceStack, sourceCard, targetStack, nrOfFaceDownInSourceTableauAfterChange);
+                        makeMoveTableauToFoundation(textureStringTableauSource, cardBeneathSource, sourceStack, sourceCard, targetStack, nrOfFaceDownInSourceTableauAfterChange);
                     }
                 }
                 // set new smallestY for source
@@ -550,26 +537,21 @@ public class View implements GameListener {
             case FOUNDATION:
                 // ------------------------ F -> T ------------------------
                 if (ac2 != null) {
-                    if (ac2.getGameObject().equals(GameObject.TABLEAU)) {
+                    if (ac2.getLocation() == TABLEAU) {
                         Tableau tabAtTargetStack = game.getTableauAtPos(targetStack);
-                        Vector<Card> faceUpAtTargetStack = tabAtTargetStack.getFaceUp();
+                        Vector<Card> faceUpAtTargetStack = tabAtTargetStack.faceUp();
 
                         // after moving the card the old foundation top is now on top the tableau
                         // (on top the targetCard)
-                        String textureStringFoundationSource = loader.getCardTextureName(
-                                faceUpAtTargetStack.get(targetCard + 1));
+                        String textureStringFoundationSource = loader.getCardTextureName(faceUpAtTargetStack.get(targetCard + 1));
 
                         String textureStringTableauTarget = null;
-                        if (tabAtTargetStack.getNrOfAllCards() != 1) {
-                            textureStringTableauTarget = loader.getCardTextureName(
-                                    faceUpAtTargetStack.get(targetCard));
+                        if (tabAtTargetStack.getCardsSize() != 1) {
+                            textureStringTableauTarget = loader.getCardTextureName(faceUpAtTargetStack.get(targetCard));
                         }
-                        int nrOfFaceDownInTargetTableau =
-                                tabAtTargetStack.getFaceDown().size();
+                        int nrOfFaceDownInTargetTableau = tabAtTargetStack.getFaceDownCardsSize();
 
-                        makeMoveFoundationToTableau(textureStringFoundationSource,
-                                textureStringTableauTarget, targetStack, targetCard,
-                                nrOfFaceDownInTargetTableau);
+                        makeMoveFoundationToTableau(textureStringFoundationSource, textureStringTableauTarget, targetStack, targetCard, nrOfFaceDownInTargetTableau);
 
                         // set new smallestY for target
                         setNewSmallestY(targetStack, tabAtTargetStack);
@@ -617,8 +599,7 @@ public class View implements GameListener {
      * @param fanCardsToBeRearranged a boolean depicting whether this was called by paintInitialDeckWaste
      *                               (true) or turnOrUnturnDeckCard (false)
      */
-    private void paintWaste(DeckWaste deckWaste, boolean isInitialization,
-                            boolean fanCardsToBeRearranged) {
+    private void paintWaste(DeckWaste deckWaste, boolean isInitialization, boolean fanCardsToBeRearranged) {
         // draw first few cards before the open fan
         Vector<Card> waste = deckWaste.getWaste();
         for (int i = 0; i < waste.size() - deckWaste.getFanSize(); i++) {
@@ -629,13 +610,11 @@ public class View implements GameListener {
             if (isInitialization) {
                 wasteCard = loadActorForCardAndSaveInMap(c);
 
-                setImageScalingAndPositionAndStackCardIndicesAndAddToStage(wasteCard, GameObject.WASTE,
-                        ViewConstants.WasteX1Fan, ViewConstants.WasteDeckFoundationY, -1, 5);
+                setImageScalingAndPositionAndStackCardIndicesAndAddToStage(wasteCard, WASTE, ViewConstants.WasteX1Fan, ViewConstants.WasteDeckFoundationY, -1, 5);
             } else {
                 wasteCard = faceUpCards.get(textureName);
 
-                moveCard(ViewConstants.WasteX1Fan, ViewConstants.WasteDeckFoundationY, wasteCard, 5,
-                        false);
+                moveCard(ViewConstants.WasteX1Fan, ViewConstants.WasteDeckFoundationY, wasteCard, 5, false);
             }
         }
 
@@ -663,8 +642,7 @@ public class View implements GameListener {
                 if (fanCardsToBeRearranged) {
                     moveCard(ViewConstants.WasteX1Fan, ViewConstants.WasteDeckFoundationY, card, 5, true);
                 } else {
-                    setImageScalingAndPositionAndStackCardIndicesAndAddToStage(card, GameObject.WASTE,
-                            ViewConstants.WasteX1Fan, ViewConstants.WasteDeckFoundationY, 5, -1);
+                    setImageScalingAndPositionAndStackCardIndicesAndAddToStage(card, WASTE, ViewConstants.WasteX1Fan, ViewConstants.WasteDeckFoundationY, 5, -1);
                 }
 
                 card.setVisible(true);
@@ -678,10 +656,8 @@ public class View implements GameListener {
                     moveCard(ViewConstants.WasteX2Fan1, ViewConstants.WasteDeckFoundationY, card0, 5, true);
                     moveCard(ViewConstants.WasteX2Fan2, ViewConstants.WasteDeckFoundationY, card1, 5, true);
                 } else {
-                    setImageScalingAndPositionAndStackCardIndicesAndAddToStage(card0, GameObject.WASTE,
-                            ViewConstants.WasteX2Fan1, ViewConstants.WasteDeckFoundationY, 5, -1);
-                    setImageScalingAndPositionAndStackCardIndicesAndAddToStage(card1, GameObject.WASTE,
-                            ViewConstants.WasteX2Fan2, ViewConstants.WasteDeckFoundationY, 5, -1);
+                    setImageScalingAndPositionAndStackCardIndicesAndAddToStage(card0, WASTE, ViewConstants.WasteX2Fan1, ViewConstants.WasteDeckFoundationY, 5, -1);
+                    setImageScalingAndPositionAndStackCardIndicesAndAddToStage(card1, WASTE, ViewConstants.WasteX2Fan2, ViewConstants.WasteDeckFoundationY, 5, -1);
                 }
 
                 card0.setVisible(true);
@@ -699,12 +675,9 @@ public class View implements GameListener {
                     moveCard(ViewConstants.WasteX3Fan2, ViewConstants.WasteDeckFoundationY, card1, 5, true);
                     moveCard(ViewConstants.WasteX3Fan3, ViewConstants.WasteDeckFoundationY, card2, 5, true);
                 } else {
-                    setImageScalingAndPositionAndStackCardIndicesAndAddToStage(card0, GameObject.WASTE,
-                            ViewConstants.WasteX3Fan1, ViewConstants.WasteDeckFoundationY, 5, -1);
-                    setImageScalingAndPositionAndStackCardIndicesAndAddToStage(card1, GameObject.WASTE,
-                            ViewConstants.WasteX3Fan2, ViewConstants.WasteDeckFoundationY, 5, -1);
-                    setImageScalingAndPositionAndStackCardIndicesAndAddToStage(card2, GameObject.WASTE,
-                            ViewConstants.WasteX3Fan3, ViewConstants.WasteDeckFoundationY, 5, -1);
+                    setImageScalingAndPositionAndStackCardIndicesAndAddToStage(card0, WASTE, ViewConstants.WasteX3Fan1, ViewConstants.WasteDeckFoundationY, 5, -1);
+                    setImageScalingAndPositionAndStackCardIndicesAndAddToStage(card1, WASTE, ViewConstants.WasteX3Fan2, ViewConstants.WasteDeckFoundationY, 5, -1);
+                    setImageScalingAndPositionAndStackCardIndicesAndAddToStage(card2, WASTE, ViewConstants.WasteX3Fan3, ViewConstants.WasteDeckFoundationY, 5, -1);
                 }
 
                 card0.setVisible(true);
@@ -729,7 +702,7 @@ public class View implements GameListener {
         // set all waste-cards invisible
         for (String textureName : faceUpCards.keySet()) {
             ImageWrapper potentiallyWasteCard = faceUpCards.get(textureName);
-            if (potentiallyWasteCard.getGameObject().equals(GameObject.WASTE)) {
+            if (potentiallyWasteCard.getGameObject().equals(WASTE)) {
                 potentiallyWasteCard.setVisible(false);
             }
         }
@@ -746,7 +719,7 @@ public class View implements GameListener {
         // set all waste-cards invisible
         for (String textureName : faceUpCards.keySet()) {
             ImageWrapper potentiallyWasteCard = faceUpCards.get(textureName);
-            if (potentiallyWasteCard.getGameObject().equals(GameObject.WASTE)) {
+            if (potentiallyWasteCard.getGameObject().equals(WASTE)) {
                 potentiallyWasteCard.setVisible(true);
             }
         }
@@ -759,12 +732,11 @@ public class View implements GameListener {
      * @param tab        the tableau that has changed
      */
     private void setNewSmallestY(int stackIndex, Tableau tab) {
-        int nrOfCardsInTableau = tab.getFaceUp().size() + tab.getFaceDown().size();
+        int nrOfCardsInTableau = tab.getFaceUpCardsSize() + tab.getFaceDownCardsSize();
         if (nrOfCardsInTableau == 0 || nrOfCardsInTableau == 1) {
             smallestYForTableau.put(stackIndex, ViewConstants.TableauBaseY);
         } else {
-            smallestYForTableau.put(stackIndex, ViewConstants.TableauBaseY -
-                    (nrOfCardsInTableau - 1) * ViewConstants.offsetHeightBetweenCards);
+            smallestYForTableau.put(stackIndex, ViewConstants.TableauBaseY - (nrOfCardsInTableau - 1) * ViewConstants.offsetHeightBetweenCards);
         }
     }
 
@@ -779,8 +751,7 @@ public class View implements GameListener {
      *                                    stack
      * @param nrOfFaceDownInTargetTableau the number of face-down cards in the target tableau
      */
-    private void makeMoveWasteToTableau(String sourceCardTextureString, String targetCardTextureString,
-                                        int targetStack, int targetCardIndex, int nrOfFaceDownInTargetTableau) {
+    private void makeMoveWasteToTableau(String sourceCardTextureString, String targetCardTextureString, int targetStack, int targetCardIndex, int nrOfFaceDownInTargetTableau) {
         ImageWrapper sourceCard = faceUpCards.get(sourceCardTextureString);
         ImageWrapper targetCard = null;
         if (targetCardTextureString != null) {
@@ -792,17 +763,13 @@ public class View implements GameListener {
             boolean targetCardExists = targetCard != null;
 
             // make movement
-            float newX = targetCardExists ?
-                    targetCard.getX() :
-                    ViewConstants.TableauFoundationX[targetStack];
-            float newY = targetCardExists ?
-                    targetCard.getY() - ViewConstants.offsetHeightBetweenCards :
-                    ViewConstants.TableauBaseY;
+            float newX = targetCardExists ? targetCard.getX() : ViewConstants.TableauFoundationX[targetStack];
+            float newY = targetCardExists ? targetCard.getY() - ViewConstants.offsetHeightBetweenCards : ViewConstants.TableauBaseY;
 
             moveCard(newX, newY, sourceCard, targetStack, true);
 
             // set meta-information
-            sourceCard.setGameObject(GameObject.TABLEAU);
+            sourceCard.setGameObject(TABLEAU);
             sourceCard.setWrapperCardIndex(nrOfFaceDownInTargetTableau + targetCardIndex + 1);
         } else {
             throw new RuntimeException("source or target of move could not be found");
@@ -820,11 +787,10 @@ public class View implements GameListener {
 
         if (sourceCard != null) {
             // make movement
-            moveCard(ViewConstants.TableauFoundationX[targetStack],
-                    ViewConstants.WasteDeckFoundationY, sourceCard, targetStack, true);
+            moveCard(ViewConstants.TableauFoundationX[targetStack], ViewConstants.WasteDeckFoundationY, sourceCard, targetStack, true);
 
             // set meta-information
-            sourceCard.setGameObject(GameObject.FOUNDATION);
+            sourceCard.setGameObject(FOUNDATION);
             sourceCard.setWrapperCardIndex(-1);
         } else {
             throw new RuntimeException("source or target of move could not be found");
@@ -849,11 +815,7 @@ public class View implements GameListener {
      * @param nrOfFaceDownInSourceTableau  the number of face-down cards in the source tableau
      * @param nrOfFaceDownInTargetTableau  analogous to the nrOfFaceDownInSourceTableau
      */
-    private void makeMoveTableauToTableau(List<String> cardsToBeMovedTextureStrings, boolean wasTurnOver,
-                                          String targetCardTextureString, Card beneathSourceCard,
-                                          int sourceStack, int sourceCardIndex, int targetStack,
-                                          int targetCardIndex, int nrOfFaceDownInSourceTableau,
-                                          int nrOfFaceDownInTargetTableau) {
+    private void makeMoveTableauToTableau(List<String> cardsToBeMovedTextureStrings, boolean wasTurnOver, String targetCardTextureString, Card beneathSourceCard, int sourceStack, int sourceCardIndex, int targetStack, int targetCardIndex, int nrOfFaceDownInSourceTableau, int nrOfFaceDownInTargetTableau) {
         // find correct card that should be moved and card to move it to
         List<ImageWrapper> sourceCards = new ArrayList<ImageWrapper>(cardsToBeMovedTextureStrings.size());
         for (int i = 0; i < cardsToBeMovedTextureStrings.size(); i++) {
@@ -869,8 +831,7 @@ public class View implements GameListener {
             beneathSourceCardImageWrapper = faceUpCards.get(beneathSourceCardTextureString);
         }
 
-        if (!sourceCards.isEmpty() && !(targetCard == null
-                && nrOfFaceDownInTargetTableau + targetCardIndex == 0)) {
+        if (!sourceCards.isEmpty() && !(targetCard == null && nrOfFaceDownInTargetTableau + targetCardIndex == 0)) {
             boolean targetCardExists = targetCard != null;
 
             // if the action, that we are currently inverting turned the card beneath the
@@ -882,8 +843,7 @@ public class View implements GameListener {
                     // it does not have to be loaded again
                     targetCard.setVisible(false);
 
-                    ImageWrapper faceDownCard = getBackSideCardForStackAndCardIndex(targetStack,
-                            nrOfFaceDownInTargetTableau - 1);
+                    ImageWrapper faceDownCard = getBackSideCardForStackAndCardIndex(targetStack, nrOfFaceDownInTargetTableau - 1);
                     if (faceDownCard != null) {
                         faceDownCard.setVisible(true);
                     }
@@ -894,12 +854,8 @@ public class View implements GameListener {
             for (int i = 0; i < sourceCards.size(); i++) {
                 ImageWrapper sourceCard = sourceCards.get(i);
 
-                float newX = targetCardExists ?
-                        targetCard.getX() :
-                        ViewConstants.TableauFoundationX[targetStack];
-                float newY = targetCardExists ?
-                        targetCard.getY() - (i + 1) * ViewConstants.offsetHeightBetweenCards :
-                        ViewConstants.TableauBaseY - i * ViewConstants.offsetHeightBetweenCards;
+                float newX = targetCardExists ? targetCard.getX() : ViewConstants.TableauFoundationX[targetStack];
+                float newY = targetCardExists ? targetCard.getY() - (i + 1) * ViewConstants.offsetHeightBetweenCards : ViewConstants.TableauBaseY - i * ViewConstants.offsetHeightBetweenCards;
 
                 moveCard(newX, newY, sourceCard, targetStack, true);
             }
@@ -912,8 +868,7 @@ public class View implements GameListener {
             // if there is/was a card beneath the sourceCard, turn it
             if (beneathSourceCardTextureString != null) {
                 // delete backsideImage
-                ImageWrapper backsideImage = getBackSideCardForStackAndCardIndex(sourceStack,
-                        sourceCardIndex + nrOfFaceDownInSourceTableau);
+                ImageWrapper backsideImage = getBackSideCardForStackAndCardIndex(sourceStack, sourceCardIndex + nrOfFaceDownInSourceTableau);
                 if (backsideImage != null) {
                     backsideImage.setVisible(false);
                 }
@@ -926,9 +881,7 @@ public class View implements GameListener {
                 beneathSourceCardImageWrapper.setVisible(true);
 
                 if (backsideImage != null) {
-                    setImageScalingAndPositionAndStackCardIndicesAndAddToStage(beneathSourceCardImageWrapper,
-                            GameObject.TABLEAU, backsideImage.getX(), backsideImage.getY(), sourceStack,
-                            nrOfFaceDownInSourceTableau);
+                    setImageScalingAndPositionAndStackCardIndicesAndAddToStage(beneathSourceCardImageWrapper, TABLEAU, backsideImage.getX(), backsideImage.getY(), sourceStack, nrOfFaceDownInSourceTableau);
                 }
             }
 
@@ -937,24 +890,12 @@ public class View implements GameListener {
         }
     }
 
-    private void makeMoveTableauToTableau(List<String> cardsToBeMovedTextureStrings,
-                                          String targetCardTextureString, Card beneathSourceCard,
-                                          int sourceStack, int sourceCardIndex, int targetStack,
-                                          int targetCardIndex, int nrOfFaceDownInSourceTableau,
-                                          int nrOfFaceDownInTargetTableau) {
-        makeMoveTableauToTableau(cardsToBeMovedTextureStrings, false, targetCardTextureString,
-                beneathSourceCard, sourceStack, sourceCardIndex, targetStack, targetCardIndex,
-                nrOfFaceDownInSourceTableau, nrOfFaceDownInTargetTableau);
+    private void makeMoveTableauToTableau(List<String> cardsToBeMovedTextureStrings, String targetCardTextureString, Card beneathSourceCard, int sourceStack, int sourceCardIndex, int targetStack, int targetCardIndex, int nrOfFaceDownInSourceTableau, int nrOfFaceDownInTargetTableau) {
+        makeMoveTableauToTableau(cardsToBeMovedTextureStrings, false, targetCardTextureString, beneathSourceCard, sourceStack, sourceCardIndex, targetStack, targetCardIndex, nrOfFaceDownInSourceTableau, nrOfFaceDownInTargetTableau);
     }
 
-    private void makeMoveTableauToTableau(List<String> cardsToBeMovedTextureStrings,
-                                          boolean wasTurnOver, String targetCardTextureString,
-                                          int sourceStack, int sourceCardIndex, int targetStack,
-                                          int targetCardIndex, int nrOfFaceDownInSourceTableau,
-                                          int nrOfFaceDownInTargetTableau) {
-        makeMoveTableauToTableau(cardsToBeMovedTextureStrings, wasTurnOver, targetCardTextureString,
-                null, sourceStack, sourceCardIndex, targetStack, targetCardIndex,
-                nrOfFaceDownInSourceTableau, nrOfFaceDownInTargetTableau);
+    private void makeMoveTableauToTableau(List<String> cardsToBeMovedTextureStrings, boolean wasTurnOver, String targetCardTextureString, int sourceStack, int sourceCardIndex, int targetStack, int targetCardIndex, int nrOfFaceDownInSourceTableau, int nrOfFaceDownInTargetTableau) {
+        makeMoveTableauToTableau(cardsToBeMovedTextureStrings, wasTurnOver, targetCardTextureString, null, sourceStack, sourceCardIndex, targetStack, targetCardIndex, nrOfFaceDownInSourceTableau, nrOfFaceDownInTargetTableau);
     }
 
     /**
@@ -970,9 +911,7 @@ public class View implements GameListener {
      * @param targetStack                 analogous to the sourceStack
      * @param nrOfFaceDownInSourceTableau the number of face-down cards in the source tableau
      */
-    private void makeMoveTableauToFoundation(String sourceCardTextureString, Card beneathSourceCard,
-                                             int sourceStack, int sourceCardIndex, int targetStack,
-                                             int nrOfFaceDownInSourceTableau) {
+    private void makeMoveTableauToFoundation(String sourceCardTextureString, Card beneathSourceCard, int sourceStack, int sourceCardIndex, int targetStack, int nrOfFaceDownInSourceTableau) {
         // find correct card that should be moved and card to move it to
         ImageWrapper sourceCard = faceUpCards.get(sourceCardTextureString);
         // and maybe (if it exists), the card beneath
@@ -985,18 +924,16 @@ public class View implements GameListener {
 
         if (sourceCard != null) {
             // make movement
-            moveCard(ViewConstants.TableauFoundationX[targetStack],
-                    ViewConstants.WasteDeckFoundationY, sourceCard, targetStack, true);
+            moveCard(ViewConstants.TableauFoundationX[targetStack], ViewConstants.WasteDeckFoundationY, sourceCard, targetStack, true);
 
             // set meta-information
-            sourceCard.setGameObject(GameObject.FOUNDATION);
+            sourceCard.setGameObject(FOUNDATION);
             sourceCard.setWrapperCardIndex(-1);
 
             // if there is/was a card beneath the sourceCard, turn it
             if (beneathSourceCardTextureString != null) {
                 // ---------- set backsideImage invisible ----------
-                ImageWrapper backsideImage = getBackSideCardForStackAndCardIndex(sourceStack,
-                        sourceCardIndex + nrOfFaceDownInSourceTableau);
+                ImageWrapper backsideImage = getBackSideCardForStackAndCardIndex(sourceStack, sourceCardIndex + nrOfFaceDownInSourceTableau);
                 if (backsideImage != null) {
                     backsideImage.setVisible(false);
                 }
@@ -1008,9 +945,7 @@ public class View implements GameListener {
                 beneathSourceCardImageWrapper.setVisible(true);
 
                 if (backsideImage != null) {
-                    setImageScalingAndPositionAndStackCardIndicesAndAddToStage(beneathSourceCardImageWrapper,
-                            GameObject.TABLEAU, backsideImage.getX(), backsideImage.getY(), sourceStack,
-                            nrOfFaceDownInSourceTableau);
+                    setImageScalingAndPositionAndStackCardIndicesAndAddToStage(beneathSourceCardImageWrapper, TABLEAU, backsideImage.getX(), backsideImage.getY(), sourceStack, nrOfFaceDownInSourceTableau);
                 }
             }
         } else {
@@ -1018,11 +953,8 @@ public class View implements GameListener {
         }
     }
 
-    private void makeMoveTableauToFoundation(String sourceCardTextureString, int sourceStack,
-                                             int sourceCardIndex, int targetStack,
-                                             int nrOfFaceDownInSourceTableau) {
-        makeMoveTableauToFoundation(sourceCardTextureString, null, sourceStack, sourceCardIndex,
-                targetStack, nrOfFaceDownInSourceTableau);
+    private void makeMoveTableauToFoundation(String sourceCardTextureString, int sourceStack, int sourceCardIndex, int targetStack, int nrOfFaceDownInSourceTableau) {
+        makeMoveTableauToFoundation(sourceCardTextureString, null, sourceStack, sourceCardIndex, targetStack, nrOfFaceDownInSourceTableau);
     }
 
     /**
@@ -1038,9 +970,7 @@ public class View implements GameListener {
      *                                    stack
      * @param nrOfFaceDownInTargetTableau the number of face-down cards in the target tableau
      */
-    private void makeMoveFoundationToTableau(String sourceCardTextureString, boolean wasTurnOver,
-                                             String textureStringTableauTarget, int targetStack,
-                                             int targetCardIndex, int nrOfFaceDownInTargetTableau) {
+    private void makeMoveFoundationToTableau(String sourceCardTextureString, boolean wasTurnOver, String textureStringTableauTarget, int targetStack, int targetCardIndex, int nrOfFaceDownInTargetTableau) {
         // find correct card that should be moved and card to move it to
         ImageWrapper sourceCard = faceUpCards.get(sourceCardTextureString);
         ImageWrapper targetCard = null;
@@ -1049,18 +979,13 @@ public class View implements GameListener {
         }
 
         // targetCard may be null, but only if there are no cards in the targetStack
-        if (sourceCard != null &&
-                !(targetCard == null && nrOfFaceDownInTargetTableau + targetCardIndex == 0)) {
+        if (sourceCard != null && !(targetCard == null && nrOfFaceDownInTargetTableau + targetCardIndex == 0)) {
 
             boolean targetCardExists = targetCard != null;
 
             // make movement
-            float newX = targetCardExists ?
-                    targetCard.getX() :
-                    ViewConstants.TableauFoundationX[targetStack];
-            float newY = targetCardExists ?
-                    targetCard.getY() - ViewConstants.offsetHeightBetweenCards :
-                    ViewConstants.TableauBaseY;
+            float newX = targetCardExists ? targetCard.getX() : ViewConstants.TableauFoundationX[targetStack];
+            float newY = targetCardExists ? targetCard.getY() - ViewConstants.offsetHeightBetweenCards : ViewConstants.TableauBaseY;
 
             // if the action, that we are currently inverting turned the card beneath the
             // one we are now putting back, we have to turn it back around
@@ -1071,8 +996,7 @@ public class View implements GameListener {
                     // it does not have to be loaded again
                     targetCard.setVisible(false);
 
-                    ImageWrapper faceDownCard = getBackSideCardForStackAndCardIndex(targetStack,
-                            nrOfFaceDownInTargetTableau - 1);
+                    ImageWrapper faceDownCard = getBackSideCardForStackAndCardIndex(targetStack, nrOfFaceDownInTargetTableau - 1);
                     if (faceDownCard != null) {
                         faceDownCard.setVisible(true);
                     }
@@ -1082,7 +1006,7 @@ public class View implements GameListener {
             moveCard(newX, newY, sourceCard, targetStack, true);
 
             // set meta-information
-            sourceCard.setGameObject(GameObject.TABLEAU);
+            sourceCard.setGameObject(TABLEAU);
             sourceCard.setWrapperCardIndex(nrOfFaceDownInTargetTableau + targetCardIndex + 1);
         } else {
             throw new RuntimeException("source or target of move could not be found");
@@ -1090,11 +1014,8 @@ public class View implements GameListener {
     }
 
 
-    private void makeMoveFoundationToTableau(String sourceCardTextureString,
-                                             String textureStringTableauTarget, int targetStack,
-                                             int targetCardIndex, int nrOfFaceDownInTargetTableau) {
-        makeMoveFoundationToTableau(sourceCardTextureString, false, textureStringTableauTarget,
-                targetStack, targetCardIndex, nrOfFaceDownInTargetTableau);
+    private void makeMoveFoundationToTableau(String sourceCardTextureString, String textureStringTableauTarget, int targetStack, int targetCardIndex, int nrOfFaceDownInTargetTableau) {
+        makeMoveFoundationToTableau(sourceCardTextureString, false, textureStringTableauTarget, targetStack, targetCardIndex, nrOfFaceDownInTargetTableau);
     }
 
     /**
@@ -1109,13 +1030,12 @@ public class View implements GameListener {
 
         if (sourceCard != null) {
             // make movement
-            moveCard(ViewConstants.WasteX1Fan,
-                    ViewConstants.WasteDeckFoundationY, sourceCard, 5, true);
+            moveCard(ViewConstants.WasteX1Fan, ViewConstants.WasteDeckFoundationY, sourceCard, 5, true);
 
             sourceCard.toFront();
 
             // set meta-information
-            sourceCard.setGameObject(GameObject.WASTE);
+            sourceCard.setGameObject(WASTE);
             sourceCard.setWrapperCardIndex(-1);
         } else {
             throw new RuntimeException("source or target of move could not be found");
@@ -1125,8 +1045,8 @@ public class View implements GameListener {
 
     // ---------------------------- UNDO MOVES ----------------------------
     private void handleUndoMove(Move move, SolitaireGame game) {
-        Action ac1 = move.getAction1();
-        Action ac2 = move.getAction2();
+        Action ac1 = move.sourceAction();
+        Action ac2 = move.targetAction();
 
         // CAUTION: target and source are inverted (as if the undo move was a valid move from
         // target to source
@@ -1140,9 +1060,7 @@ public class View implements GameListener {
 
 
         // click on deck
-        if (ac2 == null ||
-                (ac2.getGameObject().equals(GameObject.DECK)) &&
-                        (ac1.getGameObject().equals(GameObject.DECK))) {
+        if (ac2 == null || (ac2.getLocation() == DECK) && (ac1.getLocation() == DECK)) {
             DeckWaste deckWaste = game.getDeckWaste();
             Vector<Card> deck = deckWaste.getDeck();
 
@@ -1155,7 +1073,7 @@ public class View implements GameListener {
 
                 // turn all cards that are in the deck after size-newFanSize (fanSize after move
                 // that is currently being undone)
-                for (int i = deck.size() - move.getNewFanSize(); i < deck.size(); i++) {
+                for (int i = deck.size() - move.newFanSize(); i < deck.size(); i++) {
                     try {
                         cardsToBeUnturned.add(loader.getCardTextureName(deck.get(i)));
                     } catch (Exception E) {
@@ -1167,32 +1085,29 @@ public class View implements GameListener {
         } else {
             // works analogous to handleMove (game has already done the undo)
             // plus: if an action was X->Y, we have to perform the inverse move Y->X
-            switch (ac2.getGameObject()) {
+            switch (ac2.getLocation()) {
 
                 case TABLEAU:
                     Tableau tabAtSourceStack = game.getTableauAtPos(sourceStack);
-                    int nrOfFaceDownInSourceTableauAfterChange =
-                            tabAtSourceStack.getFaceDown().size();
+                    int nrOfFaceDownInSourceTableauAfterChange = tabAtSourceStack.getFaceDownCardsSize();
                     String sourceCardTextureString;
 
                     // ------------------------ T -> F ------------------------
-                    if (ac1.getGameObject().equals(GameObject.FOUNDATION)) {
-                        sourceCardTextureString = loader.getCardTextureName(
-                                game.getFoundationAtPos(targetStack).getTopCard());
+                    if (ac1.getLocation() == FOUNDATION) {
+                        sourceCardTextureString = loader.getCardTextureName(game.getFoundationAtPos(targetStack).getTopCard());
 
-                        makeMoveTableauToFoundation(sourceCardTextureString, sourceStack,
-                                sourceCard, targetStack, nrOfFaceDownInSourceTableauAfterChange);
+                        makeMoveTableauToFoundation(sourceCardTextureString, sourceStack, sourceCard, targetStack, nrOfFaceDownInSourceTableauAfterChange);
                     }
 
                     // ------------------------ T -> T ------------------------
-                    else if (ac1.getGameObject().equals(GameObject.TABLEAU)) {
+                    else if (ac1.getLocation() == TABLEAU) {
                         // was a card turned over?
-                        boolean wasTurnOver = move.isTurnOver();
+                        boolean wasTurnOver = move.turnover();
 
                         // get texture string of cards that were moved
                         Tableau tabAtTargetStack = game.getTableauAtPos(targetStack);
-                        Vector<Card> faceUpAtTargetStack = tabAtTargetStack.getFaceUp();
-                        int nrOfFaceDownInTargetTableau = tabAtTargetStack.getFaceDown().size();
+                        Vector<Card> faceUpAtTargetStack = tabAtTargetStack.faceUp();
+                        int nrOfFaceDownInTargetTableau = tabAtTargetStack.getFaceDownCardsSize();
                         targetCard--;
 
                         List<String> cardsToBeMovedTextureStrings = new ArrayList<String>();
@@ -1207,25 +1122,19 @@ public class View implements GameListener {
                         // 3) move to an empty tab (!wasTurnOver, but cardIndex==-1)
                         String textureStringOldTableauTop = null;
                         if (wasTurnOver && targetCard == -1) {
-                            textureStringOldTableauTop =
-                                    loader.getCardTextureName(tabAtTargetStack.getFaceDown().lastElement());
+                            textureStringOldTableauTop = loader.getCardTextureName(tabAtTargetStack.getLastFaceDownCard());
                         } else if (targetCard != -1) {
-                            textureStringOldTableauTop = loader.getCardTextureName(
-                                    faceUpAtTargetStack.get(targetCard));
+                            textureStringOldTableauTop = loader.getCardTextureName(faceUpAtTargetStack.get(targetCard));
                         }
 
-                        makeMoveTableauToTableau(cardsToBeMovedTextureStrings, wasTurnOver,
-                                textureStringOldTableauTop, sourceStack, sourceCard, targetStack,
-                                targetCard, nrOfFaceDownInSourceTableauAfterChange,
-                                nrOfFaceDownInTargetTableau);
+                        makeMoveTableauToTableau(cardsToBeMovedTextureStrings, wasTurnOver, textureStringOldTableauTop, sourceStack, sourceCard, targetStack, targetCard, nrOfFaceDownInSourceTableauAfterChange, nrOfFaceDownInTargetTableau);
 
                         // set new smallestY for target
                         setNewSmallestY(targetStack, tabAtTargetStack);
                     }
                     // ------------------------ T -> W ------------------------
-                    else if (ac1.getGameObject().equals(GameObject.WASTE)) {
-                        sourceCardTextureString = loader.getCardTextureName(
-                                game.getDeckWaste().getWasteTop());
+                    else if (ac1.getLocation() == WASTE) {
+                        sourceCardTextureString = loader.getCardTextureName(game.getDeckWaste().getWasteTop());
 
                         makeUndoMoveXToWaste(sourceCardTextureString);
 
@@ -1241,54 +1150,47 @@ public class View implements GameListener {
 
                 case FOUNDATION:
                     // ------------------------ F -> W ------------------------
-                    if (ac1.getGameObject().equals(GameObject.WASTE)) {
-                        sourceCardTextureString = loader.getCardTextureName(
-                                game.getDeckWaste().getWasteTop());
+                    if (ac1.getLocation() == WASTE) {
+                        sourceCardTextureString = loader.getCardTextureName(game.getDeckWaste().getWasteTop());
 
                         makeUndoMoveXToWaste(sourceCardTextureString);
 
                         paintWaste(game.getDeckWaste(), false, true);
                     }
                     // ------------------------ F -> T ------------------------
-                    else if (ac1.getGameObject().equals(GameObject.TABLEAU)) {
+                    else if (ac1.getLocation() == TABLEAU) {
 
                         // was a card turned over?
-                        boolean wasTurnOver = move.isTurnOver();
+                        boolean wasTurnOver = move.turnover();
 
                         // get texture string of card that was moved
                         Tableau tabAtTargetStack = game.getTableauAtPos(targetStack);
-                        Vector<Card> faceUpAtTargetStack = tabAtTargetStack.getFaceUp();
-                        boolean emptyTargetStack = tabAtTargetStack.getNrOfAllCards() == 1;
+                        Vector<Card> faceUpAtTargetStack = tabAtTargetStack.faceUp();
+                        boolean emptyTargetStack = tabAtTargetStack.getCardsSize() == 1;
 
                         // for an undo move, we have to decrement the targetCard
                         targetCard--;
 
-                        String textureStringFoundationSource = loader.getCardTextureName(
-                                faceUpAtTargetStack.lastElement());
+                        String textureStringFoundationSource = loader.getCardTextureName(faceUpAtTargetStack.lastElement());
 
                         String textureStringTableauTargetTop = null;
                         if (!wasTurnOver && !emptyTargetStack) {
                             // either this was the card tapped on and it was and is still open
-                            textureStringTableauTargetTop = loader.getCardTextureName(
-                                    faceUpAtTargetStack.get(targetCard));
+                            textureStringTableauTargetTop = loader.getCardTextureName(faceUpAtTargetStack.get(targetCard));
                         } else {
                             try {
                                 // or this was an undo of a turn over, so the prior top of the stack
                                 // is now the last element in the facedown list
-                                textureStringTableauTargetTop = loader.getCardTextureName(
-                                        tabAtTargetStack.getFaceDown().lastElement());
+                                textureStringTableauTargetTop = loader.getCardTextureName(tabAtTargetStack.getLastFaceDownCard());
 
                             } catch (Exception e) {
                                 // leave textureString at null
                             }
                         }
 
-                        int nrOfFaceDownInTargetTableau =
-                                tabAtTargetStack.getFaceDown().size();
+                        int nrOfFaceDownInTargetTableau = tabAtTargetStack.getFaceDownCardsSize();
 
-                        makeMoveFoundationToTableau(textureStringFoundationSource, wasTurnOver,
-                                textureStringTableauTargetTop, targetStack, targetCard,
-                                nrOfFaceDownInTargetTableau);
+                        makeMoveFoundationToTableau(textureStringFoundationSource, wasTurnOver, textureStringTableauTargetTop, targetStack, targetCard, nrOfFaceDownInTargetTableau);
 
 
                         // set new smallestY for target
@@ -1306,8 +1208,7 @@ public class View implements GameListener {
      * @param card    the ImageWrapper-object to be moved
      * @param animate whether to animate the moving or not
      */
-    private void moveCard(float targetX, float targetY, ImageWrapper card, int targetStack,
-                          boolean animate) {
+    private void moveCard(float targetX, float targetY, ImageWrapper card, int targetStack, boolean animate) {
         if (animate) {
             card.addAction(Actions.moveTo(targetX, targetY, 0.2f));
         } else {
@@ -1327,32 +1228,29 @@ public class View implements GameListener {
      * which foundation/tableau was tapped and which card in this tableau
      */
     Action getActionForTap(float x, float y) {
-        GameObject gameObject = null;
+        Location location = null;
         int stackIndex = getStackIndexForX(x);      // caution can be -1
         int cardIndex = -1;
 
         if (stackIndex == -1) {
-            if (y >= 16 * ViewConstants.heightOneSpace &&
-                    y <= 16 * ViewConstants.heightOneSpace + ViewConstants.heightCard) {
-                if (x >= 22 * ViewConstants.widthOneSpace
-                        && x <= ViewConstants.WasteX3Fan3 + ViewConstants.widthCard) {
+            if (y >= 16 * ViewConstants.heightOneSpace && y <= 16 * ViewConstants.heightOneSpace + ViewConstants.heightCard) {
+                if (x >= 22 * ViewConstants.widthOneSpace && x <= ViewConstants.WasteX3Fan3 + ViewConstants.widthCard) {
                     // case when fan with size 3 is open
                     stackIndex = 5;
-                    gameObject = GameObject.WASTE;
+                    location = WASTE;
                 }
             }
         } else {
             // ------------ FOUNDATION, WASTE, DECK ------------
-            if (y >= 16 * ViewConstants.heightOneSpace &&
-                    y <= 16 * ViewConstants.heightOneSpace + ViewConstants.heightCard) {
+            if (y >= 16 * ViewConstants.heightOneSpace && y <= 16 * ViewConstants.heightOneSpace + ViewConstants.heightCard) {
 
                 // 0, 1, 2, 3 are the four foundations, 4 is empty, 5 is waste, 6 is deck
                 if (stackIndex < 4) {
-                    gameObject = GameObject.FOUNDATION;
+                    location = FOUNDATION;
                 } else if (stackIndex == 5) {
-                    gameObject = GameObject.WASTE;
+                    location = WASTE;
                 } else if (stackIndex == 6) {
-                    gameObject = GameObject.DECK;
+                    location = DECK;
                 }
             }
             // ------------ TABLEAU ------------
@@ -1380,9 +1278,8 @@ public class View implements GameListener {
                             float biggestYAtPosAfterI = biggestY - ((i + 1) * ViewConstants.offsetHeightBetweenCards);
                             float remainingSpaceUntilTableauEnd = Math.abs(biggestY - (i * ViewConstants.offsetHeightBetweenCards) - smallestY);
 
-                            if ((y <= biggestYAtPosI &&
-                                    (y >= biggestYAtPosAfterI || remainingSpaceUntilTableauEnd <= ViewConstants.heightCard))) {
-                                gameObject = GameObject.TABLEAU;
+                            if ((y <= biggestYAtPosI && (y >= biggestYAtPosAfterI || remainingSpaceUntilTableauEnd <= ViewConstants.heightCard))) {
+                                location = TABLEAU;
                                 cardIndex = i;
                                 break;
                             }
@@ -1395,7 +1292,7 @@ public class View implements GameListener {
         }
 
         // return Action if click was somewhere sensible or null else
-        return gameObject == null ? null : new Action(gameObject, stackIndex, cardIndex);
+        return location == null ? null : new Action(location, stackIndex, cardIndex);
     }
 
 
@@ -1437,16 +1334,13 @@ public class View implements GameListener {
      * @param x         the x-coordinate of the position
      * @param y         the y-coordinate of the position
      */
-    private void setImageScalingAndPositionAndStackCardIndicesAndAddToStage(ImageWrapper cardImage,
-                                                                            GameObject gameObject,
-                                                                            float x, float y,
-                                                                            int stackIndex, int cardIndex) {
+    private void setImageScalingAndPositionAndStackCardIndicesAndAddToStage(ImageWrapper cardImage, Location location, float x, float y, int stackIndex, int cardIndex) {
         cardImage.setPosition(x, y);
         cardImage.setWidth(ViewConstants.scalingWidthCard * ViewConstants.widthOneSpace);
         cardImage.setHeight(ViewConstants.scalingHeightCard * ViewConstants.heightOneSpace);
         cardImage.setWrapperStackIndex(stackIndex);
         cardImage.setWrapperCardIndex(cardIndex);
-        cardImage.setGameObject(gameObject);
+        cardImage.setGameObject(location);
         stage.addActor(cardImage);
 
         if (!widthHeightOfCardSet) {
@@ -1565,14 +1459,14 @@ public class View implements GameListener {
     private class ImageWrapper extends Image {
         int stackIndex = -1;
         int cardIndex = -1;
-        GameObject gameObject = null;
+        Location location = null;
 
-        GameObject getGameObject() {
-            return gameObject;
+        Location getGameObject() {
+            return location;
         }
 
-        void setGameObject(GameObject gameObject) {
-            this.gameObject = gameObject;
+        void setGameObject(Location location) {
+            this.location = location;
         }
 
         ImageWrapper(Texture texture) {
@@ -1596,15 +1490,14 @@ public class View implements GameListener {
         }
 
         public String toString() {
-            return super.toString() + ", stack: " + stackIndex + ", card: " + cardIndex + ", gameObject: " + gameObject;
+            return super.toString() + ", stack: " + stackIndex + ", card: " + cardIndex + ", gameObject: " + location;
         }
     }
 
 
     private void playFlipCardSound() {
         if (playSounds) {
-            Music music = Gdx.audio.newMusic(Gdx.files.getFileHandle("sounds/flipCard.mp3",
-                    Files.FileType.Internal));
+            Music music = Gdx.audio.newMusic(Gdx.files.getFileHandle("sounds/flipCard.mp3", Files.FileType.Internal));
 
             try {
                 music.setVolume(0.5f);
@@ -1625,19 +1518,19 @@ public class View implements GameListener {
         Action action = getActionForTap(x, y);
         if (action != null) {
 
-            if (action.getGameObject() == GameObject.TABLEAU) {
+            if (action.getLocation() == TABLEAU) {
                 int index = action.getStackIndex();
                 Tableau tableau = game.getTableauAtPos(index);
                 int cardIndex = action.getCardIndex();
 
-                int cardIndexInFaceUp = cardIndex - tableau.getFaceDown().size();
+                int cardIndexInFaceUp = cardIndex - tableau.getFaceDownCardsSize();
                 // View can not distinguish between just one card on the stack and no card
-                if (tableau.getFaceDown().size() + tableau.getFaceUp().size() == 0) {
-                    action = new Action(GameObject.TABLEAU, index, -1);
+                if (tableau.getFaceDownCardsSize() + tableau.getFaceUpCardsSize() == 0) {
+                    action = new Action(TABLEAU, index, -1);
                 } else {
-                    action = new Action(GameObject.TABLEAU, index, cardIndexInFaceUp);
+                    action = new Action(TABLEAU, index, cardIndexInFaceUp);
                 }
-            } else if (action.getGameObject() == GameObject.DECK) {
+            } else if (action.getLocation() == DECK) {
                 game.failMove();
                 return false;
             }
@@ -1647,8 +1540,7 @@ public class View implements GameListener {
 
     private boolean createActionAndSendToModelForStart(ImageWrapper draggingCard) {
         float x = draggingCard.getX() + ViewConstants.offsetHeightBetweenCards / 2;
-        float y = draggingCard.getY() - ViewConstants.offsetHeightBetweenCards / 2 +
-                ViewConstants.heightCard;
+        float y = draggingCard.getY() - ViewConstants.offsetHeightBetweenCards / 2 + ViewConstants.heightCard;
         return createActionAndSendToModel(x, y);
     }
 
@@ -1672,25 +1564,25 @@ public class View implements GameListener {
                 if (payloadCard != null) {
                     payloadCard.setWidth(ViewConstants.scalingWidthCard * ViewConstants.widthOneSpace);
                     payloadCard.setHeight(ViewConstants.scalingHeightCard * ViewConstants.heightOneSpace);
-                    if (imageWrapper.getGameObject() == GameObject.TABLEAU) {
+                    if (imageWrapper.getGameObject() == TABLEAU) {
                         Group payloadGroup = new Group();
                         int stackIndex = imageWrapper.getWrapperStackIndex();
                         //fix wrapperCardIndices -- START
                         //ugly last minute fix, sorry :(
-                        int currWrapperCardIndex = game.getTableauAtPos(stackIndex).getFaceDown().size();
-                        for (Card faceUpCard : game.getTableauAtPos(stackIndex).getFaceUp()) {
+                        int currWrapperCardIndex = game.getTableauAtPos(stackIndex).getFaceDownCardsSize();
+                        for (Card faceUpCard : game.getTableauAtPos(stackIndex).faceUp()) {
                             ImageWrapper currImageWrapper = faceUpCards.get(loader.getCardTextureName(faceUpCard));
                             currImageWrapper.setWrapperCardIndex(currWrapperCardIndex);
                             currWrapperCardIndex++;
                         }
                         //fix wrapperCardIndices -- END
-                        int faceUpIndex = imageWrapper.getWrapperCardIndex() - game.getTableauAtPos(stackIndex).getFaceDown().size();
-                        for (int i = faceUpIndex; i < game.getTableauAtPos(stackIndex).getFaceUp().size(); i++) {
+                        int faceUpIndex = imageWrapper.getWrapperCardIndex() - game.getTableauAtPos(stackIndex).getFaceDownCardsSize();
+                        for (int i = faceUpIndex; i < game.getTableauAtPos(stackIndex).getFaceUpCardsSize(); i++) {
                             if (i == faceUpIndex) {
                                 payloadGroup.addActor(payloadCard);
                                 originalActors.add(imageWrapper);
                             } else {
-                                Card additionalCard = game.getTableauAtPos(stackIndex).getFaceUp().get(i);
+                                Card additionalCard = game.getTableauAtPos(stackIndex).faceUp().get(i);
                                 ImageWrapper additionalImageWrapper = loadActorForCardWithoutSavingInMap(additionalCard);
                                 additionalImageWrapper.setWidth(ViewConstants.scalingWidthCard * ViewConstants.widthOneSpace);
                                 additionalImageWrapper.setHeight(ViewConstants.scalingHeightCard * ViewConstants.heightOneSpace);
@@ -1713,8 +1605,7 @@ public class View implements GameListener {
             }
 
             @Override
-            public void dragStop(InputEvent event, float x, float y, int pointer,
-                                 DragAndDrop.Payload payload, DragAndDrop.Target target) {
+            public void dragStop(InputEvent event, float x, float y, int pointer, DragAndDrop.Payload payload, DragAndDrop.Target target) {
                 Actor dragActor = payload.getDragActor();
                 Actor originalActor = getActor();
                 originalActor.setVisible(true);
@@ -1748,7 +1639,7 @@ public class View implements GameListener {
         dragAndDrop.clear();
         //add all face up cards except the waste
         for (String s : faceUpCards.keySet()) {
-            if (faceUpCards.get(s).getGameObject() == GameObject.WASTE) {
+            if (faceUpCards.get(s).getGameObject() == WASTE) {
                 continue;
             }
             addTextureNameToDragAndDrop(s);

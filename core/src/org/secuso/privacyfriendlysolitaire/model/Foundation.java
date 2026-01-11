@@ -15,6 +15,7 @@ This program is free software: you can redistribute it and/or modify
  */
 
 import java.util.Comparator;
+import java.util.Objects;
 import java.util.TreeSet;
 
 /**
@@ -99,6 +100,19 @@ public class Foundation {
         final Card last = cards.last();
         cards.remove(last);
         return last;
+    }
+
+    @Override
+    public boolean equals(final Object o) {
+        if (!(o instanceof Foundation that)) {
+            return false;
+        }
+        return Objects.equals(cards, that.cards);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(cards);
     }
 
     @Override

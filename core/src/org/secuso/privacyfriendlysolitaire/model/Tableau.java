@@ -14,155 +14,130 @@ This program is free software: you can redistribute it and/or modify
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import static org.secuso.privacyfriendlysolitaire.model.Rank.KING;
+
 import java.util.Vector;
 
 /**
+ * @param faceDown the cards lying face down on this tableau
+ * @param faceUp   the cards lying face up on this tableau
  * @author M. Fischer
  */
 
-public class Tableau {
-    /**
-     * the cards lying face down on this tableau
-     */
-    private Vector<Card> faceDown;
-    /**
-     * the cards lying face up on this tableau
-     */
-    private Vector<Card> faceUp;
+public record Tableau(Vector<Card> faceDown, Vector<Card> faceUp) {
 
-    /**
-     * Constructs a new Tableau containing no face down or face up cards
-     */
-    public Tableau() {
-        this.faceDown = new Vector<Card>();
-        this.faceUp = new Vector<Card>();
+    public int getFaceDownCardsSize() {
+        return faceDown.size();
     }
 
-    /**
-     * @return the vector of cards lying face down on this tableau
-     */
-    public Vector<Card> getFaceDown() {
-        return faceDown;
+    public boolean isFaceDownEmpty() {
+        return faceDown.isEmpty();
     }
 
-    /**
-     * @param faceDown the vector of cards to be set as lying face down on this tableau
-     */
-    public void setFaceDown(Vector<Card> faceDown) {
-        this.faceDown = faceDown;
+    public Card getLastFaceDownCard() {
+        return faceDown.lastElement();
     }
 
-    /**
-     * @return the vector of cards lying face up on this tableau
-     */
-    public Vector<Card> getFaceUp() {
-        return faceUp;
+    public int getFaceUpCardsSize() {
+        return faceUp.size();
     }
 
-    public int getNrOfAllCards() {
+    public boolean isFaceUpEmpty() {
+        return faceUp.isEmpty();
+    }
+
+    public int getCardsSize() {
         return faceDown.size() + faceUp.size();
     }
 
-    /**
-     * @param faceUp the vector of cards to be set as lying face up on this tableau
-     */
-    public void setFaceUp(Vector<Card> faceUp) {
-        this.faceUp = faceUp;
+    public boolean isEmpty() {
+        return faceDown.isEmpty() && faceUp.isEmpty();
     }
 
     /**
      * @return true if the top face down card could be turned over
      */
-    public boolean turnOver() {
-        if (this.faceUp.isEmpty() && !this.faceDown.isEmpty()) {//can only turn over if no face up cards and at least one face down card on tableau
-            this.faceUp.add(this.faceDown.lastElement());
-            this.faceDown.remove(this.faceDown.size() - 1);
+    public boolean turnover() {
+        //can only turn over if no face up cards and at least one face down card on tableau
+        if (faceUp.isEmpty() && !faceDown.isEmpty()) {
+            final Card lastCard = faceDown.lastElement();
+            faceUp.add(lastCard);
+            faceDown.remove(lastCard);
             return true;
-        } else {
-            return false;
         }
+        return false;
     }
 
     /**
      * undoes turning over a card from face down to face up
      */
-    public void undoturnOver() {
+    public void undoTurnover() {
         if (faceUp.size() == 1) {
-            faceDown.add(faceUp.remove(0));
+            final Card faceUpCard = faceUp.get(0);
+            faceUp.remove(faceUpCard);
+            faceDown.add(faceUpCard);
         }
     }
 
     /**
-     * @param card the card to be added on top of the face up cards
-     */
-    public void addFaceUp(Card card) {
-        this.faceUp.add(card);
-    }
-
-    /**
-     * @param vecCards the vector of cards that should be added to this tableau pile
+     * @param cards the vector of cards that should be added to this tableau pile
      * @return true if the cards could be added to the tableau
      */
-    public boolean addFaceUpVector(final Vector<Card> vecCards) {
-        if (vecCards == null || vecCards.isEmpty()) {
+    public boolean addToFaceUpCards(final Vector<Card> cards) {
+        if (cards == null || cards.isEmpty()) {
             return true;
         }
 
-        return this.faceUp.addAll(vecCards);
-
-
+        return faceUp.addAll(cards);
     }
 
     /**
-     * @param vecCards the vector of cards that should be added to this tableau pile
+     * @param cards the vector of cards that should be added to this tableau pile
      * @return true if adding the cards to the tableau would be allowed
      */
-    public boolean isAddingFaceUpVectorPossible(Vector<Card> vecCards) {
-        if (!vecCards.isEmpty()) {
-            if (this.faceDown.isEmpty() && this.faceUp.isEmpty()) {
-                //empty tableau piles can be filled with a stack starting with a king
-                return vecCards.firstElement().rank() == Rank.KING;
-            } else if (!this.faceDown.isEmpty() && this.faceUp.isEmpty()) {
-                //cannot add cards, face down card has to be turned over first
-                return false;
-            } else
-                return this.faceUp.lastElement().suit().getColor() != vecCards.firstElement().suit().getColor() && vecCards.firstElement().rank().isPredecessor(this.faceUp.lastElement().rank());
-        } else {
+    public boolean isAddToFaceUpCardsPossible(final Vector<Card> cards) {
+        if (cards == null || cards.isEmpty()) {
             return true;
         }
+
+        final Card firstCard = cards.firstElement();
+
+        if (isEmpty()) {
+            //empty tableau piles can be filled with a stack starting with a king
+            return firstCard.rank() == KING;
+        } else if (!faceDown.isEmpty() && faceUp.isEmpty()) {
+            //cannot add cards, face down card has to be turned over first
+            return false;
+        }
+
+        final Card lastCardFaceUp = faceUp.lastElement();
+        return lastCardFaceUp.getColor() != firstCard.getColor() && firstCard.rank().isPredecessor(lastCardFaceUp.rank());
     }
 
     /**
      * @param index the index of the first card in the stack that shall be removed from face up cards on the tableau
      * @return the vector of cards that was removed from the tableau
      */
-    public Vector<Card> removeFaceUpVector(int index) {
-
-        Vector<Card> result = getCopyFaceUpVector(index);
-        this.faceUp.removeAll(result);
-        return result;
+    public Vector<Card> removeFromFaceUpCards(final int index) {
+        final Vector<Card> elementsToBeRemoved = getCopyFaceUpVector(index);
+        faceUp.removeAll(elementsToBeRemoved);
+        return elementsToBeRemoved;
     }
 
     /**
      * @param index the index of the first card in the stack that shall be copied from face up cards on the tableau
      * @return a copy of a vector of cards on this tableau starting with the card specified by index
      */
-    public Vector<Card> getCopyFaceUpVector(int index) {
-        if ((index < 0) || (index >= this.faceUp.size())) {
-            return new Vector<Card>();
-        } else {
-            Vector<Card> result = new Vector<Card>();
-            for (int i = index; i < this.faceUp.size(); ++i) {
-                result.add(this.faceUp.get(i));
-            }
-
-            return result;
+    public Vector<Card> getCopyFaceUpVector(final int index) {
+        if (index < 0 || index >= faceUp.size()) {
+            return new Vector<>();
         }
-    }
 
-    public String toString() {
-        return "Face-Down: " + faceDown.toString() + "; Face-Up: " + faceUp.toString();
+        final Vector<Card> result = new Vector<>();
+        for (int i = index; i < faceUp.size(); ++i) {
+            result.add(faceUp.get(i));
+        }
+        return result;
     }
-
 }
 

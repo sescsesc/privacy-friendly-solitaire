@@ -40,7 +40,7 @@
 
     <string-array name="waste_screen_value">
         <item name="sel_waste_one">1</item>
-        <item name="sel_waste_three">2</item>
+        <item name="sel_waste_three">3</item>
     </string-array>
 
 

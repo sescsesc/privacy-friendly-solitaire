@@ -14,6 +14,12 @@ This program is free software: you can redistribute it and/or modify
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import static org.secuso.privacyfriendlysolitaire.game.CardDrawMode.ONE;
+import static org.secuso.privacyfriendlysolitaire.game.CardDrawMode.THREE;
+import static org.secuso.privacyfriendlysolitaire.game.ScoreMode.NONE;
+import static org.secuso.privacyfriendlysolitaire.game.ScoreMode.STANDARD;
+import static org.secuso.privacyfriendlysolitaire.game.ScoreMode.VEGAS;
+
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -52,7 +58,8 @@ import org.secuso.privacyfriendlysolitaire.CallBackListener;
 import org.secuso.privacyfriendlysolitaire.R;
 import org.secuso.privacyfriendlysolitaire.Utils.Config;
 import org.secuso.privacyfriendlysolitaire.game.Application;
-import org.secuso.privacyfriendlysolitaire.game.Constants;
+import org.secuso.privacyfriendlysolitaire.game.CardDrawMode;
+import org.secuso.privacyfriendlysolitaire.game.ScoreMode;
 
 import java.util.Timer;
 import java.util.TimerTask;
@@ -99,7 +106,8 @@ public class Solitaire extends AndroidApplication implements NavigationView.OnNa
     // SHAKE
     Application application;
     boolean countTime = false;
-    boolean showPoints = false;
+
+    ScoreMode scoreMode = STANDARD;
     static boolean stillLeave = false;
 
 
@@ -152,21 +160,15 @@ public class Solitaire extends AndroidApplication implements NavigationView.OnNa
         }
 
         // default modes for cardDraw and score
-        int cardDrawMode = getCardDrawMode();
+        final CardDrawMode cardDrawMode = readCardDrawModeFromPreferences();
 
         //pointsView && select point counting mode in settings
+        updateScoreModeFromPreferences();
         pointsView = (TextView) findViewById(R.id.points);
-        final int scoreMode = getScoreMode();
-        if (scoreMode == Constants.MODE_NONE) {
-            pointsView.setVisibility(View.GONE);
-            showPoints = false;
-        } else {
-            pointsView.setVisibility(View.VISIBLE);
-            showPoints = true;
-        }
+        pointsView.setVisibility(scoreMode == NONE ? View.GONE : View.VISIBLE);
 
         // Set the background color of the game panel
-        updateBackroundColorFromPreferences();
+        updateBackgroundColorFromPreferences();
 
         //undo Button in game panel
         final ImageButton undo = (ImageButton) findViewById(R.id.undo);
@@ -186,7 +188,7 @@ public class Solitaire extends AndroidApplication implements NavigationView.OnNa
         application.customConstructor(cardDrawMode, scoreMode, sound, this.backgroundColor, draganddrop);
     }
 
-    private void updateBackroundColorFromPreferences() {
+    private void updateBackgroundColorFromPreferences() {
         final String setting = mSharedPreferences.getString(getString(R.string.sp_key_background_color), "1");
         this.backgroundColor = switch (setting) {
             case "1" -> GREEN_SOL;
@@ -198,25 +200,24 @@ public class Solitaire extends AndroidApplication implements NavigationView.OnNa
         };
     }
 
-    private int getCardDrawMode() {
+    private CardDrawMode readCardDrawModeFromPreferences() {
         final String setting = mSharedPreferences.getString(getString(R.string.pref_waste), "1");
 
         // settings-> waste
         return switch (setting) {
-            case "1" -> Constants.MODE_ONE_CARD_DEALT;
-            case "2" -> Constants.MODE_THREE_CARDS_DEALT;
-            default -> Constants.MODE_ONE_CARD_DEALT;
+            case "1" -> ONE;
+            case "3" -> THREE;
+            default -> ONE;
         };
     }
 
-    private int getScoreMode() {
-        final String setting = mSharedPreferences.getString(getString(R.string.pref_count_point), "1");
-
-        return switch (setting) {
-            case "1" -> Constants.MODE_NONE;
-            case "2" -> Constants.MODE_STANDARD;
-            case "3" -> Constants.MODE_VEGAS;
-            default -> Constants.MODE_STANDARD;
+    private void updateScoreModeFromPreferences() {
+        final String setting = mSharedPreferences.getString(getString(R.string.pref_count_point), "2");
+        this.scoreMode = switch (setting) {
+            case "1" -> NONE;
+            case "2" -> STANDARD;
+            case "3" -> VEGAS;
+            default -> STANDARD;
         };
     }
 
@@ -294,6 +295,7 @@ public class Solitaire extends AndroidApplication implements NavigationView.OnNa
     //Alert box for winning a game which prints the total time and the reached points
     public void alertBoxWonMessage() {
 
+        final boolean showPoints = scoreMode != NONE;
         WonDialog dia = new WonDialog(this, countTime, showPoints);
         Bundle args = new Bundle();
 
