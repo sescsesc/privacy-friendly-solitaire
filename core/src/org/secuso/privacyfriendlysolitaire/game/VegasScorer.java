@@ -16,6 +16,7 @@ This program is free software: you can redistribute it and/or modify
 
 import static org.secuso.privacyfriendlysolitaire.model.Location.FOUNDATION;
 
+import org.secuso.privacyfriendlysolitaire.model.Action;
 import org.secuso.privacyfriendlysolitaire.model.Move;
 
 /**
@@ -25,9 +26,9 @@ import org.secuso.privacyfriendlysolitaire.model.Move;
  * and -5 on moves from the foundation
  */
 
-class VegasScorer extends Scorer {
+public class VegasScorer extends Scorer {
 
-    VegasScorer() {
+    public VegasScorer() {
         setScore(-52);
     }
 
@@ -36,14 +37,14 @@ class VegasScorer extends Scorer {
         if (game.getPrevAction() == null) {
             setScore(-52);
             for (int i = 0; i < game.getMovePointer() + 1; i++) {
-                Move m = game.getMoves().get(i);
-                if (m.sourceAction().getLocation() == FOUNDATION) {
+                final Move m = game.getMoves().get(i);
+                final Action sourceAction = m.sourceAction();
+                if (sourceAction.getLocation() == FOUNDATION) {
                     addScore(-5);
                 }
-                if (m.targetAction() != null) {
-                    if (m.targetAction().getLocation() == FOUNDATION) {
-                        addScore(5);
-                    }
+                final Action targetAction = m.targetAction();
+                if (targetAction != null && targetAction.getLocation() == FOUNDATION) {
+                    addScore(5);
                 }
             }
             notifyListener();

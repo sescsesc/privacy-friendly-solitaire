@@ -16,18 +16,18 @@ This program is free software: you can redistribute it and/or modify
 
 /**
  * @author M. Saracoglu
- *         Empty scorer, if the user does not want to count his points
+ * Empty scorer, if the user does not want to count his points
  */
 
-class NoneScorer extends Scorer {
+public class NoneScorer extends Scorer {
 
-    NoneScorer() {
+    public NoneScorer() {
         setScore(0);
     }
 
     @Override
     public void update(SolitaireGame game) {
-
+        // do nothing
     }
 }
 
