@@ -17,63 +17,20 @@ This program is free software: you can redistribute it and/or modify
 
 /**
  * @author M. Fischer
- *         <p>
- *         represents a move in the game
+ * <p>
+ * represents a move in the game
  */
 
-public class Move {
-    private Action action1;
-    private Action action2;
-    private boolean turnover = false;
-    private int oldfanSize = -1;
-    private int newFanSize = -1;
-
-    public Move(Action action1, Action action2) {
-        this.action1 = action1;
-        this.action2 = action2;
-    }
-
-    public Move(Action action1, Action action2, boolean turnover) {
-        this.action1 = action1;
-        this.action2 = action2;
-        this.turnover = turnover;
-    }
-
-    public Action getAction1() {
-        return action1;
-    }
-
-    public Action getAction2() {
-        return action2;
-    }
-
-    public boolean isTurnover() {
-        return turnover;
-    }
-
-    public int getOldfanSize() {
-        return oldfanSize;
-    }
-
-    public void setOldfanSize(int oldfanSize) {
-        this.oldfanSize = oldfanSize;
-    }
-
-    public int getNewFanSize() {
-        return newFanSize;
-    }
-
-    public void setNewFanSize(int newFanSize) {
-        this.newFanSize = newFanSize;
-    }
+public record Move(Action sourceAction, Action targetAction, boolean turnover, int oldFanSize,
+                   int newFanSize) {
 
     @Override
     public String toString() {
         return "Move{" +
-                "action1=" + action1 +
-                ", action2=" + action2 +
+                "sourceAction=" + sourceAction +
+                ", targetAction=" + targetAction +
                 ", turnover=" + turnover +
-                ", oldfanSize=" + oldfanSize +
+                ", oldFanSize=" + oldFanSize +
                 ", newFanSize=" + newFanSize +
                 '}';
     }

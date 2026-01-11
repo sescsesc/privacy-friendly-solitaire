@@ -199,8 +199,8 @@ public class Application extends ApplicationAdapter implements ScoreListener {
                         if (move == null) {
                             break;
                         }
-                        game.handleAction(move.getAction1(), false);
-                        game.handleAction(move.getAction2(), false);
+                        game.handleAction(move.sourceAction(), false);
+                        game.handleAction(move.targetAction(), false);
 
                         try {
                             sleep(300);
@@ -227,10 +227,10 @@ public class Application extends ApplicationAdapter implements ScoreListener {
                     try {
                         if (move != null) {
                             //break;
-                            game.handleAction(move.getAction1(), false);
+                            game.handleAction(move.sourceAction(), false);
 
-                            if (move.getAction2() != null) {
-                                game.handleAction(move.getAction2(), false);
+                            if (move.targetAction() != null) {
+                                game.handleAction(move.targetAction(), false);
                             }
 
                             if (!practicallyWon) {

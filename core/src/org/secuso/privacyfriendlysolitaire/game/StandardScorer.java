@@ -47,23 +47,23 @@ class StandardScorer extends Scorer {
             setScore(0);
             for (int i = 0; i < game.getMovePointer() + 1; i++) {
                 Move m = game.getMoves().get(i);
-                if (m.getAction1().getLocation() == WASTE) {
-                    if (m.getAction2().getLocation() == TABLEAU) {
+                if (m.sourceAction().getLocation() == WASTE) {
+                    if (m.targetAction().getLocation() == TABLEAU) {
                         addScore(5);
-                    } else if (m.getAction2().getLocation() == FOUNDATION) {
+                    } else if (m.targetAction().getLocation() == FOUNDATION) {
                         addScore(10);
                     }
-                } else if (m.getAction1().getLocation() == TABLEAU) {
-                    if (m.getAction2().getLocation() == FOUNDATION) {
+                } else if (m.sourceAction().getLocation() == TABLEAU) {
+                    if (m.targetAction().getLocation() == FOUNDATION) {
                         addScore(10);
                     }
-                } else if (m.getAction1().getLocation() == FOUNDATION) {
-                    if (m.getAction2().getLocation() == TABLEAU) {
+                } else if (m.sourceAction().getLocation() == FOUNDATION) {
+                    if (m.targetAction().getLocation() == TABLEAU) {
                         addScore(-15);
                     }
                 } else if (game.getDeckWaste().getCardDrawMode() == ONE) {
-                    if (m.getAction2() != null) {
-                        if (m.getAction1().getLocation() == DECK && m.getAction2().getLocation() == DECK) {
+                    if (m.targetAction() != null) {
+                        if (m.sourceAction().getLocation() == DECK && m.targetAction().getLocation() == DECK) {
                             addScore(-100);
 
                         }

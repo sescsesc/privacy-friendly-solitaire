@@ -407,8 +407,8 @@ public class View implements GameListener {
 
     // ---------------------------- MOVES ----------------------------
     private void handleMove(Move move, SolitaireGame game) {
-        Action ac1 = move.getAction1();
-        Action ac2 = move.getAction2();
+        Action ac1 = move.sourceAction();
+        Action ac2 = move.targetAction();
 
         int sourceStack = ac1.getStackIndex();
         int sourceCard = ac1.getCardIndex();
@@ -1043,8 +1043,8 @@ public class View implements GameListener {
 
     // ---------------------------- UNDO MOVES ----------------------------
     private void handleUndoMove(Move move, SolitaireGame game) {
-        Action ac1 = move.getAction1();
-        Action ac2 = move.getAction2();
+        Action ac1 = move.sourceAction();
+        Action ac2 = move.targetAction();
 
         // CAUTION: target and source are inverted (as if the undo move was a valid move from
         // target to source
@@ -1071,7 +1071,7 @@ public class View implements GameListener {
 
                 // turn all cards that are in the deck after size-newFanSize (fanSize after move
                 // that is currently being undone)
-                for (int i = deck.size() - move.getNewFanSize(); i < deck.size(); i++) {
+                for (int i = deck.size() - move.newFanSize(); i < deck.size(); i++) {
                     try {
                         cardsToBeUnturned.add(loader.getCardTextureName(deck.get(i)));
                     } catch (Exception E) {
@@ -1100,7 +1100,7 @@ public class View implements GameListener {
                     // ------------------------ T -> T ------------------------
                     else if (ac1.getLocation() == TABLEAU) {
                         // was a card turned over?
-                        boolean wasTurnOver = move.isTurnover();
+                        boolean wasTurnOver = move.turnover();
 
                         // get texture string of cards that were moved
                         Tableau tabAtTargetStack = game.getTableauAtPos(targetStack);
@@ -1159,7 +1159,7 @@ public class View implements GameListener {
                     else if (ac1.getLocation() == TABLEAU) {
 
                         // was a card turned over?
-                        boolean wasTurnOver = move.isTurnover();
+                        boolean wasTurnOver = move.turnover();
 
                         // get texture string of card that was moved
                         Tableau tabAtTargetStack = game.getTableauAtPos(targetStack);

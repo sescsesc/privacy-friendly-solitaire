@@ -37,11 +37,11 @@ class VegasScorer extends Scorer {
             setScore(-52);
             for (int i = 0; i < game.getMovePointer() + 1; i++) {
                 Move m = game.getMoves().get(i);
-                if (m.getAction1().getLocation() == FOUNDATION) {
+                if (m.sourceAction().getLocation() == FOUNDATION) {
                     addScore(-5);
                 }
-                if (m.getAction2() != null) {
-                    if (m.getAction2().getLocation() == FOUNDATION) {
+                if (m.targetAction() != null) {
+                    if (m.targetAction().getLocation() == FOUNDATION) {
                         addScore(5);
                     }
                 }

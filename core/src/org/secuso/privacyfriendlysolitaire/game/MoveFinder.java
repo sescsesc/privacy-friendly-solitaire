@@ -109,14 +109,14 @@ class MoveFinder {
                     //check if reversal of previous move
                     if (!game.getMoves().isEmpty()) {
                         Move prevMove = game.getMoves().get(game.getMovePointer());
-                        if (prevMove.getAction1().getLocation() == FOUNDATION && prevMove.getAction2().getLocation() == TABLEAU && prevMove.getAction1().getStackIndex() == f && prevMove.getAction2().getStackIndex() == t) {
+                        if (prevMove.sourceAction().getLocation() == FOUNDATION && prevMove.targetAction().getLocation() == TABLEAU && prevMove.sourceAction().getStackIndex() == f && prevMove.targetAction().getStackIndex() == t) {
                             continue;
                         }
                     }
                     int tableauCardIndex = game.getTableauAtPos(t).getFaceUpCardsSize() - 1;
                     Action sourceAction = new Action(TABLEAU, t, tableauCardIndex);
                     Action targetAction = new Action(FOUNDATION, f, 0);
-                    return new Move(sourceAction, targetAction);
+                    return new Move(sourceAction, targetAction, false, -1, -1);
                 }
             }
         }
@@ -148,13 +148,13 @@ class MoveFinder {
                     //check if reversal of previous move
                     if (!game.getMoves().isEmpty()) {
                         Move prevMove = game.getMoves().get(game.getMovePointer());
-                        if (prevMove.getAction1().getLocation() == TABLEAU && prevMove.getAction2().getLocation() == TABLEAU && prevMove.getAction1().getStackIndex() == targetT && prevMove.getAction2().getStackIndex() == sourceT && !game.isLastMoveturnedOverTableau()) {
+                        if (prevMove.sourceAction().getLocation() == TABLEAU && prevMove.targetAction().getLocation() == TABLEAU && prevMove.sourceAction().getStackIndex() == targetT && prevMove.targetAction().getStackIndex() == sourceT && !game.isLastMoveturnedOverTableau()) {
                             continue;
                         }
                     }
                     Action sourceAction = new Action(TABLEAU, sourceT, sourceCardIndex);
                     Action targetAction = new Action(TABLEAU, targetT, 0);
-                    return new Move(sourceAction, targetAction);
+                    return new Move(sourceAction, targetAction, false, -1, -1);
                 }
 //                }
             }
@@ -182,7 +182,7 @@ class MoveFinder {
                     } else {
                         targetAction = new Action(TABLEAU, t, nrOfFaceUpInTarget - 1);
                     }
-                    return new Move(sourceAction, targetAction);
+                    return new Move(sourceAction, targetAction, false, -1, -1);
                 }
             }
         }
@@ -200,7 +200,7 @@ class MoveFinder {
                 if (game.getFoundationAtPos(f).canAddCard(toBeMoved)) {
                     Action sourceAction = new Action(WASTE, 0, 0);
                     Action targetAction = new Action(FOUNDATION, f, 0);
-                    return new Move(sourceAction, targetAction);
+                    return new Move(sourceAction, targetAction, false, -1, -1);
                 }
             }
         }
@@ -245,9 +245,9 @@ class MoveFinder {
         Move foundMove = null;
         Action action = new Action(DECK, 0, 0);
         if (game.getDeckWaste().canTurnover()) {
-            foundMove = new Move(action, null);
+            foundMove = new Move(action, null, false, -1, -1);
         } else if (game.getDeckWaste().canReset()) {
-            foundMove = new Move(action, action);
+            foundMove = new Move(action, action, false, -1, -1);
         }
         return foundMove;
     }
