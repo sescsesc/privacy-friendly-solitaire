@@ -111,7 +111,7 @@ public record Tableau(Vector<Card> faceDown, Vector<Card> faceUp) {
         }
 
         final Card lastCardFaceUp = faceUp.lastElement();
-        return lastCardFaceUp.suit().getColor() != firstCard.suit().getColor() && firstCard.rank().isPredecessor(lastCardFaceUp.rank());
+        return lastCardFaceUp.getColor() != firstCard.getColor() && firstCard.rank().isPredecessor(lastCardFaceUp.rank());
     }
 
     /**

@@ -19,6 +19,10 @@ This program is free software: you can redistribute it and/or modify
  */
 public record Card(Rank rank, Suit suit) {
 
+    public Color getColor() {
+        return suit == null ? null : suit.getColor();
+    }
+
 }
 
 
