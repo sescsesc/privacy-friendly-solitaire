@@ -19,11 +19,11 @@ import org.secuso.privacyfriendlysolitaire.ScoreListener;
 
 /**
  * @author M. Fischer
- *         <p>
- *         An abstract Scorer from which all other (Standard, Vegas, NoneScorer) can extend
+ * <p>
+ * An abstract Scorer from which all other (Standard, Vegas, NoneScorer) can extend
  */
 
-abstract class Scorer implements GameListener {
+public abstract class Scorer implements GameListener {
 
     private int score;
 

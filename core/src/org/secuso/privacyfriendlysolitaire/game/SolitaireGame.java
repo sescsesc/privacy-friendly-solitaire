@@ -14,6 +14,7 @@ This program is free software: you can redistribute it and/or modify
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import static org.secuso.privacyfriendlysolitaire.game.CardDrawMode.ONE;
 import static org.secuso.privacyfriendlysolitaire.model.Location.DECK;
 import static org.secuso.privacyfriendlysolitaire.model.Location.FOUNDATION;
 import static org.secuso.privacyfriendlysolitaire.model.Location.TABLEAU;
@@ -496,7 +497,7 @@ public class SolitaireGame {
      * @return true if the game is practically won
      */
     boolean isPracticallyWon() {
-        boolean practicallyWon = deckAndWaste != null && (deckAndWaste.getNumTurnOver() == 1);
+        boolean practicallyWon = deckAndWaste != null && deckAndWaste.getCardDrawMode() == ONE;
 
         for (Tableau tab : tableaus) {
             if (practicallyWon) {

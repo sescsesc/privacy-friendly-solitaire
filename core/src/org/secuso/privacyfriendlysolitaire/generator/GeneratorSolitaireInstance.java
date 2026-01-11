@@ -1,5 +1,13 @@
 package org.secuso.privacyfriendlysolitaire.generator;
 
+import static org.secuso.privacyfriendlysolitaire.game.CardDrawMode.ONE;
+import static org.secuso.privacyfriendlysolitaire.game.Constants.MAX_NR_IN_DECK;
+import static org.secuso.privacyfriendlysolitaire.game.Constants.NR_OF_FOUNDATIONS;
+import static org.secuso.privacyfriendlysolitaire.game.Constants.NR_OF_TABLEAUS;
+import static org.secuso.privacyfriendlysolitaire.game.ScoreMode.STANDARD;
+
+import org.secuso.privacyfriendlysolitaire.game.CardDrawMode;
+import org.secuso.privacyfriendlysolitaire.game.ScoreMode;
 import org.secuso.privacyfriendlysolitaire.game.SolitaireGame;
 import org.secuso.privacyfriendlysolitaire.model.Card;
 import org.secuso.privacyfriendlysolitaire.model.Rank;
@@ -13,8 +21,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.Vector;
-
-import static org.secuso.privacyfriendlysolitaire.game.Constants.*;
 /*
 This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -40,11 +46,7 @@ This program is free software: you can redistribute it and/or modify
 
 public class GeneratorSolitaireInstance {
 
-    public static SolitaireGame buildPlayableSolitaireInstance(int cardDrawMode, int scoreMode) {
-        if (cardDrawMode != MODE_ONE_CARD_DEALT && cardDrawMode != MODE_THREE_CARDS_DEALT) {
-            throw new IllegalArgumentException("mode should be 0 or 1 (see Constants for reference");
-        }
-
+    public static SolitaireGame buildPlayableSolitaireInstance(final CardDrawMode cardDrawMode, final ScoreMode scoreMode) {
         SolitaireGame instance = generateInstance(cardDrawMode, scoreMode);
 
         // check for playability
@@ -61,7 +63,7 @@ public class GeneratorSolitaireInstance {
     /**
      * @return a random solitaire instance
      */
-    public static SolitaireGame generateInstance(int cardDrawMode, int scoreMode) {
+    public static SolitaireGame generateInstance(final CardDrawMode cardDrawMode, final ScoreMode scoreMode) {
         Set<Card> allCards = generateAllCards();
 
         // bring generated cards into random order
@@ -97,9 +99,7 @@ public class GeneratorSolitaireInstance {
             }
         }
 
-        boolean isVegas = scoreMode == 1;
-
-        return GeneratorUtils.constructInstanceFromCardLists(cardDrawMode, isVegas, deck, tableaus);
+        return GeneratorUtils.constructInstanceFromCardLists(cardDrawMode, scoreMode, deck, tableaus);
     }
 
     /**
@@ -131,7 +131,7 @@ public class GeneratorSolitaireInstance {
      * @param instance the instance to be checked
      * @return whether it is playable, meaning that at least one of the conditions given above is false
      */
-    public static boolean isInstancePlayable(SolitaireGame instance, int mode) {
+    public static boolean isInstancePlayable(SolitaireGame instance, final CardDrawMode cardDrawMode) {
         int nrOfAces = 0;
         int nrOfPossibleMoves = 0;
 
@@ -153,7 +153,7 @@ public class GeneratorSolitaireInstance {
         }
 
         // check for all playable cards in deck
-        for (int i = 0; i < MAX_NR_IN_DECK; i += mode) {
+        for (int i = 0; i < MAX_NR_IN_DECK; i += cardDrawMode.getNumberOfCards()) {
             Card c = instance.getDeckWaste().getDeck().get(i);
 
             // whether they are an ace
@@ -217,7 +217,7 @@ public class GeneratorSolitaireInstance {
             tableaus.put(j, tableau);
         }
 
-        return GeneratorUtils.constructInstanceFromCardLists(MODE_ONE_CARD_DEALT, false, deck,
+        return GeneratorUtils.constructInstanceFromCardLists(ONE, STANDARD, deck,
                 tableaus, foundations);
     }
 }

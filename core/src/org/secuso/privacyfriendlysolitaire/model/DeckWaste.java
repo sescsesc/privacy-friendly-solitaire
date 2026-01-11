@@ -14,6 +14,11 @@ This program is free software: you can redistribute it and/or modify
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import static org.secuso.privacyfriendlysolitaire.game.ScoreMode.VEGAS;
+
+import org.secuso.privacyfriendlysolitaire.game.CardDrawMode;
+import org.secuso.privacyfriendlysolitaire.game.ScoreMode;
+
 import java.util.Objects;
 import java.util.Vector;
 
@@ -35,12 +40,12 @@ public class DeckWaste {
     /**
      * the number of cards that is turned over simultaneously
      */
-    private final int numTurnOver;
+    private final CardDrawMode cardDrawMode;
 
     /**
      * true if vegas variant is played
      */
-    private final boolean vegas;
+    private final ScoreMode scoreMode;
 
     /**
      * the number of cards currently fanned out on the waste
@@ -48,11 +53,11 @@ public class DeckWaste {
     private int fanSize;
 
 
-    public DeckWaste(final Vector<Card> deck, final Vector<Card> waste, final int numTurnOver, final boolean vegas, final int fanSize) {
+    public DeckWaste(final Vector<Card> deck, final Vector<Card> waste, final CardDrawMode cardDrawMode, final ScoreMode scoreMode, final int fanSize) {
         this.deck = deck;
         this.waste = waste;
-        this.numTurnOver = numTurnOver;
-        this.vegas = vegas;
+        this.cardDrawMode = cardDrawMode;
+        this.scoreMode = scoreMode;
         this.fanSize = fanSize;
     }
 
@@ -70,8 +75,8 @@ public class DeckWaste {
         return waste;
     }
 
-    public int getNumTurnOver() {
-        return numTurnOver;
+    public CardDrawMode getCardDrawMode() {
+        return cardDrawMode;
     }
 
     public int getFanSize() {
@@ -97,7 +102,7 @@ public class DeckWaste {
         }
 
         int newfanSize = 0;
-        for (int i = 0; i < numTurnOver; ++i) {
+        for (int i = 0; i < cardDrawMode.getNumberOfCards(); ++i) {
             if (deck.isEmpty()) {
                 break;
             }
@@ -140,7 +145,7 @@ public class DeckWaste {
      * @return true if the deck was succesfully reset from the waste
      */
     public boolean reset() {
-        if (deck.isEmpty() && !vegas) {
+        if (deck.isEmpty() && scoreMode != VEGAS) {
             while (!waste.isEmpty()) {
                 final Card lastCardFromWaste = waste.remove(waste.size() - 1);
                 deck.add(lastCardFromWaste);
@@ -194,12 +199,12 @@ public class DeckWaste {
         if (!(o instanceof DeckWaste deckWaste)) {
             return false;
         }
-        return numTurnOver == deckWaste.numTurnOver && vegas == deckWaste.vegas && fanSize == deckWaste.fanSize && Objects.equals(deck, deckWaste.deck) && Objects.equals(waste, deckWaste.waste);
+        return cardDrawMode == deckWaste.cardDrawMode && scoreMode == deckWaste.scoreMode && fanSize == deckWaste.fanSize && Objects.equals(deck, deckWaste.deck) && Objects.equals(waste, deckWaste.waste);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(deck, waste, numTurnOver, vegas, fanSize);
+        return Objects.hash(deck, waste, cardDrawMode, scoreMode, fanSize);
     }
 
     @Override

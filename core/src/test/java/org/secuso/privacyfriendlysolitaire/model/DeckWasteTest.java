@@ -17,6 +17,9 @@ This program is free software: you can redistribute it and/or modify
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
+import static org.secuso.privacyfriendlysolitaire.game.CardDrawMode.ONE;
+import static org.secuso.privacyfriendlysolitaire.game.CardDrawMode.THREE;
+import static org.secuso.privacyfriendlysolitaire.game.ScoreMode.STANDARD;
 import static org.secuso.privacyfriendlysolitaire.model.Rank.EIGHT;
 import static org.secuso.privacyfriendlysolitaire.model.Rank.JACK;
 import static org.secuso.privacyfriendlysolitaire.model.Rank.KING;
@@ -46,8 +49,8 @@ public class DeckWasteTest {
         for (final Rank r : values()) {
             clubs.add(new Card(r, CLUBS));
         }
-        deckwaste1 = new DeckWaste(clubs, new Vector<>(), 1, false, 0);
-        deckwaste3 = new DeckWaste(clubs, new Vector<>(), 3, false, 0);
+        deckwaste1 = new DeckWaste(clubs, new Vector<>(), ONE, STANDARD, 0);
+        deckwaste3 = new DeckWaste(clubs, new Vector<>(), THREE, STANDARD, 0);
     }
 
     @Test
@@ -89,7 +92,7 @@ public class DeckWasteTest {
 
     @Test
     public void wasteTopTests() {
-        deckwaste1 = new DeckWaste(clubs, clubs, 1, false, 0);
+        deckwaste1 = new DeckWaste(clubs, clubs, ONE, STANDARD, 0);
 
         assertSame("Rank of top card of waste should be KING", KING, deckwaste1.getWasteTop().rank());
         assertSame("Rank of top card of waste should be KING", KING, deckwaste1.removeWasteTop().rank());

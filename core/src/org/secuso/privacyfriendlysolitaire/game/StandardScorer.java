@@ -14,6 +14,7 @@ This program is free software: you can redistribute it and/or modify
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import static org.secuso.privacyfriendlysolitaire.game.CardDrawMode.ONE;
 import static org.secuso.privacyfriendlysolitaire.model.Location.DECK;
 import static org.secuso.privacyfriendlysolitaire.model.Location.FOUNDATION;
 import static org.secuso.privacyfriendlysolitaire.model.Location.TABLEAU;
@@ -60,7 +61,7 @@ class StandardScorer extends Scorer {
                     if (m.getAction2().getLocation() == TABLEAU) {
                         addScore(-15);
                     }
-                } else if (game.getDeckWaste().getNumTurnOver() == 1) {
+                } else if (game.getDeckWaste().getCardDrawMode() == ONE) {
                     if (m.getAction2() != null) {
                         if (m.getAction1().getLocation() == DECK && m.getAction2().getLocation() == DECK) {
                             addScore(-100);

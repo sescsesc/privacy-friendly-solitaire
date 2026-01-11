@@ -18,15 +18,16 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
+import static org.secuso.privacyfriendlysolitaire.game.CardDrawMode.ONE;
+import static org.secuso.privacyfriendlysolitaire.game.CardDrawMode.THREE;
 import static org.secuso.privacyfriendlysolitaire.game.Constants.MAX_NR_IN_DECK;
-import static org.secuso.privacyfriendlysolitaire.game.Constants.MODE_ONE_CARD_DEALT;
-import static org.secuso.privacyfriendlysolitaire.game.Constants.MODE_STANDARD;
-import static org.secuso.privacyfriendlysolitaire.game.Constants.MODE_THREE_CARDS_DEALT;
 import static org.secuso.privacyfriendlysolitaire.game.Constants.NR_CARDS;
 import static org.secuso.privacyfriendlysolitaire.game.Constants.NR_OF_FOUNDATIONS;
 import static org.secuso.privacyfriendlysolitaire.game.Constants.NR_OF_TABLEAUS;
+import static org.secuso.privacyfriendlysolitaire.game.ScoreMode.STANDARD;
 
 import org.junit.Test;
+import org.secuso.privacyfriendlysolitaire.game.CardDrawMode;
 import org.secuso.privacyfriendlysolitaire.game.SolitaireGame;
 import org.secuso.privacyfriendlysolitaire.generator.GeneratorSolitaireInstance;
 import org.secuso.privacyfriendlysolitaire.generator.GeneratorUtils;
@@ -53,8 +54,7 @@ public class GeneratorTest {
         for (Card c : allCards) {
             int nrOfEquals = 0;
             for (Card anotherCard : allCards) {
-                if (c.suit() == anotherCard.suit() &&
-                        c.rank() == anotherCard.rank()) {
+                if (c.suit() == anotherCard.suit() && c.rank() == anotherCard.rank()) {
                     nrOfEquals++;
                 }
             }
@@ -66,7 +66,7 @@ public class GeneratorTest {
     public void generateInstanceTest() {
         // since randomness is involved, we test 100 instances
         for (int j = 0; j < 1000; j++) {
-            SolitaireGame instance = GeneratorSolitaireInstance.generateInstance(MODE_ONE_CARD_DEALT, MODE_STANDARD);
+            SolitaireGame instance = GeneratorSolitaireInstance.generateInstance(ONE, STANDARD);
 
             Vector<Card> allCards = new Vector<Card>(NR_CARDS);
 
@@ -97,26 +97,20 @@ public class GeneratorTest {
         for (int j = 0; j < 100; j++) {
             // unplayability is only possible for MODE_THREE_CARDS_DEALT
             // (otherwise: too many playable cards to make it unplayable)
-            int mode = MODE_THREE_CARDS_DEALT;
+            SolitaireGame unplayableInstance = buildUnplayableInstance(THREE);
 
-            SolitaireGame unplayableInstance = buildUnplayableInstance(mode);
-
-            assertFalse(GeneratorSolitaireInstance.isInstancePlayable(unplayableInstance, mode));
+            assertFalse(GeneratorSolitaireInstance.isInstancePlayable(unplayableInstance, THREE));
         }
     }
 
     @Test
     public void buildPlayableSolitaireInstanceTest() {
         for (int j = 0; j < 1000; j++) {
-            int mode;
-            if (j % 2 == 0) {
-                mode = MODE_ONE_CARD_DEALT;
-            } else {
-                mode = MODE_THREE_CARDS_DEALT;
-            }
-            SolitaireGame instance = GeneratorSolitaireInstance.buildPlayableSolitaireInstance(mode, MODE_STANDARD);
+            final CardDrawMode cardDrawMode = (j % 2 == 0) ? ONE : THREE;
 
-            assertTrue(GeneratorSolitaireInstance.isInstancePlayable(instance, mode));
+            final SolitaireGame instance = GeneratorSolitaireInstance.buildPlayableSolitaireInstance(cardDrawMode, STANDARD);
+
+            assertTrue(GeneratorSolitaireInstance.isInstancePlayable(instance, cardDrawMode));
         }
     }
 
@@ -129,7 +123,7 @@ public class GeneratorTest {
      * <li>None of the 8/24 playable cards in the deck can be moved to any of the seven tableaus</li>
      * </ul>
      */
-    private SolitaireGame buildUnplayableInstance(int mode) {
+    private SolitaireGame buildUnplayableInstance(final CardDrawMode cardDrawMode) {
         HashSet<Card> allCards = GeneratorSolitaireInstance.generateAllCards();
 
         // at least 21 cards are hidden in the tableaus,
@@ -159,9 +153,7 @@ public class GeneratorTest {
                         // and the color is reverse
                         Card otherCard = playableCards.get(i);
 
-                        if ((c.rank().isPredecessor(otherCard.rank()) ||
-                                c.rank().isSuccessor(otherCard.rank())) &&
-                                c.suit().getColor() != otherCard.suit().getColor()) {
+                        if ((c.rank().isPredecessor(otherCard.rank()) || c.rank().isSuccessor(otherCard.rank())) && c.suit().getColor() != otherCard.suit().getColor()) {
                             unplayableCards.add(c);
                             // set playable false so card will not be added to playable-list as well
                             playable = false;
@@ -191,8 +183,7 @@ public class GeneratorTest {
                 playableCards.removeAll(unplayableCards);
             }
 
-            stableInstance = (unplayableCards.size() == desiredNrUnplayable
-                    && playableCards.size() == desiredNrPlayable);
+            stableInstance = (unplayableCards.size() == desiredNrUnplayable && playableCards.size() == desiredNrPlayable);
         }
 
         // build instance from lists
@@ -219,8 +210,8 @@ public class GeneratorTest {
             // unplayable cards in deck
             else {
                 for (int j = 0; j < MAX_NR_IN_DECK; j++) {
-                    // for mode=3, fill 0,1, not 2, 3,4, not 5, ...
-                    if ((j + 1) % mode != 0) {
+                    // for cardDrawMode=3, fill 0,1, not 2, 3,4, not 5, ...
+                    if ((j + 1) % cardDrawMode.getNumberOfCards() != 0) {
                         deck.add(j, unplayableCardToBeAdded);
                     }
                 }
@@ -240,15 +231,15 @@ public class GeneratorTest {
             // playable cards in deck
             else {
                 for (int j = 0; j < MAX_NR_IN_DECK; j++) {
-                    // for mode=3, fill not 0,not 1, 2, not 3,not 4, 5, ...
-                    if ((j + 1) % mode == 0) {
+                    // for cardDrawMode=3, fill not 0,not 1, 2, not 3,not 4, 5, ...
+                    if ((j + 1) % cardDrawMode.getNumberOfCards() == 0) {
                         deck.add(j, playableCardToBeAdded);
                     }
                 }
             }
         }
 
-        return GeneratorUtils.constructInstanceFromCardLists(mode, false, deck, tableaus);
+        return GeneratorUtils.constructInstanceFromCardLists(cardDrawMode, STANDARD, deck, tableaus);
     }
 
 
