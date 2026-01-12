@@ -14,23 +14,31 @@ This program is free software: you can redistribute it and/or modify
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import static org.secuso.privacyfriendlysolitaire.model.Location.DECK;
+import static org.secuso.privacyfriendlysolitaire.model.Location.FOUNDATION;
+import static org.secuso.privacyfriendlysolitaire.model.Location.TABLEAU;
+import static org.secuso.privacyfriendlysolitaire.model.Location.WASTE;
+
 import org.secuso.privacyfriendlysolitaire.CallBackListener;
 import org.secuso.privacyfriendlysolitaire.model.Action;
 import org.secuso.privacyfriendlysolitaire.model.Card;
-import org.secuso.privacyfriendlysolitaire.model.GameObject;
+import org.secuso.privacyfriendlysolitaire.model.DeckWaste;
+import org.secuso.privacyfriendlysolitaire.model.Foundation;
 import org.secuso.privacyfriendlysolitaire.model.Move;
+import org.secuso.privacyfriendlysolitaire.model.Suit;
 import org.secuso.privacyfriendlysolitaire.model.Tableau;
 
-
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Vector;
 
 /**
  * @author M. Fischer
- *         <p>
- *         class to find possible moves in a given game
+ * <p>
+ * class to find possible moves in a given game
  */
 
-class MoveFinder {
+public class MoveFinder {
     private static int nrCardsInDeck = 52;
     private static int nrOfConsecutiveMovesThroughDeck = 0;
 
@@ -38,16 +46,11 @@ class MoveFinder {
      * @param game the SolitaireGame in which a Move shall be found
      * @return a possible Move to progress the Game or null if none could be found
      */
-    static Move findMove(SolitaireGame game, CallBackListener listener) {
+    public static Move findMove(SolitaireGame game, CallBackListener listener) {
         nrCardsInDeck = game.getDeckWaste().getSizeOfDeckAndWaste();
         checkWhetherNoMoves(listener);
 
         Move foundMove = findMoveTableauToFoundation(game);
-        if (foundMove != null) {
-            nrOfConsecutiveMovesThroughDeck = 0;
-            return foundMove;
-        }
-        foundMove = findMoveWasteToTableau(game);
         if (foundMove != null) {
             nrOfConsecutiveMovesThroughDeck = 0;
             return foundMove;
@@ -58,6 +61,11 @@ class MoveFinder {
             return foundMove;
         }
         foundMove = findMoveTableauToTableau(game);
+        if (foundMove != null) {
+            nrOfConsecutiveMovesThroughDeck = 0;
+            return foundMove;
+        }
+        foundMove = findMoveWasteToTableau(game);
         if (foundMove != null) {
             nrOfConsecutiveMovesThroughDeck = 0;
             return foundMove;
@@ -96,28 +104,30 @@ class MoveFinder {
      * @param game the SolitaireGame in which a Move from Tableau to Foundation shall be found
      * @return a possible Move from Tableau to Foundation or null if none could be found
      */
-    static Move findMoveTableauToFoundation(SolitaireGame game) {
-        for (int t = 0; t < game.getTableaus().size(); t++) {
-            if (game.getTableauAtPos(t).getFaceUp().isEmpty()) {
+    static Move findMoveTableauToFoundation(final SolitaireGame game) {
+        for (int tableauIndex = 0; tableauIndex < game.getTableaus().size(); tableauIndex++) {
+            final Tableau tableau = game.getTableauAtPos(tableauIndex);
+            if (tableau.isFaceUpEmpty()) {
                 continue;
             }
-            for (int f = 0; f < game.getFoundations().size(); f++) {
-                if (game.getFoundationAtPos(f).canAddCard(game.getTableauAtPos(t).getFaceUp().lastElement())) {
-                    //check if reversal of previous move
-                    if (!game.getMoves().isEmpty()) {
-                        Move prevMove = game.getMoves().get(game.getMovePointer());
-                        if (prevMove.getAction1().getGameObject() == GameObject.FOUNDATION &&
-                                prevMove.getAction2().getGameObject() == GameObject.TABLEAU &&
-                                prevMove.getAction1().getStackIndex() == f &&
-                                prevMove.getAction2().getStackIndex() == t) {
-                            continue;
-                        }
+
+            final Card cardFromTableau = tableau.faceUp().lastElement();
+
+            final int foundationIndex = calculateFoundationIndexForSuit(game.getFoundations(), cardFromTableau.suit());
+
+            final Foundation foundation = game.getFoundationAtPos(foundationIndex);
+
+            if (foundation.canAddCard(cardFromTableau)) {
+                //check if reversal of previous move
+                if (!game.getMoves().isEmpty()) {
+                    final Move prevMove = game.getMoves().get(game.getMovePointer());
+                    if (prevMove.sourceAction().getLocation() == FOUNDATION && prevMove.targetAction().getLocation() == TABLEAU && prevMove.sourceAction().getStackIndex() == foundationIndex && prevMove.targetAction().getStackIndex() == tableauIndex) {
+                        continue;
                     }
-                    int tableauCardIndex = game.getTableauAtPos(t).getFaceUp().size() - 1;
-                    Action sourceAction = new Action(GameObject.TABLEAU, t, tableauCardIndex);
-                    Action targetAction = new Action(GameObject.FOUNDATION, f, 0);
-                    return new Move(sourceAction, targetAction);
                 }
+                final Action removeFromTableauAction = new Action(TABLEAU, tableauIndex, tableau.getFaceUpCardsSize() - 1);
+                final Action addToFoundationAction = new Action(FOUNDATION, foundationIndex, 0);
+                return new Move(removeFromTableauAction, addToFoundationAction, false, -1, -1);
             }
         }
         return null;
@@ -127,38 +137,36 @@ class MoveFinder {
      * @param game the SolitaireGame in which a Move from Tableau to Tableau shall be found
      * @return a possible Move from Tableau to Tableau or null if none could be found
      */
-    private static Move findMoveTableauToTableau(SolitaireGame game) {
-        for (int sourceT = 0; sourceT < Constants.NR_OF_TABLEAUS; sourceT++) {
-            Tableau sourceTab = game.getTableauAtPos(sourceT);
-            if (sourceTab.getFaceUp().isEmpty()) {
+    private static Move findMoveTableauToTableau(final SolitaireGame game) {
+        for (int tableauIndexSource = 0; tableauIndexSource < Constants.NR_OF_TABLEAUS; tableauIndexSource++) {
+            final Tableau tableauSource = game.getTableauAtPos(tableauIndexSource);
+            if (tableauSource.isFaceUpEmpty()) {
                 continue;
             }
-            for (int targetT = 0; targetT < Constants.NR_OF_TABLEAUS; targetT++) {
-                if (sourceT == targetT) {
+            for (int tableauIndexTarget = 0; tableauIndexTarget < Constants.NR_OF_TABLEAUS; tableauIndexTarget++) {
+                if (tableauIndexSource == tableauIndexTarget) {
                     continue;
                 }
-                Tableau targetTab = game.getTableauAtPos(targetT);
-                if (targetTab.getFaceDown().isEmpty() && sourceTab.getFaceDown().isEmpty()) {
+                final Tableau tableauTarget = game.getTableauAtPos(tableauIndexTarget);
+                // FIXME improve condition
+                if (tableauTarget.isFaceDownEmpty() && tableauSource.isFaceDownEmpty()) {
                     continue;
                 }
                 int sourceCardIndex = 0;
-//                for (int sourceCardIndex = 0; sourceCardIndex < sourceTab.getFaceUp().size(); sourceCardIndex++) {
-                Vector<Card> toBeMoved = sourceTab.getCopyFaceUpVector(sourceCardIndex);
-                if (targetTab.isAddingFaceUpVectorPossible(toBeMoved)) {
+                // FIXME check for all "face up cards"
+//                for (int sourceCardIndex = 0; sourceCardIndex < tableauSource.getFaceUp().size(); sourceCardIndex++) {
+                final Vector<Card> toBeMoved = tableauSource.getCopyFaceUpVector(sourceCardIndex);
+                if (tableauTarget.isAddToFaceUpCardsPossible(toBeMoved)) {
                     //check if reversal of previous move
                     if (!game.getMoves().isEmpty()) {
                         Move prevMove = game.getMoves().get(game.getMovePointer());
-                        if (prevMove.getAction1().getGameObject() == GameObject.TABLEAU &&
-                                prevMove.getAction2().getGameObject() == GameObject.TABLEAU &&
-                                prevMove.getAction1().getStackIndex() == targetT &&
-                                prevMove.getAction2().getStackIndex() == sourceT &&
-                                !game.isLastMoveturnedOverTableau()) {
+                        if (prevMove.sourceAction().getLocation() == TABLEAU && prevMove.targetAction().getLocation() == TABLEAU && prevMove.sourceAction().getStackIndex() == tableauIndexTarget && prevMove.targetAction().getStackIndex() == tableauIndexSource && !game.isLastMoveturnedOverTableau()) {
                             continue;
                         }
                     }
-                    Action sourceAction = new Action(GameObject.TABLEAU, sourceT, sourceCardIndex);
-                    Action targetAction = new Action(GameObject.TABLEAU, targetT, 0);
-                    return new Move(sourceAction, targetAction);
+                    final Action sourceAction = new Action(TABLEAU, tableauIndexSource, sourceCardIndex);
+                    final Action targetAction = new Action(TABLEAU, tableauIndexTarget, 0);
+                    return new Move(sourceAction, targetAction, false, -1, -1);
                 }
 //                }
             }
@@ -170,24 +178,23 @@ class MoveFinder {
      * @param game the SolitaireGame in which a Move from Waste to Tableau shall be found
      * @return a possible Move from Waste to Tableau or null if none could be found
      */
-    private static Move findMoveWasteToTableau(SolitaireGame game) {
-        if (!game.getDeckWaste().isWasteEmpty()) {
-            Vector<Card> toBeMoved = new Vector<Card>();
-            toBeMoved.add(game.getDeckWaste().getWasteTop());
-            for (int t = 0; t < game.getTableaus().size(); t++) {
-                Tableau targetTab = game.getTableauAtPos(t);
+    private static Move findMoveWasteToTableau(final SolitaireGame game) {
+        final DeckWaste deckWaste = game.getDeckWaste();
+        if (deckWaste.isWasteEmpty()) {
+            return null;
+        }
 
-                if (targetTab.isAddingFaceUpVectorPossible(toBeMoved)) {
-                    Action sourceAction = new Action(GameObject.WASTE, 0, 0);
-                    Action targetAction;
-                    int nrOfFaceUpInTarget = targetTab.getFaceUp().size();
-                    if (nrOfFaceUpInTarget == 0) {
-                        targetAction = new Action(GameObject.TABLEAU, t, -1);
-                    } else {
-                        targetAction = new Action(GameObject.TABLEAU, t, nrOfFaceUpInTarget - 1);
-                    }
-                    return new Move(sourceAction, targetAction);
-                }
+        final Vector<Card> cardsFromWaste = new Vector<>();
+        cardsFromWaste.add(deckWaste.getWasteTop());
+
+        for (int t = 0; t < game.getTableaus().size(); t++) {
+            final Tableau tableau = game.getTableauAtPos(t);
+
+            if (tableau.isAddToFaceUpCardsPossible(cardsFromWaste)) {
+                final Action removeFromWasteAction = new Action(WASTE, 0, 0);
+                final int nrOfFaceUpsInTableau = tableau.getFaceUpCardsSize();
+                final Action addToTableauAction = new Action(TABLEAU, t, nrOfFaceUpsInTableau - 1);
+                return new Move(removeFromWasteAction, addToTableauAction, false, -1, -1);
             }
         }
         return null;
@@ -197,18 +204,48 @@ class MoveFinder {
      * @param game the SolitaireGame in which a Move from Waste to Foundation shall be found
      * @return a possible Move from Waste to Foundation or null if none could be found
      */
-    private static Move findMoveWasteToFoundation(SolitaireGame game) {
-        if (!game.getDeckWaste().isWasteEmpty()) {
-            Card toBeMoved = game.getDeckWaste().getWasteTop();
-            for (int f = 0; f < game.getFoundations().size(); f++) {
-                if (game.getFoundationAtPos(f).canAddCard(toBeMoved)) {
-                    Action sourceAction = new Action(GameObject.WASTE, 0, 0);
-                    Action targetAction = new Action(GameObject.FOUNDATION, f, 0);
-                    return new Move(sourceAction, targetAction);
-                }
-            }
+    private static Move findMoveWasteToFoundation(final SolitaireGame game) {
+        final DeckWaste deckWaste = game.getDeckWaste();
+        if (deckWaste.isWasteEmpty()) {
+            return null;
+        }
+
+        final Card cardFromWaste = deckWaste.getWasteTop();
+
+        final int possibleFoundationIndex = calculateFoundationIndexForSuit(game.getFoundations(), cardFromWaste.suit());
+        final Foundation possibleFoundation = game.getFoundationAtPos(possibleFoundationIndex);
+
+        if (possibleFoundation != null && possibleFoundation.canAddCard(cardFromWaste)) {
+            final Action removeFromWasteAction = new Action(WASTE, 0, 0);
+            final Action addToFoundationAction = new Action(FOUNDATION, possibleFoundationIndex, 0);
+            return new Move(removeFromWasteAction, addToFoundationAction, false, -1, -1);
         }
         return null;
+    }
+
+    private static int calculateFoundationIndexForSuit(final ArrayList<Foundation> foundations, final Suit suit) {
+        final List<Integer> possibleIndex = new ArrayList<>(foundations.size());
+
+        for (int foundationIndex = 0; foundationIndex < foundations.size(); foundationIndex++) {
+            final Foundation f = foundations.get(foundationIndex);
+            if (f.isEmpty()) {
+                possibleIndex.add(foundationIndex);
+                continue;
+            }
+            if (f.getSuit() == suit) {
+                return foundationIndex;
+            }
+        }
+
+        if (possibleIndex.isEmpty()) {
+            throw new IllegalStateException("no foundation found for suit " + suit);
+        }
+
+        if (possibleIndex.contains(suit.ordinal())) {
+            return suit.ordinal();
+        }
+
+        return possibleIndex.get(0);
     }
 
 //    /**
@@ -245,15 +282,18 @@ class MoveFinder {
      * @param game the SolitaireGame in which a Move involving the Deck shall be found
      * @return a possible Move involving the Deck or null if none could be found
      */
-    private static Move findMoveDeck(SolitaireGame game) {
-        Move foundMove = null;
-        Action action = new Action(GameObject.DECK, 0, 0);
-        if (game.getDeckWaste().canTurnOver()) {
-            foundMove = new Move(action, null);
-        } else if (game.getDeckWaste().canReset()) {
-            foundMove = new Move(action, action);
+    private static Move findMoveDeck(final SolitaireGame game) {
+        final Action action = new Action(DECK, 0, 0);
+        final DeckWaste deckWaste = game.getDeckWaste();
+
+        if (deckWaste.canTurnover()) {
+            // FIXME tunover = true?
+            return new Move(action, null, false, -1, -1);
+        } else if (deckWaste.canReset()) {
+            // FIXME waste -> deck = different actions?
+            return new Move(action, action, false, -1, -1);
         }
-        return foundMove;
+        return null;
     }
 
 }

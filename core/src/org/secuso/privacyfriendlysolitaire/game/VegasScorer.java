@@ -14,19 +14,21 @@ This program is free software: you can redistribute it and/or modify
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import org.secuso.privacyfriendlysolitaire.model.GameObject;
+import static org.secuso.privacyfriendlysolitaire.model.Location.FOUNDATION;
+
+import org.secuso.privacyfriendlysolitaire.model.Action;
 import org.secuso.privacyfriendlysolitaire.model.Move;
 
 /**
  * @author M. Fischer
- *         <p>
- *         The vegas scorer starts with -52 points and only adds 5 on moves to the foundation
- *         and -5 on moves from the foundation
+ * <p>
+ * The vegas scorer starts with -52 points and only adds 5 on moves to the foundation
+ * and -5 on moves from the foundation
  */
 
-class VegasScorer extends Scorer {
+public class VegasScorer extends Scorer {
 
-    VegasScorer() {
+    public VegasScorer() {
         setScore(-52);
     }
 
@@ -35,14 +37,14 @@ class VegasScorer extends Scorer {
         if (game.getPrevAction() == null) {
             setScore(-52);
             for (int i = 0; i < game.getMovePointer() + 1; i++) {
-                Move m = game.getMoves().get(i);
-                if (m.getAction1().getGameObject() == GameObject.FOUNDATION) {
+                final Move m = game.getMoves().get(i);
+                final Action sourceAction = m.sourceAction();
+                if (sourceAction.getLocation() == FOUNDATION) {
                     addScore(-5);
                 }
-                if (m.getAction2() != null) {
-                    if (m.getAction2().getGameObject() == GameObject.FOUNDATION) {
-                        addScore(5);
-                    }
+                final Action targetAction = m.targetAction();
+                if (targetAction != null && targetAction.getLocation() == FOUNDATION) {
+                    addScore(5);
                 }
             }
             notifyListener();
