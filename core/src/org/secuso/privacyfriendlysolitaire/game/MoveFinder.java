@@ -55,17 +55,17 @@ public class MoveFinder {
             nrOfConsecutiveMovesThroughDeck = 0;
             return foundMove;
         }
-        foundMove = findMoveWasteToTableau(game);
-        if (foundMove != null) {
-            nrOfConsecutiveMovesThroughDeck = 0;
-            return foundMove;
-        }
         foundMove = findMoveWasteToFoundation(game);
         if (foundMove != null) {
             nrOfConsecutiveMovesThroughDeck = 0;
             return foundMove;
         }
         foundMove = findMoveTableauToTableau(game);
+        if (foundMove != null) {
+            nrOfConsecutiveMovesThroughDeck = 0;
+            return foundMove;
+        }
+        foundMove = findMoveWasteToTableau(game);
         if (foundMove != null) {
             nrOfConsecutiveMovesThroughDeck = 0;
             return foundMove;
