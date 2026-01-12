@@ -71,7 +71,7 @@ public class GeneratorTest {
             Vector<Card> allCards = new Vector<Card>(NR_CARDS);
 
             // assert all cards are in the deck and none in the waste
-            DeckWaste d = instance.getDeckWaste();
+            DeckAndWaste d = instance.getDeckWaste();
             assertEquals(MAX_NR_IN_DECK, d.getDeck().size());
             assertEquals(0, d.getWaste().size());
             allCards.addAll(d.getDeck());

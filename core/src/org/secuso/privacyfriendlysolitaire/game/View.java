@@ -36,7 +36,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.DragAndDrop;
 import org.secuso.privacyfriendlysolitaire.GameListener;
 import org.secuso.privacyfriendlysolitaire.model.Action;
 import org.secuso.privacyfriendlysolitaire.model.Card;
-import org.secuso.privacyfriendlysolitaire.model.DeckWaste;
+import org.secuso.privacyfriendlysolitaire.model.DeckAndWaste;
 import org.secuso.privacyfriendlysolitaire.model.Foundation;
 import org.secuso.privacyfriendlysolitaire.model.Location;
 import org.secuso.privacyfriendlysolitaire.model.Move;
@@ -186,21 +186,21 @@ public class View implements GameListener {
         }
     }
 
-    private void paintInitialDeckWaste(DeckWaste deckWaste) {
+    private void paintInitialDeckWaste(DeckAndWaste deckAndWaste) {
         // ----- waste -----
         // draw empty space card
         ImageWrapper emptySpace = loader.getEmptySpaceImageWithoutLogo();
         setImageScalingAndPositionAndStackCardIndicesAndAddToStage(emptySpace, null, ViewConstants.WasteX1Fan, ViewConstants.WasteDeckFoundationY, -1, -1);
 
         // then draw the open fan
-        paintWaste(deckWaste, true, false);
+        paintWaste(deckAndWaste, true, false);
 
 
         // ----- deck -----
         ImageWrapper emptySpaceDeck = loader.getEmptySpaceImageWithoutLogo();
         setImageScalingAndPositionAndStackCardIndicesAndAddToStage(emptySpaceDeck, null, ViewConstants.DeckX, ViewConstants.WasteDeckFoundationY, -1, -1);
         setImageScalingAndPositionAndStackCardIndicesAndAddToStage(backsideCardOnDeck, DECK, ViewConstants.DeckX, ViewConstants.WasteDeckFoundationY, -1, -1);
-        if (deckWaste.getDeck().isEmpty()) {
+        if (deckAndWaste.getDeck().isEmpty()) {
             backsideCardOnDeck.setVisible(false);
         }
     }
@@ -568,9 +568,9 @@ public class View implements GameListener {
 
 
     private void turnOrUnturnDeckCard(SolitaireGame game, Vector<String> cardsToBeUnturned) {
-        DeckWaste deckWaste = game.getDeckWaste();
+        DeckAndWaste deckAndWaste = game.getDeckWaste();
 
-        paintWaste(deckWaste, false, false);
+        paintWaste(deckAndWaste, false, false);
 
         if (cardsToBeUnturned != null) {
             for (String texString : cardsToBeUnturned) {
@@ -583,7 +583,7 @@ public class View implements GameListener {
         }
 
         // check if this was the last
-        if (deckWaste.getDeck().isEmpty()) {
+        if (deckAndWaste.getDeck().isEmpty()) {
             backsideCardOnDeck.setVisible(false);
         } else {
             backsideCardOnDeck.setVisible(true);
@@ -593,16 +593,16 @@ public class View implements GameListener {
     /**
      * paints the waste in its current state
      *
-     * @param deckWaste              the deckWaste object from the game
+     * @param deckAndWaste              the deckWaste object from the game
      * @param isInitialization       a boolean depicting whether this was called by paintInitialDeckWaste
      *                               (true) or turnOrUnturnDeckCard (false)
      * @param fanCardsToBeRearranged a boolean depicting whether this was called by paintInitialDeckWaste
      *                               (true) or turnOrUnturnDeckCard (false)
      */
-    private void paintWaste(DeckWaste deckWaste, boolean isInitialization, boolean fanCardsToBeRearranged) {
+    private void paintWaste(DeckAndWaste deckAndWaste, boolean isInitialization, boolean fanCardsToBeRearranged) {
         // draw first few cards before the open fan
-        Vector<Card> waste = deckWaste.getWaste();
-        for (int i = 0; i < waste.size() - deckWaste.getFanSize(); i++) {
+        Vector<Card> waste = deckAndWaste.getWaste();
+        for (int i = 0; i < waste.size() - deckAndWaste.getFanSize(); i++) {
             Card c = waste.get(i);
             String textureName = loader.getCardTextureName(c);
 
@@ -619,7 +619,7 @@ public class View implements GameListener {
         }
 
         // get nr of open cards in fan
-        int fanSize = deckWaste.getFanSize();
+        int fanSize = deckAndWaste.getFanSize();
         Vector<ImageWrapper> fanImages = new Vector<ImageWrapper>(3);
 
 
@@ -1061,8 +1061,8 @@ public class View implements GameListener {
 
         // click on deck
         if (ac2 == null || (ac2.getLocation() == DECK) && (ac1.getLocation() == DECK)) {
-            DeckWaste deckWaste = game.getDeckWaste();
-            Vector<Card> deck = deckWaste.getDeck();
+            DeckAndWaste deckAndWaste = game.getDeckWaste();
+            Vector<Card> deck = deckAndWaste.getDeck();
 
             if (game.getDeckWaste().isWasteEmpty()) {
                 resetDeck();

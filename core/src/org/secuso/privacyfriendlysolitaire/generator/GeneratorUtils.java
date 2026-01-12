@@ -21,7 +21,7 @@ import org.secuso.privacyfriendlysolitaire.game.CardDrawMode;
 import org.secuso.privacyfriendlysolitaire.game.ScoreMode;
 import org.secuso.privacyfriendlysolitaire.game.SolitaireGame;
 import org.secuso.privacyfriendlysolitaire.model.Card;
-import org.secuso.privacyfriendlysolitaire.model.DeckWaste;
+import org.secuso.privacyfriendlysolitaire.model.DeckAndWaste;
 import org.secuso.privacyfriendlysolitaire.model.Foundation;
 import org.secuso.privacyfriendlysolitaire.model.Tableau;
 
@@ -88,7 +88,7 @@ public class GeneratorUtils {
      * @return an instance generated from the given lists
      */
     static SolitaireGame constructInstanceFromCardLists(final CardDrawMode cardDrawMode, final ScoreMode scoreMode, Vector<Card> deck, HashMap<Integer, Vector<Card>> tableaus, HashMap<Integer, Vector<Card>> foundations) {
-        final DeckWaste d = new DeckWaste(deck, new Vector<>(), cardDrawMode, scoreMode, 0);
+        final DeckAndWaste d = new DeckAndWaste(deck, new Vector<>(), cardDrawMode, scoreMode, 0);
 
         ArrayList<Tableau> tableauList = new ArrayList<>(NR_OF_TABLEAUS);
         for (int i = 0; i < NR_OF_TABLEAUS; i++) {

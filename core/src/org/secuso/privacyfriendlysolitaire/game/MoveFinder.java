@@ -22,7 +22,7 @@ import static org.secuso.privacyfriendlysolitaire.model.Location.WASTE;
 import org.secuso.privacyfriendlysolitaire.CallBackListener;
 import org.secuso.privacyfriendlysolitaire.model.Action;
 import org.secuso.privacyfriendlysolitaire.model.Card;
-import org.secuso.privacyfriendlysolitaire.model.DeckWaste;
+import org.secuso.privacyfriendlysolitaire.model.DeckAndWaste;
 import org.secuso.privacyfriendlysolitaire.model.Foundation;
 import org.secuso.privacyfriendlysolitaire.model.Move;
 import org.secuso.privacyfriendlysolitaire.model.Suit;
@@ -179,13 +179,13 @@ public class MoveFinder {
      * @return a possible Move from Waste to Tableau or null if none could be found
      */
     private static Move findMoveWasteToTableau(final SolitaireGame game) {
-        final DeckWaste deckWaste = game.getDeckWaste();
-        if (deckWaste.isWasteEmpty()) {
+        final DeckAndWaste deckAndWaste = game.getDeckWaste();
+        if (deckAndWaste.isWasteEmpty()) {
             return null;
         }
 
         final Vector<Card> cardsFromWaste = new Vector<>();
-        cardsFromWaste.add(deckWaste.getWasteTop());
+        cardsFromWaste.add(deckAndWaste.getWasteTop());
 
         for (int t = 0; t < game.getTableaus().size(); t++) {
             final Tableau tableau = game.getTableauAtPos(t);
@@ -205,12 +205,12 @@ public class MoveFinder {
      * @return a possible Move from Waste to Foundation or null if none could be found
      */
     private static Move findMoveWasteToFoundation(final SolitaireGame game) {
-        final DeckWaste deckWaste = game.getDeckWaste();
-        if (deckWaste.isWasteEmpty()) {
+        final DeckAndWaste deckAndWaste = game.getDeckWaste();
+        if (deckAndWaste.isWasteEmpty()) {
             return null;
         }
 
-        final Card cardFromWaste = deckWaste.getWasteTop();
+        final Card cardFromWaste = deckAndWaste.getWasteTop();
 
         final int possibleFoundationIndex = calculateFoundationIndexForSuit(game.getFoundations(), cardFromWaste.suit());
         final Foundation possibleFoundation = game.getFoundationAtPos(possibleFoundationIndex);
@@ -284,12 +284,12 @@ public class MoveFinder {
      */
     private static Move findMoveDeck(final SolitaireGame game) {
         final Action action = new Action(DECK, 0, 0);
-        final DeckWaste deckWaste = game.getDeckWaste();
+        final DeckAndWaste deckAndWaste = game.getDeckWaste();
 
-        if (deckWaste.canTurnover()) {
+        if (deckAndWaste.canTurnover()) {
             // FIXME tunover = true?
             return new Move(action, null, false, -1, -1);
-        } else if (deckWaste.canReset()) {
+        } else if (deckAndWaste.canReset()) {
             // FIXME waste -> deck = different actions?
             return new Move(action, action, false, -1, -1);
         }

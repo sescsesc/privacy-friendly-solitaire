@@ -38,9 +38,9 @@ import java.util.Vector;
  * @author M. Fischer
  */
 
-public class DeckWasteTest {
-    private DeckWaste deckwaste1;
-    private DeckWaste deckwaste3;
+public class DeckAndWasteTest {
+    private DeckAndWaste deckwaste1;
+    private DeckAndWaste deckwaste3;
     private Vector<Card> clubs;
 
     @Before
@@ -49,8 +49,8 @@ public class DeckWasteTest {
         for (final Rank r : values()) {
             clubs.add(new Card(r, CLUBS));
         }
-        deckwaste1 = new DeckWaste(clubs, new Vector<>(), ONE, STANDARD, 0);
-        deckwaste3 = new DeckWaste(clubs, new Vector<>(), THREE, STANDARD, 0);
+        deckwaste1 = new DeckAndWaste(clubs, new Vector<>(), ONE, STANDARD, 0);
+        deckwaste3 = new DeckAndWaste(clubs, new Vector<>(), THREE, STANDARD, 0);
     }
 
     @Test
@@ -92,7 +92,7 @@ public class DeckWasteTest {
 
     @Test
     public void wasteTopTests() {
-        deckwaste1 = new DeckWaste(clubs, clubs, ONE, STANDARD, 0);
+        deckwaste1 = new DeckAndWaste(clubs, clubs, ONE, STANDARD, 0);
 
         assertSame("Rank of top card of waste should be KING", KING, deckwaste1.getWasteTop().rank());
         assertSame("Rank of top card of waste should be KING", KING, deckwaste1.removeWasteTop().rank());

@@ -24,7 +24,7 @@ import org.secuso.privacyfriendlysolitaire.CallBackListener;
 import org.secuso.privacyfriendlysolitaire.GameListener;
 import org.secuso.privacyfriendlysolitaire.model.Action;
 import org.secuso.privacyfriendlysolitaire.model.Card;
-import org.secuso.privacyfriendlysolitaire.model.DeckWaste;
+import org.secuso.privacyfriendlysolitaire.model.DeckAndWaste;
 import org.secuso.privacyfriendlysolitaire.model.Foundation;
 import org.secuso.privacyfriendlysolitaire.model.Move;
 import org.secuso.privacyfriendlysolitaire.model.Rank;
@@ -44,7 +44,7 @@ public class SolitaireGame {
     /**
      * the deck and the waste of the game
      */
-    private DeckWaste deckAndWaste;
+    private DeckAndWaste deckAndWaste;
 
     /**
      * the foundations of the game
@@ -101,7 +101,7 @@ public class SolitaireGame {
      */
     private boolean undoMove = false;
 
-    public SolitaireGame(DeckWaste initialDeck, ArrayList<Foundation> initialFoundations,
+    public SolitaireGame(DeckAndWaste initialDeck, ArrayList<Foundation> initialFoundations,
                          ArrayList<Tableau> initialTableaus) {
         deckAndWaste = initialDeck;
         foundations = initialFoundations;
@@ -110,7 +110,7 @@ public class SolitaireGame {
         moves = new Vector<Move>();
     }
 
-    public DeckWaste getDeckWaste() {
+    public DeckAndWaste getDeckWaste() {
         return deckAndWaste;
     }
 

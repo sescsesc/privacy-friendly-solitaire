@@ -26,7 +26,7 @@ import java.util.Vector;
  * @author M. Fischer
  */
 
-public class DeckWaste {
+public class DeckAndWaste {
     /**
      * the vector of cards representing the deck
      */
@@ -53,7 +53,7 @@ public class DeckWaste {
     private int fanSize;
 
 
-    public DeckWaste(final Vector<Card> deck, final Vector<Card> waste, final CardDrawMode cardDrawMode, final ScoreMode scoreMode, final int fanSize) {
+    public DeckAndWaste(final Vector<Card> deck, final Vector<Card> waste, final CardDrawMode cardDrawMode, final ScoreMode scoreMode, final int fanSize) {
         this.deck = deck;
         this.waste = waste;
         this.cardDrawMode = cardDrawMode;
@@ -196,10 +196,10 @@ public class DeckWaste {
 
     @Override
     public boolean equals(final Object o) {
-        if (!(o instanceof DeckWaste deckWaste)) {
+        if (!(o instanceof DeckAndWaste deckAndWaste)) {
             return false;
         }
-        return cardDrawMode == deckWaste.cardDrawMode && scoreMode == deckWaste.scoreMode && fanSize == deckWaste.fanSize && Objects.equals(deck, deckWaste.deck) && Objects.equals(waste, deckWaste.waste);
+        return cardDrawMode == deckAndWaste.cardDrawMode && scoreMode == deckAndWaste.scoreMode && fanSize == deckAndWaste.fanSize && Objects.equals(deck, deckAndWaste.deck) && Objects.equals(waste, deckAndWaste.waste);
     }
 
     @Override
