@@ -102,6 +102,10 @@ public class Foundation {
         return last;
     }
 
+    public boolean hasAllCards() {
+        return !cards.isEmpty() && cards.last().rank() == Rank.KING;
+    }
+
     @Override
     public boolean equals(final Object o) {
         if (!(o instanceof Foundation that)) {
@@ -117,6 +121,6 @@ public class Foundation {
 
     @Override
     public String toString() {
-        return cards.toString();
+        return "Foundation " + getSuit() + " = " + cards;
     }
 }

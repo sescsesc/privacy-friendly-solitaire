@@ -14,7 +14,6 @@ This program is free software: you can redistribute it and/or modify
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import static org.secuso.privacyfriendlysolitaire.game.Constants.NR_OF_FOUNDATIONS;
 import static org.secuso.privacyfriendlysolitaire.game.Constants.NR_OF_TABLEAUS;
 
 import org.secuso.privacyfriendlysolitaire.game.CardDrawMode;
@@ -22,7 +21,6 @@ import org.secuso.privacyfriendlysolitaire.game.ScoreMode;
 import org.secuso.privacyfriendlysolitaire.game.SolitaireGame;
 import org.secuso.privacyfriendlysolitaire.model.Card;
 import org.secuso.privacyfriendlysolitaire.model.DeckAndWaste;
-import org.secuso.privacyfriendlysolitaire.model.Foundation;
 import org.secuso.privacyfriendlysolitaire.model.Tableau;
 
 import java.util.ArrayList;
@@ -71,23 +69,6 @@ public class GeneratorUtils {
      * @return an instance generated from the given lists
      */
     public static SolitaireGame constructInstanceFromCardLists(final CardDrawMode cardDrawMode, final ScoreMode scoreMode, Vector<Card> deck, HashMap<Integer, Vector<Card>> tableaus) {
-        HashMap<Integer, Vector<Card>> emptyFoundations = new HashMap<>(NR_OF_FOUNDATIONS);
-        for (int i = 0; i < NR_OF_FOUNDATIONS; i++) {
-            emptyFoundations.put(i, new Vector<>());
-        }
-
-        return constructInstanceFromCardLists(cardDrawMode, scoreMode, deck, tableaus, emptyFoundations);
-    }
-
-
-    /**
-     * @param cardDrawMode the mode
-     * @param deck         a list of deck cards
-     * @param tableaus     a hashmap of int->Vector<Card> containing the tableaus
-     * @param foundations  a hashmap of int->Vector<Card> containing the foundations
-     * @return an instance generated from the given lists
-     */
-    static SolitaireGame constructInstanceFromCardLists(final CardDrawMode cardDrawMode, final ScoreMode scoreMode, Vector<Card> deck, HashMap<Integer, Vector<Card>> tableaus, HashMap<Integer, Vector<Card>> foundations) {
         final DeckAndWaste d = new DeckAndWaste(deck, new Vector<>(), cardDrawMode, scoreMode, 0);
 
         ArrayList<Tableau> tableauList = new ArrayList<>(NR_OF_TABLEAUS);
@@ -107,19 +88,8 @@ public class GeneratorUtils {
             tableauList.add(new Tableau(t, lastCardVector));
         }
 
-
-        ArrayList<Foundation> foundationList = new ArrayList<>(NR_OF_FOUNDATIONS);
-        for (int i = 0; i < NR_OF_FOUNDATIONS; i++) {
-            Vector<Card> f = foundations.get(i);
-            Foundation foundation = new Foundation();
-
-            for (Card c : f) {
-                foundation.addCard(c);
-            }
-
-            foundationList.add(foundation);
-        }
-
-        return new SolitaireGame(d, foundationList, tableauList);
+        return new SolitaireGame(d, tableauList);
     }
+
+
 }

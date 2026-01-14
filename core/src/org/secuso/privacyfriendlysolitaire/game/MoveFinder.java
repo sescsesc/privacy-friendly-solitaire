@@ -23,13 +23,9 @@ import org.secuso.privacyfriendlysolitaire.CallBackListener;
 import org.secuso.privacyfriendlysolitaire.model.Action;
 import org.secuso.privacyfriendlysolitaire.model.Card;
 import org.secuso.privacyfriendlysolitaire.model.DeckAndWaste;
-import org.secuso.privacyfriendlysolitaire.model.Foundation;
 import org.secuso.privacyfriendlysolitaire.model.Move;
-import org.secuso.privacyfriendlysolitaire.model.Suit;
 import org.secuso.privacyfriendlysolitaire.model.Tableau;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Vector;
 
 /**
@@ -113,20 +109,17 @@ public class MoveFinder {
 
             final Card cardFromTableau = tableau.faceUp().lastElement();
 
-            final int foundationIndex = calculateFoundationIndexForSuit(game.getFoundations(), cardFromTableau.suit());
-
-            final Foundation foundation = game.getFoundationAtPos(foundationIndex);
-
-            if (foundation.canAddCard(cardFromTableau)) {
+            if (game.canAddCardToFoundation(cardFromTableau)) {
                 //check if reversal of previous move
+                final int index = game.getOrCreateFoundationIndex(cardFromTableau.suit());
                 if (!game.getMoves().isEmpty()) {
                     final Move prevMove = game.getMoves().get(game.getMovePointer());
-                    if (prevMove.sourceAction().getLocation() == FOUNDATION && prevMove.targetAction().getLocation() == TABLEAU && prevMove.sourceAction().getStackIndex() == foundationIndex && prevMove.targetAction().getStackIndex() == tableauIndex) {
+                    if (prevMove.sourceAction().getLocation() == FOUNDATION && prevMove.targetAction().getLocation() == TABLEAU && prevMove.sourceAction().getStackIndex() == index && prevMove.targetAction().getStackIndex() == tableauIndex) {
                         continue;
                     }
                 }
                 final Action removeFromTableauAction = new Action(TABLEAU, tableauIndex, tableau.getFaceUpCardsSize() - 1);
-                final Action addToFoundationAction = new Action(FOUNDATION, foundationIndex, 0);
+                final Action addToFoundationAction = new Action(FOUNDATION, index, 0);
                 return new Move(removeFromTableauAction, addToFoundationAction, false, -1, -1);
             }
         }
@@ -212,40 +205,13 @@ public class MoveFinder {
 
         final Card cardFromWaste = deckAndWaste.getWasteTop();
 
-        final int possibleFoundationIndex = calculateFoundationIndexForSuit(game.getFoundations(), cardFromWaste.suit());
-        final Foundation possibleFoundation = game.getFoundationAtPos(possibleFoundationIndex);
-
-        if (possibleFoundation != null && possibleFoundation.canAddCard(cardFromWaste)) {
+        if (game.canAddCardToFoundation(cardFromWaste)) {
+            final int index = game.getOrCreateFoundationIndex(cardFromWaste.suit());
             final Action removeFromWasteAction = new Action(WASTE, 0, 0);
-            final Action addToFoundationAction = new Action(FOUNDATION, possibleFoundationIndex, 0);
+            final Action addToFoundationAction = new Action(FOUNDATION, index, 0);
             return new Move(removeFromWasteAction, addToFoundationAction, false, -1, -1);
         }
         return null;
-    }
-
-    private static int calculateFoundationIndexForSuit(final ArrayList<Foundation> foundations, final Suit suit) {
-        final List<Integer> possibleIndex = new ArrayList<>(foundations.size());
-
-        for (int foundationIndex = 0; foundationIndex < foundations.size(); foundationIndex++) {
-            final Foundation f = foundations.get(foundationIndex);
-            if (f.isEmpty()) {
-                possibleIndex.add(foundationIndex);
-                continue;
-            }
-            if (f.getSuit() == suit) {
-                return foundationIndex;
-            }
-        }
-
-        if (possibleIndex.isEmpty()) {
-            throw new IllegalStateException("no foundation found for suit " + suit);
-        }
-
-        if (possibleIndex.contains(suit.ordinal())) {
-            return suit.ordinal();
-        }
-
-        return possibleIndex.get(0);
     }
 
 //    /**

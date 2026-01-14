@@ -78,9 +78,7 @@ public class GeneratorTest {
 
             // assert all foundations are empty
             for (int i = 0; i < NR_OF_FOUNDATIONS; i++) {
-                Foundation f = instance.getFoundationAtPos(i);
-                assertTrue(f.isEmpty());
-                assertNull(f.getSuit());
+                assertNull(instance.getTopCardOfFoundation(i));
             }
 
             // assert all tableaus have the correct number of cards face-up and face-down
