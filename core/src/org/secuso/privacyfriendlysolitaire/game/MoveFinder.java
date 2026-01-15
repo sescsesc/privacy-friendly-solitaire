@@ -22,14 +22,10 @@ import static org.secuso.privacyfriendlysolitaire.model.Location.WASTE;
 import org.secuso.privacyfriendlysolitaire.CallBackListener;
 import org.secuso.privacyfriendlysolitaire.model.Action;
 import org.secuso.privacyfriendlysolitaire.model.Card;
-import org.secuso.privacyfriendlysolitaire.model.DeckWaste;
-import org.secuso.privacyfriendlysolitaire.model.Foundation;
+import org.secuso.privacyfriendlysolitaire.model.DeckAndWaste;
 import org.secuso.privacyfriendlysolitaire.model.Move;
-import org.secuso.privacyfriendlysolitaire.model.Suit;
 import org.secuso.privacyfriendlysolitaire.model.Tableau;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Vector;
 
 /**
@@ -113,20 +109,17 @@ public class MoveFinder {
 
             final Card cardFromTableau = tableau.faceUp().lastElement();
 
-            final int foundationIndex = calculateFoundationIndexForSuit(game.getFoundations(), cardFromTableau.suit());
-
-            final Foundation foundation = game.getFoundationAtPos(foundationIndex);
-
-            if (foundation.canAddCard(cardFromTableau)) {
+            if (game.canAddCardToFoundation(cardFromTableau)) {
                 //check if reversal of previous move
+                final int position = game.getOrCreateFoundationPosition(cardFromTableau.suit());
                 if (!game.getMoves().isEmpty()) {
                     final Move prevMove = game.getMoves().get(game.getMovePointer());
-                    if (prevMove.sourceAction().getLocation() == FOUNDATION && prevMove.targetAction().getLocation() == TABLEAU && prevMove.sourceAction().getStackIndex() == foundationIndex && prevMove.targetAction().getStackIndex() == tableauIndex) {
+                    if (prevMove.sourceAction().getLocation() == FOUNDATION && prevMove.targetAction().getLocation() == TABLEAU && prevMove.sourceAction().getStackIndex() == position && prevMove.targetAction().getStackIndex() == tableauIndex) {
                         continue;
                     }
                 }
                 final Action removeFromTableauAction = new Action(TABLEAU, tableauIndex, tableau.getFaceUpCardsSize() - 1);
-                final Action addToFoundationAction = new Action(FOUNDATION, foundationIndex, 0);
+                final Action addToFoundationAction = new Action(FOUNDATION, position, 0);
                 return new Move(removeFromTableauAction, addToFoundationAction, false, -1, -1);
             }
         }
@@ -179,13 +172,13 @@ public class MoveFinder {
      * @return a possible Move from Waste to Tableau or null if none could be found
      */
     private static Move findMoveWasteToTableau(final SolitaireGame game) {
-        final DeckWaste deckWaste = game.getDeckWaste();
-        if (deckWaste.isWasteEmpty()) {
+        final DeckAndWaste deckAndWaste = game.getDeckWaste();
+        if (deckAndWaste.isWasteEmpty()) {
             return null;
         }
 
         final Vector<Card> cardsFromWaste = new Vector<>();
-        cardsFromWaste.add(deckWaste.getWasteTop());
+        cardsFromWaste.add(deckAndWaste.getWasteTop());
 
         for (int t = 0; t < game.getTableaus().size(); t++) {
             final Tableau tableau = game.getTableauAtPos(t);
@@ -205,47 +198,20 @@ public class MoveFinder {
      * @return a possible Move from Waste to Foundation or null if none could be found
      */
     private static Move findMoveWasteToFoundation(final SolitaireGame game) {
-        final DeckWaste deckWaste = game.getDeckWaste();
-        if (deckWaste.isWasteEmpty()) {
+        final DeckAndWaste deckAndWaste = game.getDeckWaste();
+        if (deckAndWaste.isWasteEmpty()) {
             return null;
         }
 
-        final Card cardFromWaste = deckWaste.getWasteTop();
+        final Card cardFromWaste = deckAndWaste.getWasteTop();
 
-        final int possibleFoundationIndex = calculateFoundationIndexForSuit(game.getFoundations(), cardFromWaste.suit());
-        final Foundation possibleFoundation = game.getFoundationAtPos(possibleFoundationIndex);
-
-        if (possibleFoundation != null && possibleFoundation.canAddCard(cardFromWaste)) {
+        if (game.canAddCardToFoundation(cardFromWaste)) {
+            final int position = game.getOrCreateFoundationPosition(cardFromWaste.suit());
             final Action removeFromWasteAction = new Action(WASTE, 0, 0);
-            final Action addToFoundationAction = new Action(FOUNDATION, possibleFoundationIndex, 0);
+            final Action addToFoundationAction = new Action(FOUNDATION, position, 0);
             return new Move(removeFromWasteAction, addToFoundationAction, false, -1, -1);
         }
         return null;
-    }
-
-    private static int calculateFoundationIndexForSuit(final ArrayList<Foundation> foundations, final Suit suit) {
-        final List<Integer> possibleIndex = new ArrayList<>(foundations.size());
-
-        for (int foundationIndex = 0; foundationIndex < foundations.size(); foundationIndex++) {
-            final Foundation f = foundations.get(foundationIndex);
-            if (f.isEmpty()) {
-                possibleIndex.add(foundationIndex);
-                continue;
-            }
-            if (f.getSuit() == suit) {
-                return foundationIndex;
-            }
-        }
-
-        if (possibleIndex.isEmpty()) {
-            throw new IllegalStateException("no foundation found for suit " + suit);
-        }
-
-        if (possibleIndex.contains(suit.ordinal())) {
-            return suit.ordinal();
-        }
-
-        return possibleIndex.get(0);
     }
 
 //    /**
@@ -284,12 +250,12 @@ public class MoveFinder {
      */
     private static Move findMoveDeck(final SolitaireGame game) {
         final Action action = new Action(DECK, 0, 0);
-        final DeckWaste deckWaste = game.getDeckWaste();
+        final DeckAndWaste deckAndWaste = game.getDeckWaste();
 
-        if (deckWaste.canTurnover()) {
+        if (deckAndWaste.canTurnover()) {
             // FIXME tunover = true?
             return new Move(action, null, false, -1, -1);
-        } else if (deckWaste.canReset()) {
+        } else if (deckAndWaste.canReset()) {
             // FIXME waste -> deck = different actions?
             return new Move(action, action, false, -1, -1);
         }

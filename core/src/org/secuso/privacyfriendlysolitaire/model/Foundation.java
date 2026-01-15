@@ -38,12 +38,8 @@ public class Foundation {
     }
 
     /**
-     * @return the Cards in this Foundation
+     * @return true if this Foundation is empty (has no cards)
      */
-    public TreeSet<Card> getCards() {
-        return cards;
-    }
-
     public boolean isEmpty() {
         return cards.isEmpty();
     }
@@ -102,6 +98,10 @@ public class Foundation {
         return last;
     }
 
+    public boolean isFull() {
+        return !cards.isEmpty() && cards.last().rank() == Rank.KING;
+    }
+
     @Override
     public boolean equals(final Object o) {
         if (!(o instanceof Foundation that)) {
@@ -117,6 +117,9 @@ public class Foundation {
 
     @Override
     public String toString() {
-        return cards.toString();
+        if (cards.isEmpty()) {
+            return "Foundation is empty";
+        }
+        return "Foundation " + getSuit() + " = " + cards;
     }
 }

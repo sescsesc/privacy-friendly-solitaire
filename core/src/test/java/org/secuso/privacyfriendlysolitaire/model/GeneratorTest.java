@@ -71,16 +71,14 @@ public class GeneratorTest {
             Vector<Card> allCards = new Vector<Card>(NR_CARDS);
 
             // assert all cards are in the deck and none in the waste
-            DeckWaste d = instance.getDeckWaste();
+            DeckAndWaste d = instance.getDeckWaste();
             assertEquals(MAX_NR_IN_DECK, d.getDeck().size());
             assertEquals(0, d.getWaste().size());
             allCards.addAll(d.getDeck());
 
             // assert all foundations are empty
             for (int i = 0; i < NR_OF_FOUNDATIONS; i++) {
-                Foundation f = instance.getFoundationAtPos(i);
-                assertTrue(f.isEmpty());
-                assertNull(f.getSuit());
+                assertNull(instance.getTopCardOfFoundation(i));
             }
 
             // assert all tableaus have the correct number of cards face-up and face-down
