@@ -130,8 +130,8 @@ public class SolitaireGame {
         return turnedOverTableau;
     }
 
-    public int getOrCreateFoundationIndex(final Suit suit) {
-        return foundations.getOrCreateIndex(suit);
+    public int getOrCreateFoundationPosition(final Suit suit) {
+        return foundations.getOrCreatePosition(suit);
     }
 
     /**
@@ -254,7 +254,7 @@ public class SolitaireGame {
      */
     private boolean handleFoundation(Action action, boolean redoMove) {
         if (prevAction == null) {
-            if (foundations.getTopCardAtIndex(action.getStackIndex()) != null) {
+            if (foundations.getTopCardAtPosition(action.getStackIndex()) != null) {
                 saveAction(action);
                 notifyListeners();
                 return true;
@@ -409,7 +409,7 @@ public class SolitaireGame {
      */
     private boolean handleFoundationToTableau(Action action) {
         //get card to be moved from the foundation
-        final Card topCard = foundations.getTopCardAtIndex(prevAction.getStackIndex());
+        final Card topCard = foundations.getTopCardAtPosition(prevAction.getStackIndex());
 
         if (topCard != null) {
             final Vector<Card> toBeMoved = new Vector<>();
@@ -418,7 +418,7 @@ public class SolitaireGame {
             final Tableau tableau = getTableauAtPos(action.getStackIndex());
             if (tableau.isAddToFaceUpCardsPossible(toBeMoved)) {
                 tableau.addToFaceUpCards(toBeMoved);
-                foundations.removeTopCardAtIndex(prevAction.getStackIndex());
+                foundations.removeTopCardAtPosition(prevAction.getStackIndex());
                 return true;
             }
         }
@@ -485,7 +485,7 @@ public class SolitaireGame {
      * @return true if the game is won
      */
     boolean isWon() {
-        return foundations.hasAllCards();
+        return foundations.allFull();
     }
 
     /**
@@ -649,7 +649,7 @@ public class SolitaireGame {
      * @param toUndo the move to be reversed
      */
     private void undoFoundationTableau(final Move toUndo) {
-        final Card card = foundations.removeTopCardAtIndex(toUndo.targetAction().getStackIndex());
+        final Card card = foundations.removeTopCardAtPosition(toUndo.targetAction().getStackIndex());
 
         Tableau sourceT = getTableauAtPos(toUndo.sourceAction().getStackIndex());
         if (toUndo.turnover()) {
@@ -667,7 +667,7 @@ public class SolitaireGame {
      * @param toUndo the move to be reversed
      */
     private void undoFoundationWaste(Move toUndo) {
-        final Card card = foundations.removeTopCardAtIndex(toUndo.targetAction().getStackIndex());
+        final Card card = foundations.removeTopCardAtPosition(toUndo.targetAction().getStackIndex());
         deckAndWaste.getWaste().add(card);
         deckAndWaste.setFanSize(toUndo.oldFanSize());
     }
@@ -686,6 +686,6 @@ public class SolitaireGame {
     }
 
     public Card getTopCardOfFoundation(final int position) {
-        return foundations.getTopCardAtIndex(position);
+        return foundations.getTopCardAtPosition(position);
     }
 }

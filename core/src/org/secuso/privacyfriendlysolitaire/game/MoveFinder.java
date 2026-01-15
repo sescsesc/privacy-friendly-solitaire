@@ -111,15 +111,15 @@ public class MoveFinder {
 
             if (game.canAddCardToFoundation(cardFromTableau)) {
                 //check if reversal of previous move
-                final int index = game.getOrCreateFoundationIndex(cardFromTableau.suit());
+                final int position = game.getOrCreateFoundationPosition(cardFromTableau.suit());
                 if (!game.getMoves().isEmpty()) {
                     final Move prevMove = game.getMoves().get(game.getMovePointer());
-                    if (prevMove.sourceAction().getLocation() == FOUNDATION && prevMove.targetAction().getLocation() == TABLEAU && prevMove.sourceAction().getStackIndex() == index && prevMove.targetAction().getStackIndex() == tableauIndex) {
+                    if (prevMove.sourceAction().getLocation() == FOUNDATION && prevMove.targetAction().getLocation() == TABLEAU && prevMove.sourceAction().getStackIndex() == position && prevMove.targetAction().getStackIndex() == tableauIndex) {
                         continue;
                     }
                 }
                 final Action removeFromTableauAction = new Action(TABLEAU, tableauIndex, tableau.getFaceUpCardsSize() - 1);
-                final Action addToFoundationAction = new Action(FOUNDATION, index, 0);
+                final Action addToFoundationAction = new Action(FOUNDATION, position, 0);
                 return new Move(removeFromTableauAction, addToFoundationAction, false, -1, -1);
             }
         }
@@ -206,9 +206,9 @@ public class MoveFinder {
         final Card cardFromWaste = deckAndWaste.getWasteTop();
 
         if (game.canAddCardToFoundation(cardFromWaste)) {
-            final int index = game.getOrCreateFoundationIndex(cardFromWaste.suit());
+            final int position = game.getOrCreateFoundationPosition(cardFromWaste.suit());
             final Action removeFromWasteAction = new Action(WASTE, 0, 0);
-            final Action addToFoundationAction = new Action(FOUNDATION, index, 0);
+            final Action addToFoundationAction = new Action(FOUNDATION, position, 0);
             return new Move(removeFromWasteAction, addToFoundationAction, false, -1, -1);
         }
         return null;
