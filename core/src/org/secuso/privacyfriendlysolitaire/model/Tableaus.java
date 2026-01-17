@@ -48,12 +48,25 @@ public record Tableaus(Map<Integer, Tableau> indexToTableauMap) {
         return indexToTableauMap.values().stream().allMatch(Tableau::isFaceDownEmpty);
     }
 
+    public Tableaus clone() {
+        final Map<Integer, Tableau> i = new HashMap<>();
+        for (final Map.Entry<Integer, Tableau> entry : indexToTableauMap.entrySet()) {
+            i.put(entry.getKey(), entry.getValue().clone());
+        }
+        return new Tableaus(i);
+    }
+
     @Override
     public boolean equals(Object o) {
         if (!(o instanceof Tableaus t)) {
             return false;
         }
         return Objects.equals(indexToTableauMap, t.indexToTableauMap);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(indexToTableauMap);
     }
 
     @Override

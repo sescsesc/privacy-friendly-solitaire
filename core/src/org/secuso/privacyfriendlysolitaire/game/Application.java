@@ -87,8 +87,8 @@ public class Application extends ApplicationAdapter implements ScoreListener {
 
     private void initMVC(final SolitaireGame g) {
         game = g;
-        deckAndWasteAtStart = game.getDeckWaste();
-        tableausAtStart = game.getTableaus();
+        deckAndWasteAtStart = game.getDeckWaste().clone();
+        tableausAtStart = game.getTableaus().clone();
         System.out.println("deck at start = " + deckAndWasteAtStart);
         System.out.println("tableaus at start = " + tableausAtStart);
         initVC();

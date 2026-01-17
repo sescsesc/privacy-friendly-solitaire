@@ -194,6 +194,10 @@ public class DeckAndWaste {
         return waste.remove(waste.size() - 1);
     }
 
+    public DeckAndWaste clone() {
+        return new DeckAndWaste(new Vector<>(deck), new Vector<>(waste), cardDrawMode, scoreMode, fanSize);
+    }
+
     @Override
     public boolean equals(final Object o) {
         if (!(o instanceof DeckAndWaste deckAndWaste)) {
