@@ -20,15 +20,17 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceManager;
-import com.google.android.material.navigation.NavigationView;
-import androidx.core.app.TaskStackBuilder;
-import androidx.core.view.GravityCompat;
-import androidx.drawerlayout.widget.DrawerLayout;
+import android.view.MenuItem;
+import android.view.View;
+
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
-import android.view.MenuItem;
-import android.view.View;
+import androidx.core.app.TaskStackBuilder;
+import androidx.core.view.GravityCompat;
+import androidx.drawerlayout.widget.DrawerLayout;
+
+import com.google.android.material.navigation.NavigationView;
 
 import org.secuso.privacyfriendlysolitaire.R;
 import org.secuso.privacyfriendlysolitaire.tutorial.TutorialActivity;
@@ -66,7 +68,7 @@ public class BaseActivity extends AppCompatActivity implements NavigationView.On
 
     @Override
     public void onBackPressed() {
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        DrawerLayout drawer = findViewById(R.id.drawer_layout);
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else {
@@ -92,12 +94,7 @@ public class BaseActivity extends AppCompatActivity implements NavigationView.On
         }
 
         // delay transition so the drawer can close
-        mHandler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                callDrawerItem(itemId);
-            }
-        }, NAVDRAWER_LAUNCH_DELAY);
+        mHandler.postDelayed(() -> callDrawerItem(itemId), NAVDRAWER_LAUNCH_DELAY);
 
         mDrawerLayout.closeDrawer(GravityCompat.START);
         selectNavigationItem(itemId);
@@ -170,18 +167,18 @@ public class BaseActivity extends AppCompatActivity implements NavigationView.On
     @Override
     protected void onPostCreate(Bundle savedInstanceState) {
         super.onPostCreate(savedInstanceState);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        Toolbar toolbar = findViewById(R.id.toolbar);
         if (getSupportActionBar() == null) {
             setSupportActionBar(toolbar);
         }
 
-        mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+        mDrawerLayout = findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, mDrawerLayout, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         mDrawerLayout.addDrawerListener(toggle);
         toggle.syncState();
 
-        mNavigationView = (NavigationView) findViewById(R.id.nav_view);
+        mNavigationView = findViewById(R.id.nav_view);
         mNavigationView.setNavigationItemSelectedListener(this);
 
         selectNavigationItem(getNavigationDrawerID());

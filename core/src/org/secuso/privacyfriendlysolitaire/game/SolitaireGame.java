@@ -532,7 +532,7 @@ public class SolitaireGame {
      * @return true if undoing is possible
      */
     boolean canUndo() {
-        return movePointer >= 0;
+        return !moves.isEmpty() && movePointer >= 0;
     }
 
     /**
