@@ -102,6 +102,7 @@ public class Application extends ApplicationAdapter implements ScoreListener {
     }
 
     private void initVC() {
+        stage.clear();
         View view = new View(game, stage, playSounds, dragAndDrop);
         game.registerGameListener(view);
 
@@ -157,8 +158,9 @@ public class Application extends ApplicationAdapter implements ScoreListener {
         if (clickPossible) {
             clickPossible = false;
             Gdx.app.postRunnable(() -> {
+                won = false;
+                practicallyWon = false;
                 initMVC(new SolitaireGame(deckAndWasteAtStart, tableausAtStart));
-                render();
 
                 try {
                     sleep(300);
