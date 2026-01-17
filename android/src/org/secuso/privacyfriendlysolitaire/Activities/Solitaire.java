@@ -532,6 +532,11 @@ public class Solitaire extends AndroidApplication implements NavigationView.OnNa
                             game.finish();
                         }
                     })
+                    //
+                    .setNeutralButton(getString(R.string.alert_box_won_lost_restart), (dialog, which) -> {
+                        dialog.dismiss();
+                        game.application.restart();
+                    })
                     // or start another game
                     .setPositiveButton(getString(R.string.alert_box_won_lost_another), new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int id) {

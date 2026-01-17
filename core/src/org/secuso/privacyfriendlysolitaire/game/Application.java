@@ -89,8 +89,6 @@ public class Application extends ApplicationAdapter implements ScoreListener {
         game = g;
         deckAndWasteAtStart = game.getDeckWaste().clone();
         tableausAtStart = game.getTableaus().clone();
-        System.out.println("deck at start = " + deckAndWasteAtStart);
-        System.out.println("tableaus at start = " + tableausAtStart);
         initVC();
 
         InputProcessor inputProcessorStage = stage;
