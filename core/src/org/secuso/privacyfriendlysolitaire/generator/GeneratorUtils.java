@@ -14,17 +14,13 @@ This program is free software: you can redistribute it and/or modify
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import static org.secuso.privacyfriendlysolitaire.game.Constants.NR_OF_TABLEAUS;
-
 import org.secuso.privacyfriendlysolitaire.game.CardDrawMode;
 import org.secuso.privacyfriendlysolitaire.game.ScoreMode;
 import org.secuso.privacyfriendlysolitaire.game.SolitaireGame;
 import org.secuso.privacyfriendlysolitaire.model.Card;
 import org.secuso.privacyfriendlysolitaire.model.DeckAndWaste;
-import org.secuso.privacyfriendlysolitaire.model.Tableau;
+import org.secuso.privacyfriendlysolitaire.model.Tableaus;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Vector;
 
 /**
@@ -61,34 +57,9 @@ public class GeneratorUtils {
         }
     }
 
-
-    /**
-     * @param cardDrawMode the mode
-     * @param deck         a list of deck cards
-     * @param tableaus     a hashmap of int->Vector<Card> containing the tableaus
-     * @return an instance generated from the given lists
-     */
-    public static SolitaireGame constructInstanceFromCardLists(final CardDrawMode cardDrawMode, final ScoreMode scoreMode, Vector<Card> deck, HashMap<Integer, Vector<Card>> tableaus) {
-        final DeckAndWaste d = new DeckAndWaste(deck, new Vector<>(), cardDrawMode, scoreMode, 0);
-
-        ArrayList<Tableau> tableauList = new ArrayList<>(NR_OF_TABLEAUS);
-        for (int i = 0; i < NR_OF_TABLEAUS; i++) {
-            Vector<Card> t = tableaus.get(i);
-
-            // add last card (with highest index) as face up
-            final Card lastCard = t.lastElement();
-
-            // remove this card from the interim-list and add the rest as face down
-            t.removeElement(lastCard);
-
-            final Vector<Card> lastCardVector = new Vector<>();
-            lastCardVector.add(lastCard);
-
-            // add to list
-            tableauList.add(new Tableau(t, lastCardVector));
-        }
-
-        return new SolitaireGame(d, tableauList);
+    public static SolitaireGame constructInstanceFromCardLists(final CardDrawMode cardDrawMode, final ScoreMode scoreMode, final Vector<Card> deck, final Tableaus tableaus) {
+        final DeckAndWaste deckAndWaste = new DeckAndWaste(deck, new Vector<>(), cardDrawMode, scoreMode, 0);
+        return new SolitaireGame(deckAndWaste, tableaus);
     }
 
 

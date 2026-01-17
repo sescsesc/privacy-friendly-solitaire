@@ -1,6 +1,7 @@
 package org.secuso.privacyfriendlysolitaire.generator;
 
 import static org.secuso.privacyfriendlysolitaire.game.Constants.MAX_NR_IN_DECK;
+import static org.secuso.privacyfriendlysolitaire.game.Constants.MAX_NR_IN_TABLEAU;
 import static org.secuso.privacyfriendlysolitaire.game.Constants.NR_OF_TABLEAUS;
 import static org.secuso.privacyfriendlysolitaire.model.Rank.ACE;
 import static org.secuso.privacyfriendlysolitaire.model.Rank.values;
@@ -12,10 +13,10 @@ import org.secuso.privacyfriendlysolitaire.model.Card;
 import org.secuso.privacyfriendlysolitaire.model.Rank;
 import org.secuso.privacyfriendlysolitaire.model.Suit;
 import org.secuso.privacyfriendlysolitaire.model.Tableau;
+import org.secuso.privacyfriendlysolitaire.model.Tableaus;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Vector;
@@ -65,28 +66,22 @@ public class GeneratorSolitaireInstance {
 
         // generate data container to store the deck and tableaus
         final Vector<Card> deck = new Vector<>(MAX_NR_IN_DECK);
-        final HashMap<Integer, Vector<Card>> tableaus = new HashMap<>(NR_OF_TABLEAUS);
-        for (int i = 0; i < NR_OF_TABLEAUS; i++) {
-            tableaus.put(i, new Vector<>(i + 1));
-        }
+        final Vector<Card> tableau = new Vector<>(MAX_NR_IN_TABLEAU);
 
         // 28 cards in tableaus, 24 in deck
         for (int cardIndex = 0; cardIndex < allCardsInRandomOrder.size(); cardIndex++) {
             final Card card = allCardsInRandomOrder.get(cardIndex);
 
-            if (cardIndex < 28) {
+            if (cardIndex < MAX_NR_IN_TABLEAU) {
                 // fill tableaus
-                final int indexOfTableau = GeneratorUtils.mapIndexToTableau(cardIndex);
-                final Vector<Card> currentTableau = tableaus.get(indexOfTableau);
-                currentTableau.add(card);
-                tableaus.put(indexOfTableau, currentTableau);
+                tableau.add(card);
             } else {
                 // fill deck
                 deck.add(card);
             }
         }
 
-        return GeneratorUtils.constructInstanceFromCardLists(cardDrawMode, scoreMode, deck, tableaus);
+        return GeneratorUtils.constructInstanceFromCardLists(cardDrawMode, scoreMode, deck, new Tableaus(tableau));
     }
 
     /**

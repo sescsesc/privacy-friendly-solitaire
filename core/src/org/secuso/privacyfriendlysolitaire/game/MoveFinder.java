@@ -101,7 +101,7 @@ public class MoveFinder {
      * @return a possible Move from Tableau to Foundation or null if none could be found
      */
     static Move findMoveTableauToFoundation(final SolitaireGame game) {
-        for (int tableauIndex = 0; tableauIndex < game.getTableaus().size(); tableauIndex++) {
+        for (int tableauIndex = 0; tableauIndex < game.getListOfTableaus().size(); tableauIndex++) {
             final Tableau tableau = game.getTableauAtPos(tableauIndex);
             if (tableau.isFaceUpEmpty()) {
                 continue;
@@ -180,7 +180,7 @@ public class MoveFinder {
         final Vector<Card> cardsFromWaste = new Vector<>();
         cardsFromWaste.add(deckAndWaste.getWasteTop());
 
-        for (int t = 0; t < game.getTableaus().size(); t++) {
+        for (int t = 0; t < game.getListOfTableaus().size(); t++) {
             final Tableau tableau = game.getTableauAtPos(t);
 
             if (tableau.isAddToFaceUpCardsPossible(cardsFromWaste)) {

@@ -40,6 +40,15 @@
                     android:orientation="horizontal"
                     android:weightSum="14">
 
+                    <ImageButton
+                        android:contentDescription="@string/string_descr_restart_button"
+                        android:id="@+id/restart"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginRight="32dp"
+                        android:clickable="true"
+                        android:src="@android:drawable/ic_media_previous"
+                        android:background="@null"/>
 
                     <ImageButton
                         android:contentDescription="@string/string_descr_undo_button"

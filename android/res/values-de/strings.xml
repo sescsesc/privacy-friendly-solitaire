@@ -143,6 +143,7 @@
     <string name="string_descr_drawer_pfa_logo">Drawer PFA Logo</string>
     <string name="string_descr_secuso_blue">Secuso Logo Blau</string>
     <string name="string_descr_icon_main_menu">Icon Hauptmenü</string>
+    <string name="string_descr_restart_button">Restart Button Asset</string>
     <string name="string_descr_undo_button">Undo Button Asset</string>
     <string name="string_descr_redo_button">Redo Button Asset</string>
     <string name="string_descr_hint_button">Hinweis Button Asset</string>

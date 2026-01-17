@@ -170,6 +170,11 @@ public class Solitaire extends AndroidApplication implements NavigationView.OnNa
         // Set the background color of the game panel
         updateBackgroundColorFromPreferences();
 
+        // restart button in game panel
+        final ImageButton restart = (ImageButton) findViewById(R.id.restart);
+        restart.setVisibility(View.VISIBLE);
+        restart.setOnClickListener(v -> application.restart());
+
         //undo Button in game panel
         final ImageButton undo = (ImageButton) findViewById(R.id.undo);
         undo.setVisibility(View.GONE);

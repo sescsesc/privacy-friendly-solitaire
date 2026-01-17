@@ -32,7 +32,9 @@ import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import org.secuso.privacyfriendlysolitaire.CallBackListener;
 import org.secuso.privacyfriendlysolitaire.ScoreListener;
 import org.secuso.privacyfriendlysolitaire.generator.GeneratorSolitaireInstance;
+import org.secuso.privacyfriendlysolitaire.model.DeckAndWaste;
 import org.secuso.privacyfriendlysolitaire.model.Move;
+import org.secuso.privacyfriendlysolitaire.model.Tableaus;
 
 /**
  * @author I. Dix
@@ -46,6 +48,11 @@ public class Application extends ApplicationAdapter implements ScoreListener {
 
     // state of game
     private SolitaireGame game;
+
+    private DeckAndWaste deckAndWasteAtStart;
+
+    private Tableaus tableausAtStart;
+
     private Controller controller;
 
     private CardDrawMode cardDrawMode;
@@ -74,11 +81,14 @@ public class Application extends ApplicationAdapter implements ScoreListener {
     @Override
     public void create() {
         stage = new Stage();
-        initMVC();
+        initMVC(GeneratorSolitaireInstance.buildPlayableSolitaireInstance(cardDrawMode, scoreMode));
     }
 
-    private void initMVC() {
-        game = GeneratorSolitaireInstance.buildPlayableSolitaireInstance(cardDrawMode, scoreMode);
+
+    private void initMVC(final SolitaireGame g) {
+        game = g;
+        deckAndWasteAtStart = game.getDeckWaste();
+        tableausAtStart = game.getTableaus();
         initVC();
 
         InputProcessor inputProcessorStage = stage;
@@ -139,6 +149,23 @@ public class Application extends ApplicationAdapter implements ScoreListener {
 
     public void registerCallBackListener(CallBackListener listener) {
         this.listener = listener;
+    }
+
+    public void restart() {
+        if (clickPossible) {
+            clickPossible = false;
+            Gdx.app.postRunnable(() -> {
+                initMVC(new SolitaireGame(deckAndWasteAtStart, tableausAtStart));
+                render();
+
+                try {
+                    sleep(300);
+                    clickPossible = true;
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            });
+        }
     }
 
     public void undo() {

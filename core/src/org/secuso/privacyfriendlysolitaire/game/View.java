@@ -127,7 +127,7 @@ public class View implements GameListener {
     // ------------------------------------ Initial ------------------------------------
     private void arrangeInitialView(SolitaireGame game) {
         paintInitialFoundations();
-        paintInitialTableaus(game.getTableaus());
+        paintInitialTableaus(game.getListOfTableaus());
         paintInitialDeckWaste(game.getDeckWaste());
         if (useDragAndDrop) {
             addCurrentFaceUpCardsToDragAndDrop();
@@ -142,7 +142,7 @@ public class View implements GameListener {
         }
     }
 
-    private void paintInitialTableaus(ArrayList<Tableau> tableaus) {
+    private void paintInitialTableaus(List<Tableau> tableaus) {
         for (int i = 0; i < NR_OF_TABLEAUS; i++) {
             Tableau t = tableaus.get(i);
 
@@ -281,7 +281,7 @@ public class View implements GameListener {
     }
 
     private void setAllFaceUpCardsToCorrectOrder(SolitaireGame game) {
-        for (Tableau t : game.getTableaus()) {
+        for (Tableau t : game.getListOfTableaus()) {
             for (Card faceUpCard : t.faceUp()) {
                 ImageWrapper image = faceUpCards.get(loader.getCardTextureName(faceUpCard));
                 image.toFront();
