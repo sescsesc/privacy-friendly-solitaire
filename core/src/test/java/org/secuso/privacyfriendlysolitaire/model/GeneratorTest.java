@@ -235,7 +235,9 @@ public class GeneratorTest {
             }
         }
 
-        return GeneratorUtils.constructInstanceFromCardLists(cardDrawMode, STANDARD, deck, new Tableaus(tableaus));
+        final Tableaus tableaus1 = new Tableaus(tableaus);
+        final DeckAndWaste deckAndWaste = new DeckAndWaste(deck, new Vector<>(), cardDrawMode, STANDARD, 0);
+        return new SolitaireGame(deckAndWaste, tableaus1);
     }
 
 

@@ -127,8 +127,16 @@ public class SolitaireGame {
         return tableaus.getTableaus();
     }
 
-    public Tableaus getTableaus(){
+    public Tableaus getTableaus() {
         return tableaus;
+    }
+
+    public boolean isAddToFaceUpCardsOfTableausPossible(final Vector<Card> cards) {
+        return tableaus.isAddToFaceUpCardsPossible(cards);
+    }
+
+    public List<Card> getAllLastFaceUpCardsOfTableaus() {
+        return tableaus.getAllLastFaceUpCards();
     }
 
     int getTurnedOverTableau() {

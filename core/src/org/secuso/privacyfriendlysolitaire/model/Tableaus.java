@@ -3,11 +3,13 @@ package org.secuso.privacyfriendlysolitaire.model;
 import org.secuso.privacyfriendlysolitaire.generator.GeneratorUtils;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Vector;
+import java.util.stream.Collectors;
 
 public record Tableaus(Map<Integer, Tableau> indexToTableauMap) {
 
@@ -19,7 +21,7 @@ public record Tableaus(Map<Integer, Tableau> indexToTableauMap) {
         for (int i = 0; i < tableauCards.size(); i++) {
             final int index = GeneratorUtils.mapIndexToTableau(i);
             tmpMap.putIfAbsent(index, new Vector<>());
-            Vector<Card> v = tmpMap.get(index);
+            final Vector<Card> v = tmpMap.get(index);
             v.add(tableauCards.get(i));
         }
 
@@ -46,6 +48,15 @@ public record Tableaus(Map<Integer, Tableau> indexToTableauMap) {
 
     public boolean areAllFaceDownsEmpty() {
         return indexToTableauMap.values().stream().allMatch(Tableau::isFaceDownEmpty);
+    }
+
+    public boolean isAddToFaceUpCardsPossible(final Vector<Card> cards) {
+        final Collection<Tableau> tableaus = indexToTableauMap.values();
+        return !tableaus.isEmpty() && tableaus.stream().anyMatch(t -> t.isAddToFaceUpCardsPossible(cards));
+    }
+
+    public List<Card> getAllLastFaceUpCards() {
+        return indexToTableauMap.values().stream().map(Tableau::faceUp).map(Vector::lastElement).collect(Collectors.toList());
     }
 
     public Tableaus clone() {
