@@ -33,6 +33,9 @@
 
     <string name="help">Hilfe</string>
 
+    <string name="help_restart">Neustart</string>
+    <string name="help_restart_summary">Das Spiel neustarten</string>
+
     <string name="help_undo">Rückgängig</string>
     <string name="help_undo_summary">Den letzten Zug rückgängig machen</string>
 
@@ -79,14 +82,6 @@
 
 
     <!-- ###SETTINGS### -->
-    <string name="pref_sound_switch">Ton</string>
-    <string name="pref_sound_switch_summary_on">An</string>
-    <string name="pref_sound_switch_summary_off">Aus</string>
-
-    <string name="pref_shake_switch">Schüttelfunktion </string>
-    <string name="pref_shake_switch_summary_on">An</string>
-    <string name="pref_shake_switch_summary_off">Aus</string>
-
     <string name="pref_dnd_switch_summary_on">An</string>
     <string name="pref_dnd_switch_summary_off">Aus</string>
 

@@ -31,6 +31,9 @@
 
     <string name="help">Help</string>
 
+    <string name="help_restart">Restart</string>
+    <string name="help_restart_summary">Restart game</string>
+
     <string name="help_undo">Undo</string>
     <string name="help_undo_summary">Undo last move</string>
 
@@ -77,15 +80,6 @@
     <string name="more_info">More information can be found on:</string>
 
     <!-- ###SETTINGS### -->
-    <string name="pref_sound_switch">Sound</string>
-    <string name="pref_sound_switch_summary_on">On</string>
-    <string name="pref_sound_switch_summary_off">Off</string>
-
-    <string name="pref_shake_switch">Shake function</string>
-    <string name="pref_shake_switch_summary_on">On</string>
-    <string name="pref_shake_switch_summary_off">Off</string>
-
-
     <string name="pref_dnd_switch_summary_on">On</string>
     <string name="pref_dnd_switch_summary_off">Off</string>
 

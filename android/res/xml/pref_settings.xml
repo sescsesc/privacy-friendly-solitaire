@@ -4,13 +4,6 @@
 
     <PreferenceCategory>
 
-        <!-- Sound-Switch -->
-        <SwitchPreference
-            android:key="@string/pref_sound_switch"
-            android:summaryOff="@string/pref_sound_switch_summary_off"
-            android:summaryOn="@string/pref_sound_switch_summary_on"
-            android:title="@string/pref_sound_switch" />
-
         <!-- Time-Switch -->
         <SwitchPreference
             android:key="@string/pref_time"
@@ -18,19 +11,12 @@
             android:summaryOn="@string/pref_time_summary_on"
             android:title="@string/pref_time" />
 
-        <!-- Shake-Switch -->
+        <!-- DragAndDrop-Switch -->
         <SwitchPreference
             android:key="@string/pref_dnd_switch"
             android:summaryOff="@string/pref_dnd_switch_summary_off"
             android:summaryOn="@string/pref_dnd_switch_summary_on"
             android:title="@string/pref_dnd_switch" />
-
-        <!-- DragAndDrop-Switch -->
-        <SwitchPreference
-            android:key="@string/pref_shake_switch"
-            android:summaryOff="@string/pref_shake_switch_summary_off"
-            android:summaryOn="@string/pref_shake_switch_summary_on"
-            android:title="@string/pref_shake_switch" />
 
         <!-- Waste-List -->
         <ListPreference

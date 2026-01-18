@@ -4,6 +4,11 @@
     <PreferenceCategory android:title="@string/help_usage">
 
 
+           <Preference android:title="@string/help_restart"
+               android:selectable="false"
+               android:icon="@android:drawable/ic_media_previous"
+               android:summary="@string/help_restart_summary"/>
+
            <Preference android:title="@string/help_undo"
                android:selectable="false"
                android:icon="@android:drawable/ic_media_rew"
@@ -13,11 +18,6 @@
                android:selectable="false"
                android:icon="@android:drawable/ic_media_ff"
                android:summary="@string/help_redo_summary"/>
-
-           <Preference android:title="@string/help_foundation"
-               android:selectable="false"
-               android:icon="@drawable/glyphicons_shake"
-               android:summary="@string/help_foundation_summary"/>
 
            <Preference android:title="@string/help_hint"
                android:selectable="false"
