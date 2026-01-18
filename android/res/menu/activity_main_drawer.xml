@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <group android:checkableBehavior="all"
-        android:id="@+id/nav_group_main">
+    <group
+        android:id="@+id/nav_group_main"
+        android:checkableBehavior="all">
         <item
             android:id="@+id/nav_example"
-            android:icon="@drawable/ic_home_black_24dp"
+            android:icon="@android:drawable/ic_media_play"
             android:title="@string/action_main" />
         <item
             android:id="@+id/nav_game"
@@ -14,23 +15,24 @@
             android:visible="false"/>
         <item
             android:id="@+id/nav_tutorial"
-            android:icon="@drawable/ic_menu_tutorial"
+            android:icon="@android:drawable/ic_menu_slideshow"
             android:title="@string/action_tutorial" />
     </group>
 
-    <group android:id="@+id/nav_group_add"
+    <group
+        android:id="@+id/nav_group_add"
         android:checkableBehavior="all">
         <item
             android:id="@+id/nav_settings"
-            android:icon="@drawable/ic_settings"
+            android:icon="@android:drawable/ic_menu_preferences"
             android:title="@string/action_settings" />
         <item
             android:id="@+id/nav_help"
-            android:icon="@drawable/ic_menu_help"
+            android:icon="@android:drawable/ic_menu_help"
             android:title="@string/action_help" />
         <item
             android:id="@+id/nav_about"
-            android:icon="@drawable/ic_menu_info"
+            android:icon="@android:drawable/ic_menu_info_details"
             android:title="@string/action_about" />
     </group>
 </menu>
