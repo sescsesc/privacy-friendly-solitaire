@@ -21,9 +21,7 @@ import static org.secuso.privacyfriendlysolitaire.model.Location.FOUNDATION;
 import static org.secuso.privacyfriendlysolitaire.model.Location.TABLEAU;
 import static org.secuso.privacyfriendlysolitaire.model.Location.WASTE;
 
-import com.badlogic.gdx.Files;
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Group;
@@ -63,8 +61,6 @@ public class View implements GameListener {
     private final ImageWrapper backsideCardOnDeck;
     private SolitaireGame game;
 
-    private boolean playSounds;
-
     private DragAndDrop dragAndDrop = new DragAndDrop();
     private boolean useDragAndDrop;
     private boolean dragStartResult = false;
@@ -75,10 +71,9 @@ public class View implements GameListener {
     // describes the y at which the given tableau is positioned at the smallest
     private final HashMap<Integer, Float> smallestYForTableau = new HashMap<Integer, Float>(7);
 
-    public View(SolitaireGame game, Stage stage, boolean playSounds, boolean useDragAndDrop) {
+    public View(SolitaireGame game, Stage stage, boolean useDragAndDrop) {
         this.stage = stage;
         this.game = game;
-        this.playSounds = playSounds;
         this.useDragAndDrop = useDragAndDrop;
         initialiseViewConstants();
 
@@ -418,7 +413,6 @@ public class View implements GameListener {
             // possibilities: Deck -> Waste, Deck-Reset
             // both are initiated by a click on the deck and therefore have the deck as ac1
             case DECK:
-                playFlipCardSound();
                 // if after the move was handled (in the game) the waste is empty, this was a reset
                 if (game.getDeckWaste().isWasteEmpty()) {
                     resetDeck();
@@ -1482,21 +1476,6 @@ public class View implements GameListener {
 
         public String toString() {
             return super.toString() + ", stack: " + stackIndex + ", card: " + cardIndex + ", gameObject: " + location;
-        }
-    }
-
-
-    private void playFlipCardSound() {
-        if (playSounds) {
-            Music music = Gdx.audio.newMusic(Gdx.files.getFileHandle("sounds/flipCard.mp3", Files.FileType.Internal));
-
-            try {
-                music.setVolume(0.5f);
-                music.play();
-                music.setLooping(false);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
         }
     }
 

@@ -14,17 +14,18 @@ This program is free software: you can redistribute it and/or modify
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import static org.secuso.privacyfriendlysolitaire.dialog.WonDialog.KEY_POINTS;
+import static org.secuso.privacyfriendlysolitaire.dialog.WonDialog.KEY_SHOW_POINTS;
+import static org.secuso.privacyfriendlysolitaire.dialog.WonDialog.KEY_SHOW_TIME;
+import static org.secuso.privacyfriendlysolitaire.dialog.WonDialog.KEY_TIME;
 import static org.secuso.privacyfriendlysolitaire.game.CardDrawMode.ONE;
 import static org.secuso.privacyfriendlysolitaire.game.CardDrawMode.THREE;
 import static org.secuso.privacyfriendlysolitaire.game.ScoreMode.NONE;
 import static org.secuso.privacyfriendlysolitaire.game.ScoreMode.STANDARD;
 import static org.secuso.privacyfriendlysolitaire.game.ScoreMode.VEGAS;
 
-import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.hardware.Sensor;
-import android.hardware.SensorManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.preference.PreferenceActivity;
@@ -71,11 +72,6 @@ public class Solitaire extends AndroidApplication implements NavigationView.OnNa
     private static final Color LILA_SOL = new Color(216 / 255.0f, 191 / 255.0f, 216 / 255.0f, 1);
     private static final Color WHITE_SOL = new Color(255 / 255.0f, 255 / 255.0f, 255 / 255.0f, 1);
 
-    // The following are used for the shake detection
-    private SensorManager mSensorManager;
-    private Sensor mAccelerometer;
-    private ShakeDetector mShakeDetector;
-
     // declare the attributes for time, which can be counted in a game
     private Timer timer;
     private TextView timerView;
@@ -98,7 +94,6 @@ public class Solitaire extends AndroidApplication implements NavigationView.OnNa
     private SharedPreferences mSharedPreferences;
     private Config config;
 
-    // SHAKE
     private Application application;
     private boolean countTime = false;
 
@@ -128,20 +123,8 @@ public class Solitaire extends AndroidApplication implements NavigationView.OnNa
 
         // settings, which were set by the player,
         // if the setting could not be found, set it to false
-        final boolean sound = mSharedPreferences.getBoolean(getString(R.string.pref_sound_switch), false);
-        final boolean shake = mSharedPreferences.getBoolean(getString(R.string.pref_shake_switch), false);
         countTime = mSharedPreferences.getBoolean(getString(R.string.pref_time), false);
-        final boolean draganddrop = mSharedPreferences.getBoolean(getString(R.string.pref_dnd_switch), false);
-
-        // ShakeDetector initialization
-        mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
-        mAccelerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
-        mShakeDetector = new ShakeDetector();
-        mShakeDetector.setOnShakeListener(count -> {
-            if (shake) {
-                application.autoFoundations();
-            }
-        });
+        final boolean draganddrop = mSharedPreferences.getBoolean(getString(R.string.pref_dnd_switch), true);
 
 
         //start timer for game if it is selected in setting by the player
@@ -182,7 +165,7 @@ public class Solitaire extends AndroidApplication implements NavigationView.OnNa
         hint.setOnClickListener(v -> application.autoMove());
 
         // start game
-        application.customConstructor(cardDrawMode, scoreMode, sound, backgroundColor, draganddrop);
+        application.customConstructor(cardDrawMode, scoreMode, backgroundColor, draganddrop);
     }
 
     private Color getBackgroundColorFromPreferences() {
@@ -221,14 +204,10 @@ public class Solitaire extends AndroidApplication implements NavigationView.OnNa
     @Override
     public void onResume() {
         super.onResume();
-        // Add the following line to register the Session Manager Listener onResume
-        mSensorManager.registerListener(mShakeDetector, mAccelerometer, SensorManager.SENSOR_DELAY_UI);
     }
 
     @Override
     public void onPause() {
-        // Add the following line to unregister the Sensor Manager onPause
-        mSensorManager.unregisterListener(mShakeDetector);
         super.onPause();
     }
 
@@ -265,12 +244,19 @@ public class Solitaire extends AndroidApplication implements NavigationView.OnNa
     //Alert box for winning a game which prints the total time and the reached points
     public void showWonDialog() {
         final boolean showPoints = scoreMode != NONE;
-        final WonDialog dia = new WonDialog(this, countTime, showPoints);
-        Bundle args = new Bundle();
+        final WonDialog dia = new WonDialog(this);
+        final Bundle args = new Bundle();
 
         // put necessary arguments to build correct alertBox
-        args.putString("timeForAlert", DateUtils.formatElapsedTime(time));
-        args.putString("pointsString", pointsView.getText().toString());
+        args.putBoolean(KEY_SHOW_TIME, countTime);
+        if (countTime) {
+            args.putString(KEY_TIME, DateUtils.formatElapsedTime(time));
+        }
+        args.putBoolean(KEY_SHOW_POINTS, showPoints);
+        if (showPoints) {
+            args.putString(KEY_POINTS, pointsView.getText().toString());
+        }
+
         dia.setArguments(args);
         dia.show(getFragmentManager(), "WonDialog");
     }

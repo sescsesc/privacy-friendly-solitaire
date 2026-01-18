@@ -17,11 +17,9 @@ This program is free software: you can redistribute it and/or modify
 import static java.lang.Thread.sleep;
 
 import com.badlogic.gdx.ApplicationAdapter;
-import com.badlogic.gdx.Files;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.InputProcessor;
-import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.input.GestureDetector;
@@ -57,8 +55,6 @@ public class Application extends ApplicationAdapter implements ScoreListener {
 
     private CardDrawMode cardDrawMode;
     private ScoreMode scoreMode;
-    private boolean playSounds;
-
     private Color backgroundColour;
 
     private boolean dragAndDrop;
@@ -69,11 +65,10 @@ public class Application extends ApplicationAdapter implements ScoreListener {
 
     private int intervallBetweenAutoMoves = 0;
 
-    public void customConstructor(final CardDrawMode cardDrawMode, final ScoreMode scoreMode, boolean playSounds,
+    public void customConstructor(final CardDrawMode cardDrawMode, final ScoreMode scoreMode,
                                   Color backgroundColour, boolean dragAndDrop) {
         this.cardDrawMode = cardDrawMode;
         this.scoreMode = scoreMode;
-        this.playSounds = playSounds;
         this.backgroundColour = backgroundColour;
         this.dragAndDrop = dragAndDrop;
     }
@@ -101,7 +96,7 @@ public class Application extends ApplicationAdapter implements ScoreListener {
 
     private void initVC() {
         stage.clear();
-        View view = new View(game, stage, playSounds, dragAndDrop);
+        View view = new View(game, stage, dragAndDrop);
         game.registerGameListener(view);
 
         final Scorer scorer = scoreMode.getScorer();
@@ -121,7 +116,6 @@ public class Application extends ApplicationAdapter implements ScoreListener {
 
         if (game.isWon() && listener != null && !won) {
             listener.onWon();
-            playWonSound();
             won = true;
         } else if (practicallyWon && !won) {
             if (intervallBetweenAutoMoves >= 4) {
@@ -173,7 +167,6 @@ public class Application extends ApplicationAdapter implements ScoreListener {
     public void undo() {
         if (clickPossible && game.canUndo()) {
             clickPossible = false;
-            playUndoRedoSound();
             Gdx.app.postRunnable(new Runnable() {
                 @Override
                 public void run() {
@@ -193,7 +186,6 @@ public class Application extends ApplicationAdapter implements ScoreListener {
     public void redo() {
         if (clickPossible && game.canRedo()) {
             clickPossible = false;
-            playUndoRedoSound();
             Gdx.app.postRunnable(new Runnable() {
                 @Override
                 public void run() {
@@ -277,30 +269,6 @@ public class Application extends ApplicationAdapter implements ScoreListener {
                     }
                 }
             });
-        }
-    }
-
-
-    private void playWonSound() {
-        playSoundWithName("success.mp3");
-    }
-
-    private void playUndoRedoSound() {
-        playSoundWithName("button.mp3");
-    }
-
-    private void playSoundWithName(String fileName) {
-        if (playSounds) {
-            Music music = Gdx.audio.newMusic(Gdx.files.getFileHandle("sounds/" + fileName,
-                    Files.FileType.Internal));
-
-            try {
-                music.setVolume(0.5f);
-                music.play();
-                music.setLooping(false);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
         }
     }
 }
