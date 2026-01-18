@@ -17,7 +17,6 @@ This program is free software: you can redistribute it and/or modify
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.View;
 import android.widget.Button;
 
 import org.secuso.privacyfriendlysolitaire.R;
@@ -29,28 +28,17 @@ public class MainActivity extends BaseActivity {
         setContentView(R.layout.activity_menu);
 
         //set NEW GAME button and the function to start a new game on Main Activity
-        Button button = (Button) findViewById(R.id.game_button_start);
-        button.setOnClickListener(new View.OnClickListener() {
-
-            @Override
-            public void onClick(View v) {
-                startActivity(new Intent(MainActivity.this, Solitaire.class));
-            }
-        });
+        Button button = findViewById(R.id.game_button_start);
+        button.setOnClickListener(v -> startActivity(new Intent(MainActivity.this, Solitaire.class)));
 
         overridePendingTransition(0, 0);
 
     }
 
-//do not open new activity by selecting Main Activity again
+    //do not open new activity by selecting Main Activity again
     @Override
     protected int getNavigationDrawerID() {
         return R.id.nav_example;
     }
 
-//    public void onClick(View view) {
-//        switch (view.getId()) {
-//            default:
-//        }
-//    }
 }

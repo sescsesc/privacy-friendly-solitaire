@@ -29,8 +29,9 @@ import org.secuso.privacyfriendlysolitaire.model.Foundations;
 import org.secuso.privacyfriendlysolitaire.model.Move;
 import org.secuso.privacyfriendlysolitaire.model.Suit;
 import org.secuso.privacyfriendlysolitaire.model.Tableau;
+import org.secuso.privacyfriendlysolitaire.model.Tableaus;
 
-import java.util.ArrayList;
+import java.util.List;
 import java.util.Vector;
 
 /**
@@ -44,7 +45,7 @@ public class SolitaireGame {
     /**
      * the deck and the waste of the game
      */
-    private DeckAndWaste deckAndWaste;
+    private final DeckAndWaste deckAndWaste;
 
     /**
      * the foundations of the game
@@ -54,7 +55,7 @@ public class SolitaireGame {
     /**
      * the tableaus of the game
      */
-    private ArrayList<Tableau> tableaus;
+    private final Tableaus tableaus;
 
     /**
      * the previous action
@@ -101,10 +102,10 @@ public class SolitaireGame {
      */
     private boolean undoMove = false;
 
-    public SolitaireGame(DeckAndWaste initialDeck, ArrayList<Tableau> initialTableaus) {
-        deckAndWaste = initialDeck;
-        foundations = new Foundations();
-        tableaus = initialTableaus;
+    public SolitaireGame(final DeckAndWaste initialDeck, final Tableaus initialTableaus) {
+        this.deckAndWaste = initialDeck;
+        this.foundations = new Foundations();
+        this.tableaus = initialTableaus;
         prevAction = null;
         moves = new Vector<>();
     }
@@ -119,11 +120,23 @@ public class SolitaireGame {
 
 
     public Tableau getTableauAtPos(int n) {
-        return tableaus.get(n);
+        return tableaus.getTableau(n);
     }
 
-    ArrayList<Tableau> getTableaus() {
+    List<Tableau> getListOfTableaus() {
+        return tableaus.getTableaus();
+    }
+
+    public Tableaus getTableaus() {
         return tableaus;
+    }
+
+    public boolean isAddToFaceUpCardsOfTableausPossible(final Vector<Card> cards) {
+        return tableaus.isAddToFaceUpCardsPossible(cards);
+    }
+
+    public List<Card> getAllLastFaceUpCardsOfTableaus() {
+        return tableaus.getAllLastFaceUpCards();
     }
 
     int getTurnedOverTableau() {
@@ -461,17 +474,12 @@ public class SolitaireGame {
         return false;
     }
 
+    @Override
     public String toString() {
-        StringBuilder sb = new StringBuilder(this.deckAndWaste.toString());
-        sb.append("\n");
-        for (Tableau t : tableaus) {
-            sb.append("Tableau: ");
-            sb.append(t.toString());
-            sb.append("\n");
-        }
-
+        final StringBuilder sb = new StringBuilder();
+        sb.append(deckAndWaste).append("\n");
+        sb.append(tableaus).append("\n");
         sb.append(foundations).append("\n");
-
         return sb.toString();
     }
 
@@ -492,16 +500,7 @@ public class SolitaireGame {
      * @return true if the game is practically won
      */
     boolean isPracticallyWon() {
-        boolean practicallyWon = deckAndWaste != null && deckAndWaste.getCardDrawMode() == ONE;
-
-        for (Tableau tab : tableaus) {
-            if (practicallyWon) {
-                practicallyWon = tab.isFaceDownEmpty();
-            } else {
-                break;
-            }
-        }
-        return practicallyWon;
+        return deckAndWaste != null && deckAndWaste.getCardDrawMode() == ONE && tableaus.areAllFaceDownsEmpty();
     }
 
     void registerGameListener(GameListener gameListener) {
@@ -533,7 +532,7 @@ public class SolitaireGame {
      * @return true if undoing is possible
      */
     boolean canUndo() {
-        return movePointer >= 0;
+        return !moves.isEmpty() && movePointer >= 0;
     }
 
     /**

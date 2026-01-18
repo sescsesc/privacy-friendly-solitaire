@@ -139,5 +139,9 @@ public record Tableau(Vector<Card> faceDown, Vector<Card> faceUp) {
         }
         return result;
     }
+
+    public Tableau clone(){
+        return new Tableau(new Vector<>(faceDown), new Vector<>(faceUp));
+    }
 }
 

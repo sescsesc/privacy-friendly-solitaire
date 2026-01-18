@@ -187,11 +187,7 @@ public class GeneratorTest {
         // build instance from lists
         Vector<Card> deck = new Vector<Card>(MAX_NR_IN_DECK);
         deck.setSize(MAX_NR_IN_DECK);
-        HashMap<Integer, Vector<Card>> tableaus = new HashMap<Integer, Vector<Card>>(7);
-        for (int i = 0; i < NR_OF_TABLEAUS; i++) {
-            int j = i + 1;
-            tableaus.put(i, new Vector<Card>(j));
-        }
+        HashMap<Integer, Tableau> tableaus = new HashMap<>(7);
 
         // ------------- distribute unplayable cards -------------
         for (int i = 0; i < unplayableCards.size(); i++) {
@@ -201,8 +197,9 @@ public class GeneratorTest {
             if (i < 21) {
                 // shifted one to the right for face-down cards
                 int indexOfTableau = GeneratorUtils.mapIndexToTableau(i) + 1;
-                Vector<Card> currentTableau = tableaus.get(indexOfTableau);
-                currentTableau.add(unplayableCardToBeAdded);
+                tableaus.putIfAbsent(indexOfTableau, new Tableau(new Vector<>(), new Vector<>()));
+                Tableau currentTableau = tableaus.get(indexOfTableau);
+                currentTableau.faceDown().add(unplayableCardToBeAdded);
                 tableaus.put(indexOfTableau, currentTableau);
             }
             // unplayable cards in deck
@@ -222,8 +219,9 @@ public class GeneratorTest {
 
             // face-up cards of tableaus
             if (i < 7) {
-                Vector<Card> currentTableau = tableaus.get(i);
-                currentTableau.add(playableCardToBeAdded);
+                tableaus.putIfAbsent(i, new Tableau(new Vector<>(), new Vector<>()));
+                Tableau currentTableau = tableaus.get(i);
+                currentTableau.faceUp().add(playableCardToBeAdded);
                 tableaus.put(i, currentTableau);
             }
             // playable cards in deck
@@ -237,7 +235,9 @@ public class GeneratorTest {
             }
         }
 
-        return GeneratorUtils.constructInstanceFromCardLists(cardDrawMode, STANDARD, deck, tableaus);
+        final Tableaus tableaus1 = new Tableaus(tableaus);
+        final DeckAndWaste deckAndWaste = new DeckAndWaste(deck, new Vector<>(), cardDrawMode, STANDARD, 0);
+        return new SolitaireGame(deckAndWaste, tableaus1);
     }
 
 

@@ -20,37 +20,16 @@ import android.content.SharedPreferences;
 public class Config {
 
     private final SharedPreferences settings;
-    private final SharedPreferences.Editor editor;
 
     public Config(Context applicationContext) {
         settings = applicationContext.getSharedPreferences("settings", 0);
-        editor = settings.edit();
     }
 
-    public boolean isFirstCall() {
-        // check whether this is the first call of this app,
-        // if no record exists, it probably is (return true)
-        boolean isFirstCall = settings.getBoolean(Constant.FIRST_CALL, true);
-
-        // after the first call, we have to toggle the state (we can skip this later)
-        if (isFirstCall) {
-            editor.putBoolean(Constant.FIRST_CALL, false);
-            editor.apply();
-        }
-
-        // first call of app
-        return isFirstCall;
-    }
 
     // alerbox warning, if player wants to leave game
     public boolean showWarningWhenLeavingGame() {
         return settings.getBoolean(Constant.SHOW_WARNING, true);
     }
 
-
-    public void setShowWarningWhenLeavingGame(boolean show_warning) {
-        editor.putBoolean(Constant.SHOW_WARNING, show_warning);
-        editor.apply();
-    }
 
 }

@@ -4,7 +4,7 @@
     <!-- ###Start###-->
     <string name="app_name">Solitär2</string>
     <string name="app_name_long">Privacy Friendly Solitär2</string>
-    
+
     <string name="okay">Okay</string>
 
     <!-- ###DRAWER###-->
@@ -121,6 +121,7 @@
     <string name="alert_box_won_time">Zeit: </string>
     <string name="alert_box_won_points">Punkte: </string>
     <string name="alert_box_won_lost_main">Hauptmenü</string>
+    <string name="alert_box_won_lost_restart">Erneut spielen</string>
     <string name="alert_box_won_lost_another">Neues Spiel</string>
 
     <!-- ### LOST DIALOG ### -->
@@ -143,6 +144,7 @@
     <string name="string_descr_drawer_pfa_logo">Drawer PFA Logo</string>
     <string name="string_descr_secuso_blue">Secuso Logo Blau</string>
     <string name="string_descr_icon_main_menu">Icon Hauptmenü</string>
+    <string name="string_descr_restart_button">Restart Button Asset</string>
     <string name="string_descr_undo_button">Undo Button Asset</string>
     <string name="string_descr_redo_button">Redo Button Asset</string>
     <string name="string_descr_hint_button">Hinweis Button Asset</string>

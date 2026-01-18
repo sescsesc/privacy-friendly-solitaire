@@ -24,5 +24,6 @@ public class Constants {
     public final static int NR_OF_TABLEAUS = 7;
     public final static int NR_OF_FOUNDATIONS = 4;
     public final static int MAX_NR_IN_DECK = 24;
+    public final static int MAX_NR_IN_TABLEAU = 28;
     public final static int NR_CARDS = 52;
 }
