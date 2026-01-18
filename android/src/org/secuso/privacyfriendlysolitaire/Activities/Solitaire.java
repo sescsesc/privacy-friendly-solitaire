@@ -14,6 +14,10 @@ This program is free software: you can redistribute it and/or modify
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import static org.secuso.privacyfriendlysolitaire.dialog.WonDialog.KEY_POINTS;
+import static org.secuso.privacyfriendlysolitaire.dialog.WonDialog.KEY_SHOW_POINTS;
+import static org.secuso.privacyfriendlysolitaire.dialog.WonDialog.KEY_SHOW_TIME;
+import static org.secuso.privacyfriendlysolitaire.dialog.WonDialog.KEY_TIME;
 import static org.secuso.privacyfriendlysolitaire.game.CardDrawMode.ONE;
 import static org.secuso.privacyfriendlysolitaire.game.CardDrawMode.THREE;
 import static org.secuso.privacyfriendlysolitaire.game.ScoreMode.NONE;
@@ -131,7 +135,7 @@ public class Solitaire extends AndroidApplication implements NavigationView.OnNa
         final boolean sound = mSharedPreferences.getBoolean(getString(R.string.pref_sound_switch), false);
         final boolean shake = mSharedPreferences.getBoolean(getString(R.string.pref_shake_switch), false);
         countTime = mSharedPreferences.getBoolean(getString(R.string.pref_time), false);
-        final boolean draganddrop = mSharedPreferences.getBoolean(getString(R.string.pref_dnd_switch), false);
+        final boolean draganddrop = mSharedPreferences.getBoolean(getString(R.string.pref_dnd_switch), true);
 
         // ShakeDetector initialization
         mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
@@ -265,12 +269,19 @@ public class Solitaire extends AndroidApplication implements NavigationView.OnNa
     //Alert box for winning a game which prints the total time and the reached points
     public void showWonDialog() {
         final boolean showPoints = scoreMode != NONE;
-        final WonDialog dia = new WonDialog(this, countTime, showPoints);
-        Bundle args = new Bundle();
+        final WonDialog dia = new WonDialog(this);
+        final Bundle args = new Bundle();
 
         // put necessary arguments to build correct alertBox
-        args.putString("timeForAlert", DateUtils.formatElapsedTime(time));
-        args.putString("pointsString", pointsView.getText().toString());
+        args.putBoolean(KEY_SHOW_TIME, countTime);
+        if (countTime) {
+            args.putString(KEY_TIME, DateUtils.formatElapsedTime(time));
+        }
+        args.putBoolean(KEY_SHOW_POINTS, showPoints);
+        if (showPoints) {
+            args.putString(KEY_POINTS, pointsView.getText().toString());
+        }
+
         dia.setArguments(args);
         dia.show(getFragmentManager(), "WonDialog");
     }
