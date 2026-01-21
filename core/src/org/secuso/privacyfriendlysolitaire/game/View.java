@@ -237,13 +237,14 @@ public class View implements GameListener {
 
                 try {
                     if (!game.wasInvalidMove()) {
+                        final Vector<Move> moves = game.getMoves();
                         if (!game.wasUndoMove()) {
                             // usual move
-                            Move prevMove = game.getMoves().elementAt(game.getMovePointer());
+                            Move prevMove = moves.elementAt(game.getMovePointer());
                             handleMove(prevMove, game);
                         } else {
                             // undo move
-                            Move undoMove = game.getMoves().elementAt(game.getMovePointer() + 1);
+                            Move undoMove = moves.elementAt(game.getMovePointer() + 1);
                             handleUndoMove(undoMove, game);
                         }
                     }
@@ -256,13 +257,14 @@ public class View implements GameListener {
             if (prevAction == null) {
                 try {
                     if (!game.wasInvalidMove()) {
+                        final Vector<Move> moves = game.getMoves();
                         if (!game.wasUndoMove()) {
                             // usual move
-                            Move prevMove = game.getMoves().elementAt(game.getMovePointer());
+                            Move prevMove = moves.elementAt(game.getMovePointer());
                             handleMove(prevMove, game);
                         } else {
                             // undo move
-                            Move undoMove = game.getMoves().elementAt(game.getMovePointer() + 1);
+                            Move undoMove = moves.elementAt(game.getMovePointer() + 1);
                             handleUndoMove(undoMove, game);
                         }
                     }

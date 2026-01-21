@@ -14,7 +14,6 @@ This program is free software: you can redistribute it and/or modify
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import static org.secuso.privacyfriendlysolitaire.model.Location.DECK;
 import static org.secuso.privacyfriendlysolitaire.model.Location.TABLEAU;
 
 import com.badlogic.gdx.Gdx;
@@ -85,17 +84,6 @@ class Controller implements GestureDetector.GestureListener {
                         actionForClick = new Action(TABLEAU, index, cardIndexInFaceUp);
                     }
                 }
-            }
-        }
-
-        // if we get a user-move that is not a deck-move we reset the MoveFinder's counter
-        // if we get a deck-action we do not reset the number, but we also do not increment it
-        // this is a behaviour that we implemented, such that the user can tap through the deck
-        // by hand, if he wants to see its content, but if he is 'asking the game for help' by
-        // invoking the MoveFinder and only gets deck-moves the game is definitely lost
-        if (actionForClick != null) {
-            if (DECK != actionForClick.getLocation()) {
-                MoveFinder.resetNrOfMovesThroughDeck();
             }
         }
 

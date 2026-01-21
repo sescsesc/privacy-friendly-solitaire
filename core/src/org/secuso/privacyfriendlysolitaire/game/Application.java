@@ -220,7 +220,7 @@ public class Application extends ApplicationAdapter implements ScoreListener {
             // all of this needs to run on libgdx's open gl rendering thread
             Gdx.app.postRunnable(() -> {
 
-                Move move = MoveFinder.findMove(game, listener);
+                Move move = MoveFinder.findMove(game);
                 try {
                     if (move != null) {
                         //break;
@@ -233,7 +233,6 @@ public class Application extends ApplicationAdapter implements ScoreListener {
                         if (!practicallyWon) {
                             scheduleEnableClick();
                         }
-
                     }
                 } catch (Exception e) {
                     e.printStackTrace();

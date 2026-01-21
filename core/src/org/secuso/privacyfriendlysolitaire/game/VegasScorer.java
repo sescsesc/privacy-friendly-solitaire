@@ -19,6 +19,8 @@ import static org.secuso.privacyfriendlysolitaire.model.Location.FOUNDATION;
 import org.secuso.privacyfriendlysolitaire.model.Action;
 import org.secuso.privacyfriendlysolitaire.model.Move;
 
+import java.util.Vector;
+
 /**
  * @author M. Fischer
  * <p>
@@ -36,8 +38,9 @@ public class VegasScorer extends Scorer {
     public void update(SolitaireGame game) {
         if (game.getPrevAction() == null) {
             setScore(-52);
+            final Vector<Move> moves = game.getMoves();
             for (int i = 0; i < game.getMovePointer() + 1; i++) {
-                final Move m = game.getMoves().get(i);
+                final Move m = moves.get(i);
                 final Action sourceAction = m.sourceAction();
                 if (sourceAction.getLocation() == FOUNDATION) {
                     addScore(-5);

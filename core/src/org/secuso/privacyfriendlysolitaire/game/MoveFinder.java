@@ -19,7 +19,6 @@ import static org.secuso.privacyfriendlysolitaire.model.Location.FOUNDATION;
 import static org.secuso.privacyfriendlysolitaire.model.Location.TABLEAU;
 import static org.secuso.privacyfriendlysolitaire.model.Location.WASTE;
 
-import org.secuso.privacyfriendlysolitaire.CallBackListener;
 import org.secuso.privacyfriendlysolitaire.model.Action;
 import org.secuso.privacyfriendlysolitaire.model.Card;
 import org.secuso.privacyfriendlysolitaire.model.DeckAndWaste;
@@ -35,66 +34,34 @@ import java.util.Vector;
  */
 
 public class MoveFinder {
-    private static int nrCardsInDeck = 52;
-    private static int nrOfConsecutiveMovesThroughDeck = 0;
 
     /**
      * @param game the SolitaireGame in which a Move shall be found
      * @return a possible Move to progress the Game or null if none could be found
      */
-    public static Move findMove(SolitaireGame game, CallBackListener listener) {
-        nrCardsInDeck = game.getDeckWaste().getSizeOfDeckAndWaste();
-        checkWhetherNoMoves(listener);
-
+    public static Move findMove(SolitaireGame game) {
         Move foundMove = findMoveTableauToFoundation(game);
         if (foundMove != null) {
-            nrOfConsecutiveMovesThroughDeck = 0;
             return foundMove;
         }
         foundMove = findMoveWasteToFoundation(game);
         if (foundMove != null) {
-            nrOfConsecutiveMovesThroughDeck = 0;
             return foundMove;
         }
         foundMove = findMoveTableauToTableau(game);
         if (foundMove != null) {
-            nrOfConsecutiveMovesThroughDeck = 0;
             return foundMove;
         }
         foundMove = findMoveWasteToTableau(game);
         if (foundMove != null) {
-            nrOfConsecutiveMovesThroughDeck = 0;
             return foundMove;
         }
         foundMove = findMoveDeck(game);
         if (foundMove != null) {
-            nrOfConsecutiveMovesThroughDeck++;
             return foundMove;
         }
         return null;
     }
-
-
-    /**
-     * resets the nrOfConsecutiveMovesThroughDeck to 0, if another moves was made
-     */
-    static void resetNrOfMovesThroughDeck() {
-        nrOfConsecutiveMovesThroughDeck = 0;
-    }
-
-
-    /**
-     * check whether there are no more moves (we already clicked through the deck as often as
-     * there are cards in there)
-     *
-     * @param listener the CallBackListener, that should react if the game is lost
-     */
-    private static void checkWhetherNoMoves(CallBackListener listener) {
-        if (nrOfConsecutiveMovesThroughDeck > nrCardsInDeck) {
-            listener.onLost();
-        }
-    }
-
 
     /**
      * @param game the SolitaireGame in which a Move from Tableau to Foundation shall be found
@@ -112,8 +79,9 @@ public class MoveFinder {
             if (game.canAddCardToFoundation(cardFromTableau)) {
                 //check if reversal of previous move
                 final int position = game.getOrCreateFoundationPosition(cardFromTableau.suit());
-                if (!game.getMoves().isEmpty()) {
-                    final Move prevMove = game.getMoves().get(game.getMovePointer());
+                final Vector<Move> moves = game.getMoves();
+                if (!moves.isEmpty()) {
+                    final Move prevMove = moves.get(game.getMovePointer());
                     if (prevMove.sourceAction().getLocation() == FOUNDATION && prevMove.targetAction().getLocation() == TABLEAU && prevMove.sourceAction().getStackIndex() == position && prevMove.targetAction().getStackIndex() == tableauIndex) {
                         continue;
                     }
@@ -151,8 +119,9 @@ public class MoveFinder {
                 final Vector<Card> toBeMoved = tableauSource.getCopyFaceUpVector(sourceCardIndex);
                 if (tableauTarget.isAddToFaceUpCardsPossible(toBeMoved)) {
                     //check if reversal of previous move
-                    if (!game.getMoves().isEmpty()) {
-                        Move prevMove = game.getMoves().get(game.getMovePointer());
+                    final Vector<Move> moves = game.getMoves();
+                    if (!moves.isEmpty()) {
+                        Move prevMove = moves.get(game.getMovePointer());
                         if (prevMove.sourceAction().getLocation() == TABLEAU && prevMove.targetAction().getLocation() == TABLEAU && prevMove.sourceAction().getStackIndex() == tableauIndexTarget && prevMove.targetAction().getStackIndex() == tableauIndexSource && !game.isLastMoveturnedOverTableau()) {
                             continue;
                         }
