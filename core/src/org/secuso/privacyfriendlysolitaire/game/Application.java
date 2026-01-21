@@ -191,7 +191,7 @@ public class Application extends ApplicationAdapter implements ScoreListener {
 
     @Override
     public void score(int score) {
-        listener.score(score);
+        listener.updateScore(score);
     }
 
     public void autoFoundations() {

@@ -513,7 +513,8 @@ public class SolitaireGame {
 
     private void notifyCallBackListener() {
         if (callBackListener != null) {
-            callBackListener.isUndoRedoPossible(canUndo(), canRedo());
+            callBackListener.updateUndoPossible(canUndo());
+            callBackListener.updateRedoPossible(canRedo());
         }
     }
 

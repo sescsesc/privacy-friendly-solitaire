@@ -74,9 +74,6 @@ public class Solitaire extends AndroidApplication implements NavigationView.OnNa
 
     // declare the attributes for time, which can be counted in a game
     private Timer timer;
-    private TextView timerView;
-    private TextView pointsView;
-
 
     // delay to launch nav drawer item, to allow close animation to play
     private static final int NAVDRAWER_LAUNCH_DELAY = 250;
@@ -128,19 +125,17 @@ public class Solitaire extends AndroidApplication implements NavigationView.OnNa
 
 
         //start timer for game if it is selected in setting by the player
-        timerView = findViewById(R.id.timerView);
         if (countTime) {
             startTimer();
         }
-        timerView.setVisibility(countTime ? View.VISIBLE : View.GONE);
+        findViewById(R.id.timerView).setVisibility(countTime ? View.VISIBLE : View.GONE);
 
         // default modes for cardDraw and score
         final CardDrawMode cardDrawMode = readCardDrawModeFromPreferences();
 
         //pointsView && select point counting mode in settings
         updateScoreModeFromPreferences();
-        pointsView = findViewById(R.id.points);
-        pointsView.setVisibility(scoreMode == NONE ? View.GONE : View.VISIBLE);
+        findViewById(R.id.points).setVisibility(scoreMode == NONE ? View.GONE : View.VISIBLE);
 
         // Set the background color of the game panel
         final Color backgroundColor = getBackgroundColorFromPreferences();
@@ -224,7 +219,7 @@ public class Solitaire extends AndroidApplication implements NavigationView.OnNa
                 //use a handler to run a toast that shows the current timestamp
                 handler.post(() -> {
                     time = (time + 1);
-                    timerView.setText(DateUtils.formatElapsedTime(time));
+                    ((TextView) findViewById(R.id.timerView)).setText(DateUtils.formatElapsedTime(time));
                 });
             }
         };
@@ -254,7 +249,7 @@ public class Solitaire extends AndroidApplication implements NavigationView.OnNa
         }
         args.putBoolean(KEY_SHOW_POINTS, showPoints);
         if (showPoints) {
-            args.putString(KEY_POINTS, pointsView.getText().toString());
+            args.putString(KEY_POINTS, ((TextView) findViewById(R.id.points)).getText().toString());
         }
 
         dia.setArguments(args);
@@ -393,24 +388,23 @@ public class Solitaire extends AndroidApplication implements NavigationView.OnNa
     }
 
     @Override
-    public void isUndoRedoPossible(final boolean canUndo, final boolean canRedo) {
+    public void updateUndoPossible(boolean newUndoPossible) {
         runOnUiThread(() -> {
-            //change undo-button and redo-button images here so that user knows if action is possible
-            ImageButton restart = (ImageButton) findViewById(R.id.restart);
-            restart.setVisibility(canUndo ? View.VISIBLE : View.GONE);
-
-            ImageButton undo = (ImageButton) findViewById(R.id.undo);
-            undo.setVisibility(canUndo ? View.VISIBLE : View.GONE);
-
-            ImageButton redo = (ImageButton) findViewById(R.id.redo);
-            redo.setVisibility(canRedo ? View.VISIBLE : View.GONE);
+            findViewById(R.id.restart).setVisibility(newUndoPossible ? View.VISIBLE : View.GONE);
+            findViewById(R.id.undo).setVisibility(newUndoPossible ? View.VISIBLE : View.GONE);
         });
     }
 
+    @Override
+    public void updateRedoPossible(boolean newRedoPossible) {
+        runOnUiThread(() -> {
+            findViewById(R.id.redo).setVisibility(newRedoPossible ? View.VISIBLE : View.GONE);
+        });
+    }
 
     @Override
-    public void score(final int score) {
-        runOnUiThread(() -> pointsView.setText(String.valueOf(score)));
+    public void updateScore(final int newScore) {
+        runOnUiThread(() -> ((TextView) findViewById(R.id.points)).setText(String.valueOf(newScore)));
     }
 
     public Application getApp() {

@@ -16,10 +16,10 @@ This program is free software: you can redistribute it and/or modify
 
 /**
  * @author I. Dix
- *         <p>
- *         A listener that can be used to communicate with the outside Android activity.
- *         Namely communicate the score to the outside so it can be used in the AppBar
- *         and communicating when the game is won.
+ * <p>
+ * A listener that can be used to communicate with the outside Android activity.
+ * Namely communicate the score to the outside so it can be used in the AppBar
+ * and communicating when the game is won.
  */
 
 public interface CallBackListener {
@@ -28,7 +28,9 @@ public interface CallBackListener {
 
     void onLost();
 
-    void isUndoRedoPossible(final boolean canUndo, final boolean canRedo);
+    void updateUndoPossible(final boolean newUndoPossible);
 
-    void score(int score);
+    void updateRedoPossible(final boolean newRedoPossible);
+
+    void updateScore(final int newScore);
 }
