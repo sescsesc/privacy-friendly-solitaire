@@ -14,8 +14,6 @@ This program is free software: you can redistribute it and/or modify
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import static java.lang.Thread.sleep;
-
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputMultiplexer;
@@ -26,6 +24,7 @@ import com.badlogic.gdx.input.GestureDetector;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
+import com.badlogic.gdx.utils.Timer;
 
 import org.secuso.privacyfriendlysolitaire.CallBackListener;
 import org.secuso.privacyfriendlysolitaire.ScoreListener;
@@ -153,32 +152,28 @@ public class Application extends ApplicationAdapter implements ScoreListener {
                 won = false;
                 practicallyWon = false;
                 initMVC(new SolitaireGame(deckAndWasteAtStart, tableausAtStart));
-
-                try {
-                    sleep(300);
-                    clickPossible = true;
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
+                scheduleEnableClick();
             });
         }
+    }
+
+    private void scheduleEnableClick() {
+        Timer.schedule(new Timer.Task() {
+            @Override
+            public void run() {
+                // re-enable button after animation finished
+                clickPossible = true;
+            }
+        }, .3f);
     }
 
     public void undo() {
         if (clickPossible && game.canUndo()) {
             clickPossible = false;
-            Gdx.app.postRunnable(new Runnable() {
-                @Override
-                public void run() {
-                    game.undo();
+            Gdx.app.postRunnable(() -> {
+                game.undo();
 
-                    try {
-                        sleep(300);
-                        clickPossible = true;
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                }
+                scheduleEnableClick();
             });
         }
     }
@@ -186,18 +181,10 @@ public class Application extends ApplicationAdapter implements ScoreListener {
     public void redo() {
         if (clickPossible && game.canRedo()) {
             clickPossible = false;
-            Gdx.app.postRunnable(new Runnable() {
-                @Override
-                public void run() {
-                    game.redo();
+            Gdx.app.postRunnable(() -> {
+                game.redo();
 
-                    try {
-                        sleep(300);
-                        clickPossible = true;
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                }
+                scheduleEnableClick();
             });
         }
     }
@@ -210,28 +197,19 @@ public class Application extends ApplicationAdapter implements ScoreListener {
     public void autoFoundations() {
         if (clickPossible) {
             clickPossible = false;
-            Gdx.app.postRunnable(new Runnable() {
-                @Override
-                public void run() {
+            Gdx.app.postRunnable(() -> {
 
-                    Move move;
-                    while (true) {
-                        move = MoveFinder.findMoveTableauToFoundation(game);
-                        if (move == null) {
-                            break;
-                        }
-                        game.handleAction(move.sourceAction(), false);
-                        game.handleAction(move.targetAction(), false);
-
-                        try {
-                            sleep(300);
-                            clickPossible = true;
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        }
+                Move move;
+                while (true) {
+                    move = MoveFinder.findMoveTableauToFoundation(game);
+                    if (move == null) {
+                        break;
                     }
-                }
+                    game.handleAction(move.sourceAction(), false);
+                    game.handleAction(move.targetAction(), false);
 
+                    scheduleEnableClick();
+                }
             });
         }
     }
@@ -240,33 +218,25 @@ public class Application extends ApplicationAdapter implements ScoreListener {
         if (clickPossible || practicallyWon) {
             clickPossible = false;
             // all of this needs to run on libgdx's open gl rendering thread
-            Gdx.app.postRunnable(new Runnable() {
-                @Override
-                public void run() {
+            Gdx.app.postRunnable(() -> {
 
-                    Move move = MoveFinder.findMove(game, listener);
-                    try {
-                        if (move != null) {
-                            //break;
-                            game.handleAction(move.sourceAction(), false);
+                Move move = MoveFinder.findMove(game, listener);
+                try {
+                    if (move != null) {
+                        //break;
+                        game.handleAction(move.sourceAction(), false);
 
-                            if (move.targetAction() != null) {
-                                game.handleAction(move.targetAction(), false);
-                            }
-
-                            if (!practicallyWon) {
-                                try {
-                                    sleep(300);
-                                    clickPossible = true;
-                                } catch (InterruptedException e) {
-                                    e.printStackTrace();
-                                }
-                            }
-
+                        if (move.targetAction() != null) {
+                            game.handleAction(move.targetAction(), false);
                         }
-                    } catch (Exception e) {
-                        e.printStackTrace();
+
+                        if (!practicallyWon) {
+                            scheduleEnableClick();
+                        }
+
                     }
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
             });
         }
