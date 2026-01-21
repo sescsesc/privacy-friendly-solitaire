@@ -316,7 +316,7 @@ public class SolitaireGame {
         }
         if (!redoMove) {
             cleanUpMoves();
-            this.moves.add(new Move(prevAction, action, lastMoveturnedOverTableau, -1, -1));
+            this.moves.add(new Move(prevAction, action, lastMoveturnedOverTableau, -1, -1, false));
         }
         movePointer++;
         this.prevAction = null;
@@ -345,7 +345,7 @@ public class SolitaireGame {
         }
         if (!redoMove) {
             cleanUpMoves();
-            this.moves.add(new Move(prevAction, action, lastMoveturnedOverTableau, oldFanSize, newFanSize));
+            this.moves.add(new Move(prevAction, action, lastMoveturnedOverTableau, oldFanSize, newFanSize, false));
         }
         movePointer++;
         this.prevAction = null;

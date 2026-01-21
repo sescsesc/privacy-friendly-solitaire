@@ -120,7 +120,7 @@ public class MoveFinder {
                 }
                 final Action removeFromTableauAction = new Action(TABLEAU, tableauIndex, tableau.getFaceUpCardsSize() - 1);
                 final Action addToFoundationAction = new Action(FOUNDATION, position, 0);
-                return new Move(removeFromTableauAction, addToFoundationAction, false, -1, -1);
+                return new Move(removeFromTableauAction, addToFoundationAction, false, -1, -1, true);
             }
         }
         return null;
@@ -159,7 +159,7 @@ public class MoveFinder {
                     }
                     final Action sourceAction = new Action(TABLEAU, tableauIndexSource, sourceCardIndex);
                     final Action targetAction = new Action(TABLEAU, tableauIndexTarget, 0);
-                    return new Move(sourceAction, targetAction, false, -1, -1);
+                    return new Move(sourceAction, targetAction, false, -1, -1, true);
                 }
 //                }
             }
@@ -187,7 +187,7 @@ public class MoveFinder {
                 final Action removeFromWasteAction = new Action(WASTE, 0, 0);
                 final int nrOfFaceUpsInTableau = tableau.getFaceUpCardsSize();
                 final Action addToTableauAction = new Action(TABLEAU, t, nrOfFaceUpsInTableau - 1);
-                return new Move(removeFromWasteAction, addToTableauAction, false, -1, -1);
+                return new Move(removeFromWasteAction, addToTableauAction, false, -1, -1, true);
             }
         }
         return null;
@@ -209,7 +209,7 @@ public class MoveFinder {
             final int position = game.getOrCreateFoundationPosition(cardFromWaste.suit());
             final Action removeFromWasteAction = new Action(WASTE, 0, 0);
             final Action addToFoundationAction = new Action(FOUNDATION, position, 0);
-            return new Move(removeFromWasteAction, addToFoundationAction, false, -1, -1);
+            return new Move(removeFromWasteAction, addToFoundationAction, false, -1, -1, true);
         }
         return null;
     }
@@ -254,10 +254,10 @@ public class MoveFinder {
 
         if (deckAndWaste.canTurnover()) {
             // FIXME tunover = true?
-            return new Move(action, null, false, -1, -1);
+            return new Move(action, null, false, -1, -1, true);
         } else if (deckAndWaste.canReset()) {
             // FIXME waste -> deck = different actions?
-            return new Move(action, action, false, -1, -1);
+            return new Move(action, action, false, -1, -1, true);
         }
         return null;
     }

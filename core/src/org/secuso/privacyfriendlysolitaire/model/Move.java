@@ -22,16 +22,6 @@ This program is free software: you can redistribute it and/or modify
  */
 
 public record Move(Action sourceAction, Action targetAction, boolean turnover, int oldFanSize,
-                   int newFanSize) {
+                   int newFanSize, boolean byMoveFinder) {
 
-    @Override
-    public String toString() {
-        return "Move{" +
-                "sourceAction=" + sourceAction +
-                ", targetAction=" + targetAction +
-                ", turnover=" + turnover +
-                ", oldFanSize=" + oldFanSize +
-                ", newFanSize=" + newFanSize +
-                '}';
-    }
 }
