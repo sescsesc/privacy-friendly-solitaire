@@ -222,7 +222,7 @@ public class SolitaireGame {
     private boolean handleWaste(Action action) {
         if (this.prevAction == null) {
             saveAction(action);
-            notifyListeners();
+            notifyGameListeners();
             return true;
         }
         failMove();
@@ -237,7 +237,7 @@ public class SolitaireGame {
         if (prevAction == null) {
             if (action.getCardIndex() != -1) {
                 saveAction(action);
-                notifyListeners();
+                notifyGameListeners();
                 return true;
             }
         } else if (prevAction.getLocation() == TABLEAU) {
@@ -269,7 +269,7 @@ public class SolitaireGame {
         if (prevAction == null) {
             if (foundations.getTopCardAtPosition(action.getStackIndex()) != null) {
                 saveAction(action);
-                notifyListeners();
+                notifyGameListeners();
                 return true;
             }
             return false;
@@ -321,7 +321,7 @@ public class SolitaireGame {
         movePointer++;
         this.prevAction = null;
         undoMove = false;
-        notifyListeners();
+        notifyGameListeners();
         notifyCallBackListener();
     }
 
@@ -350,7 +350,7 @@ public class SolitaireGame {
         movePointer++;
         this.prevAction = null;
         undoMove = false;
-        notifyListeners();
+        notifyGameListeners();
         notifyCallBackListener();
     }
 
@@ -362,19 +362,15 @@ public class SolitaireGame {
     void failMove() {
         invalidMove = true;
         this.prevAction = null;
-        notifyListeners();
+        notifyGameListeners();
     }
 
-    /**
-     * @return whether the last move was invalid
-     */
-    boolean wasInvalidMove() {
+    boolean wasValidMove() {
         if (invalidMove) {
             invalidMove = false;
-            return true;
-        } else {
             return false;
         }
+        return true;
     }
 
     /**
@@ -483,10 +479,8 @@ public class SolitaireGame {
         return sb.toString();
     }
 
-    private void notifyListeners() {
-        for (GameListener gl : gameListeners) {
-            gl.update(this);
-        }
+    private void notifyGameListeners() {
+        gameListeners.forEach(gl -> gl.update(this));
     }
 
     /**
@@ -556,7 +550,7 @@ public class SolitaireGame {
             movePointer--;
             undoMove = true;
             prevAction = null;
-            notifyListeners();
+            notifyGameListeners();
             notifyCallBackListener();
         }
 

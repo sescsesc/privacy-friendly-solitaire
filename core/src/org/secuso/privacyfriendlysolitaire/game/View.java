@@ -236,16 +236,16 @@ public class View implements GameListener {
                 marker.setVisible(false);
 
                 try {
-                    if (!game.wasInvalidMove()) {
+                    if (game.wasValidMove()) {
                         final Vector<Move> moves = game.getMoves();
-                        if (!game.wasUndoMove()) {
-                            // usual move
-                            Move prevMove = moves.elementAt(game.getMovePointer());
-                            handleMove(prevMove, game);
-                        } else {
+                        if (game.wasUndoMove()) {
                             // undo move
                             Move undoMove = moves.elementAt(game.getMovePointer() + 1);
                             handleUndoMove(undoMove, game);
+                        } else {
+                            // usual move
+                            Move prevMove = moves.elementAt(game.getMovePointer());
+                            handleMove(prevMove, game);
                         }
                     }
                 } catch (Exception e) {
@@ -256,16 +256,16 @@ public class View implements GameListener {
         } else {
             if (prevAction == null) {
                 try {
-                    if (!game.wasInvalidMove()) {
+                    if (game.wasValidMove()) {
                         final Vector<Move> moves = game.getMoves();
-                        if (!game.wasUndoMove()) {
-                            // usual move
-                            Move prevMove = moves.elementAt(game.getMovePointer());
-                            handleMove(prevMove, game);
-                        } else {
+                        if (game.wasUndoMove()) {
                             // undo move
                             Move undoMove = moves.elementAt(game.getMovePointer() + 1);
                             handleUndoMove(undoMove, game);
+                        } else {
+                            // usual move
+                            Move prevMove = moves.elementAt(game.getMovePointer());
+                            handleMove(prevMove, game);
                         }
                     }
                 } catch (Exception e) {
