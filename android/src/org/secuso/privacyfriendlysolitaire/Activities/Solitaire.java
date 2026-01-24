@@ -18,11 +18,11 @@ import static org.secuso.privacyfriendlysolitaire.dialog.WonDialog.KEY_POINTS;
 import static org.secuso.privacyfriendlysolitaire.dialog.WonDialog.KEY_SHOW_POINTS;
 import static org.secuso.privacyfriendlysolitaire.dialog.WonDialog.KEY_SHOW_TIME;
 import static org.secuso.privacyfriendlysolitaire.dialog.WonDialog.KEY_TIME;
-import static org.secuso.privacyfriendlysolitaire.game.CardDrawMode.ONE;
-import static org.secuso.privacyfriendlysolitaire.game.CardDrawMode.THREE;
-import static org.secuso.privacyfriendlysolitaire.game.ScoreMode.NONE;
-import static org.secuso.privacyfriendlysolitaire.game.ScoreMode.STANDARD;
-import static org.secuso.privacyfriendlysolitaire.game.ScoreMode.VEGAS;
+import static org.secuso.privacyfriendlysolitaire.model.CardDrawMode.ONE;
+import static org.secuso.privacyfriendlysolitaire.model.CardDrawMode.THREE;
+import static org.secuso.privacyfriendlysolitaire.model.ScoreMode.NONE;
+import static org.secuso.privacyfriendlysolitaire.model.ScoreMode.STANDARD;
+import static org.secuso.privacyfriendlysolitaire.model.ScoreMode.VEGAS;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -56,8 +56,8 @@ import org.secuso.privacyfriendlysolitaire.dialog.LostDialog;
 import org.secuso.privacyfriendlysolitaire.dialog.WarningDialog;
 import org.secuso.privacyfriendlysolitaire.dialog.WonDialog;
 import org.secuso.privacyfriendlysolitaire.game.Application;
-import org.secuso.privacyfriendlysolitaire.game.CardDrawMode;
-import org.secuso.privacyfriendlysolitaire.game.ScoreMode;
+import org.secuso.privacyfriendlysolitaire.model.CardDrawMode;
+import org.secuso.privacyfriendlysolitaire.model.ScoreMode;
 
 import java.util.Timer;
 import java.util.TimerTask;
