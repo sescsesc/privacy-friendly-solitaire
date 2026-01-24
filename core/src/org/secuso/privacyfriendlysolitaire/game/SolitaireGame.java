@@ -682,4 +682,8 @@ public class SolitaireGame {
     public Card getTopCardOfFoundation(final int position) {
         return foundations.getTopCardAtPosition(position);
     }
+
+    public List<Card> getTopCardsOfFoundations() {
+        return foundations.getTopCards();
+    }
 }

@@ -90,6 +90,10 @@ public class Foundations {
         return possibleIndex.get(0);
     }
 
+    public List<Card> getTopCards() {
+        return suitToFoundationMap.values().stream().map(Foundation::getTopCard).filter(Objects::nonNull).collect(Collectors.toList());
+    }
+
     @Override
     public boolean equals(final Object o) {
         if (!(o instanceof Foundations that)) return false;

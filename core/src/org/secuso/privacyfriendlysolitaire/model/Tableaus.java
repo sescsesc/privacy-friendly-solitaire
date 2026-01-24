@@ -59,6 +59,10 @@ public record Tableaus(Map<Integer, Tableau> indexToTableauMap) {
         return indexToTableauMap.values().stream().map(Tableau::faceUp).map(Vector::lastElement).collect(Collectors.toList());
     }
 
+    public List<Card> getAllFaceUpCards() {
+        return indexToTableauMap.values().stream().map(Tableau::faceUp).flatMap(List::stream).collect(Collectors.toList());
+    }
+
     public Tableaus clone() {
         final Map<Integer, Tableau> i = new HashMap<>();
         for (final Map.Entry<Integer, Tableau> entry : indexToTableauMap.entrySet()) {

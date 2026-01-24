@@ -19,15 +19,14 @@ public class ImageLoader {
         return getImageForPath("cards/mark.png");
     }
 
-    /**
-     * computes the textureString for a card (rank_suit)
-     *
-     * @param card the card for which the texture string will be computed
-     * @return a string containing the card's rank and suit
-     */
-    public static String getCardTextureName(final Card card) {
-        return card.rank().toString().toLowerCase() + "_" + card.suit().toString().toLowerCase();
+    public static ImageWrapper getCardImage(final Card card) {
+        if (card == null) {
+            return null;
+        }
+        final String textureString = card.rank().toString().toLowerCase() + "_" + card.suit().toString().toLowerCase();
+        return ImageLoader.getImageForPath("cards/" + textureString + ".png");
     }
+
 
     /**
      * loads an image for a given (relative) path
