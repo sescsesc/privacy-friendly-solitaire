@@ -59,19 +59,19 @@ public class View implements GameListener {
     private final Stage stage;
     private final ImageWrapper marker;
     private final ImageWrapper backsideCardOnDeck;
-    private SolitaireGame game;
+    private final SolitaireGame game;
 
-    private DragAndDrop dragAndDrop = new DragAndDrop();
-    private boolean useDragAndDrop;
+    private final DragAndDrop dragAndDrop = new DragAndDrop();
+    private final boolean useDragAndDrop;
     private boolean dragStartResult = false;
-    private Vector<Actor> originalActors = new Vector<Actor>();
+    private final Vector<Actor> originalActors = new Vector<>();
 
     private final HashMap<String, ImageWrapper> faceUpCards = new HashMap<>(52);
     private final List<ImageWrapper> faceDownCards = new ArrayList<>(21);
     // describes the y at which the given tableau is positioned at the smallest
-    private final HashMap<Integer, Float> smallestYForTableau = new HashMap<Integer, Float>(7);
+    private final HashMap<Integer, Float> smallestYForTableau = new HashMap<>(7);
 
-    public View(SolitaireGame game, Stage stage, boolean useDragAndDrop) {
+    public View(final SolitaireGame game, final Stage stage, final boolean useDragAndDrop) {
         this.stage = stage;
         this.game = game;
         this.useDragAndDrop = useDragAndDrop;
@@ -208,7 +208,7 @@ public class View implements GameListener {
             if (prevAction != null) {
                 int stackIndex = prevAction.getStackIndex();
 
-                List<Card> cardsToBeMarked = new ArrayList<Card>();
+                List<Card> cardsToBeMarked = new ArrayList<>();
 
                 switch (prevAction.getLocation()) {
                     case TABLEAU:
@@ -223,7 +223,7 @@ public class View implements GameListener {
                         break;
                 }
 
-                List<String> textureStrings = new ArrayList<String>(cardsToBeMarked.size());
+                List<String> textureStrings = new ArrayList<>(cardsToBeMarked.size());
                 for (Card c : cardsToBeMarked) {
                     textureStrings.add(loader.getCardTextureName(c));
                 }
@@ -286,89 +286,10 @@ public class View implements GameListener {
         }
     }
 
-//use for debugging. compares if model and view are consistent
-//    private void checkModelAndViewCorrect(SolitaireGame game) {
-//        Vector<Card> waste = game.getDeckWaste().getWaste();
-//        Vector<Card> deck = game.getDeckWaste().getDeck();
-//
-//        // check deck
-//        for (Card deckC : deck) {
-//            String texString = loader.getCardTextureName(deckC);
-//            ImageWrapper card = faceUpCards.get(texString);
-//        }
-//
-//        // check waste
-//        for (Card wasteC : waste) {
-//            String texString = loader.getCardTextureName(wasteC);
-//            ImageWrapper card = faceUpCards.get(texString);
-//        }
-//
-//        // check foundations
-//        for (int stack = 0; stack < NR_OF_FOUNDATIONS; stack++) {
-//            Foundation found = game.getFoundationAtPos(stack);
-//
-//            for (Card foundC : found.getCards()) {
-//                String texString = loader.getCardTextureName(foundC);
-//                ImageWrapper card = faceUpCards.get(texString);
-//
-//                if (card == null) {
-//                    throw new RuntimeException("Karte " + texString + " war null");
-//                } else {
-//                    assert (card.getWrapperStackIndex() == stack);
-//                    assert (card.getGameObject().equals(GameObject.FOUNDATION));
-//                    assert (Math.abs(card.getX() - ViewConstants.TableauFoundationX[stack]) <= 1);
-//                    assert (Math.abs(card.getY() - ViewConstants.WasteDeckFoundationY) <= 1);
-//                }
-//            }
-//        }
-//
-//        // check tableaus
-//        for (int stack = 0; stack < NR_OF_TABLEAUS; stack++) {
-//            Tableau tab = game.getTableauAtPos(stack);
-//            Vector<Card> faceDowns = tab.getFaceDown();
-//            Vector<Card> faceUps = tab.getFaceUp();
-//
-//            for (int cardIndex = 0; cardIndex < faceDowns.size(); cardIndex++) {
-//                ImageWrapper backside = getBackSideCardForStackAndCardIndex(stack, cardIndex);
-//                if (backside == null) {
-//                    throw new RuntimeException("Backside an stack=" + stack + " und card=" +
-//                            cardIndex + " war null");
-//                } else {
-//                    assert (backside.getGameObject().equals(GameObject.TABLEAU));
-//                    assert (Math.abs(backside.getX() - ViewConstants.TableauFoundationX[stack]) <= 1);
-//                    float shouldBeY = ViewConstants.TableauBaseY -
-//                            (cardIndex * ViewConstants.offsetHeightBetweenCards);
-//                    assert (Math.abs(backside.getY() - shouldBeY) <= 1);
-//                }
-//            }
-//
-//
-//            for (int cardIndex = 0; cardIndex < faceUps.size(); cardIndex++) {
-//                Card faceU = faceUps.get(cardIndex);
-//                String texString = loader.getCardTextureName(faceU);
-//                ImageWrapper card = faceUpCards.get(texString);
-//
-//                if (card == null) {
-//                    throw new RuntimeException("Karte " + texString + " war null");
-//                } else {
-//                    assert (card.getWrapperStackIndex() == stack);
-//                    assert (card.getWrapperCardIndex() == cardIndex);
-//                    assert (card.getGameObject().equals(GameObject.TABLEAU));
-//                    assert (Math.abs(card.getX() - ViewConstants.TableauFoundationX[stack]) <= 1);
-//                    float shouldBeY = ViewConstants.TableauBaseY -
-//                            ((cardIndex + faceDowns.size()) * ViewConstants.offsetHeightBetweenCards);
-//                    assert (Math.abs(card.getY() - shouldBeY) <= 1);
-//                }
-//            }
-//        }
-//
-//
-//    }
-
 
     // ---------------------------- ACTIONS ----------------------------
     private void markCards(List<String> textureStrings) {
-        List<ImageWrapper> cardsToBeMarked = new ArrayList<ImageWrapper>(textureStrings.size());
+        List<ImageWrapper> cardsToBeMarked = new ArrayList<>(textureStrings.size());
         for (String texString : textureStrings) {
             cardsToBeMarked.add(faceUpCards.get(texString));
         }
@@ -486,7 +407,7 @@ public class View implements GameListener {
                         // distinguish empty target tab from tab with exactly one card
                         targetCard--;
 
-                        List<String> textureStringsMovedCards = new ArrayList<String>();
+                        List<String> textureStringsMovedCards = new ArrayList<>();
                         for (int i = targetCard + 1; i < faceUpAtTargetStack.size(); i++) {
                             Card cardToBeMoved = faceUpAtTargetStack.get(i);
                             textureStringsMovedCards.add(loader.getCardTextureName(cardToBeMoved));
@@ -570,11 +491,7 @@ public class View implements GameListener {
         }
 
         // check if this was the last
-        if (deckAndWaste.getDeck().isEmpty()) {
-            backsideCardOnDeck.setVisible(false);
-        } else {
-            backsideCardOnDeck.setVisible(true);
-        }
+        backsideCardOnDeck.setVisible(!deckAndWaste.getDeck().isEmpty());
     }
 
     /**
@@ -607,7 +524,7 @@ public class View implements GameListener {
 
         // get nr of open cards in fan
         int fanSize = deckAndWaste.getFanSize();
-        Vector<ImageWrapper> fanImages = new Vector<ImageWrapper>(3);
+        Vector<ImageWrapper> fanImages = new Vector<>(3);
 
 
         // draw fan if it is bigger than 0
@@ -804,7 +721,7 @@ public class View implements GameListener {
      */
     private void makeMoveTableauToTableau(List<String> cardsToBeMovedTextureStrings, boolean wasTurnOver, String targetCardTextureString, Card beneathSourceCard, int sourceStack, int sourceCardIndex, int targetStack, int targetCardIndex, int nrOfFaceDownInSourceTableau, int nrOfFaceDownInTargetTableau) {
         // find correct card that should be moved and card to move it to
-        List<ImageWrapper> sourceCards = new ArrayList<ImageWrapper>(cardsToBeMovedTextureStrings.size());
+        List<ImageWrapper> sourceCards = new ArrayList<>(cardsToBeMovedTextureStrings.size());
         for (int i = 0; i < cardsToBeMovedTextureStrings.size(); i++) {
             String texString = cardsToBeMovedTextureStrings.get(i);
             sourceCards.add(faceUpCards.get(texString));
@@ -1097,7 +1014,7 @@ public class View implements GameListener {
                         int nrOfFaceDownInTargetTableau = tabAtTargetStack.getFaceDownCardsSize();
                         targetCard--;
 
-                        List<String> cardsToBeMovedTextureStrings = new ArrayList<String>();
+                        List<String> cardsToBeMovedTextureStrings = new ArrayList<>();
                         for (int i = targetCard + 1; i < faceUpAtTargetStack.size(); i++) {
                             Card cardToBeMoved = faceUpAtTargetStack.get(i);
                             cardsToBeMovedTextureStrings.add(loader.getCardTextureName(cardToBeMoved));
@@ -1413,15 +1330,15 @@ public class View implements GameListener {
         private static float widthOneSpace;        // the widthScreen is divided into spaces (37)
         private static float heightOneSpace;        // the heightScreen is divided into spaces (21)
 
-        private static float offsetHeightBetweenCards = 35;
+        private static final float offsetHeightBetweenCards = 35;
 
         private static float heightCard;
         private static float widthCard;
 
-        private static float scalingWidthCard = 2.3f;
-        private static float scalingHeightCard = 4f;
-        private static float scalingWidthMarker = 2.45f;
-        private static float scalingHeightMarker = 4.5f;
+        private static final float scalingWidthCard = 2.3f;
+        private static final float scalingHeightCard = 4f;
+        private static final float scalingWidthMarker = 2.45f;
+        private static final float scalingHeightMarker = 4.5f;
 
         private static float DeckX;
 
