@@ -15,13 +15,13 @@ This program is free software: you can redistribute it and/or modify
  */
 
 import android.os.Bundle;
-import androidx.appcompat.app.ActionBar;
-import androidx.appcompat.app.AppCompatActivity;
 import android.text.method.LinkMovementMethod;
 import android.view.View;
 import android.widget.TextView;
 
-import org.secuso.privacyfriendlysolitaire.BuildConfig;
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AppCompatActivity;
+
 import org.secuso.privacyfriendlysolitaire.R;
 
 /**
@@ -49,7 +49,7 @@ public class AboutActivity extends AppCompatActivity {
 
         ((TextView) findViewById(R.id.secusoWebsite)).setMovementMethod(LinkMovementMethod.getInstance());
         ((TextView) findViewById(R.id.githubURL)).setMovementMethod(LinkMovementMethod.getInstance());
-        ((TextView) findViewById(R.id.textFieldVersionName)).setText(BuildConfig.VERSION_NAME);
+//        ((TextView) findViewById(R.id.textFieldVersionName)).setText(BuildConfig.VERSION_NAME);
     }
 
 }

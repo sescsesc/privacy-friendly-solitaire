@@ -3,7 +3,7 @@ apply plugin: "java"
 //sourceCompatibility = JavaVersion.VERSION_21
 [compileJava, compileTestJava]*.options*.encoding = 'UTF-8'
 
-sourceSets.main.java.srcDirs = [ "src/" ]
+sourceSets.main.java.srcDirs = ["src/"]
 
 eclipse.project {
     name = appName + "-core"
@@ -19,4 +19,8 @@ dependencies {
     // https://mvnrepository.com/artifact/com.badlogicgames.gdx/gdx
     implementation group: 'com.badlogicgames.gdx', name: 'gdx', version: '1.14.0'
 
+}
+java {
+    sourceCompatibility = JavaVersion.VERSION_21
+    targetCompatibility = JavaVersion.VERSION_21
 }
