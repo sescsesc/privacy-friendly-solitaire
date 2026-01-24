@@ -14,12 +14,13 @@ This program is free software: you can redistribute it and/or modify
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import static org.secuso.privacyfriendlysolitaire.game.CardDrawMode.ONE;
+import static org.secuso.privacyfriendlysolitaire.model.CardDrawMode.ONE;
 import static org.secuso.privacyfriendlysolitaire.model.Location.DECK;
 import static org.secuso.privacyfriendlysolitaire.model.Location.FOUNDATION;
 import static org.secuso.privacyfriendlysolitaire.model.Location.TABLEAU;
 
 import org.secuso.privacyfriendlysolitaire.model.Action;
+import org.secuso.privacyfriendlysolitaire.model.CardDrawMode;
 import org.secuso.privacyfriendlysolitaire.model.Location;
 import org.secuso.privacyfriendlysolitaire.model.Move;
 

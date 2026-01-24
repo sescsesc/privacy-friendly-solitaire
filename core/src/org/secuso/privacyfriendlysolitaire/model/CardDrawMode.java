@@ -1,4 +1,4 @@
-package org.secuso.privacyfriendlysolitaire.game;
+package org.secuso.privacyfriendlysolitaire.model;
 
 public enum CardDrawMode {
 

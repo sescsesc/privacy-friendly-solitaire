@@ -1,4 +1,9 @@
-package org.secuso.privacyfriendlysolitaire.game;
+package org.secuso.privacyfriendlysolitaire.model;
+
+import org.secuso.privacyfriendlysolitaire.game.NoneScorer;
+import org.secuso.privacyfriendlysolitaire.game.Scorer;
+import org.secuso.privacyfriendlysolitaire.game.StandardScorer;
+import org.secuso.privacyfriendlysolitaire.game.VegasScorer;
 
 public enum ScoreMode {
 

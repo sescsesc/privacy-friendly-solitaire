@@ -29,8 +29,10 @@ import com.badlogic.gdx.utils.Timer;
 import org.secuso.privacyfriendlysolitaire.CallBackListener;
 import org.secuso.privacyfriendlysolitaire.ScoreListener;
 import org.secuso.privacyfriendlysolitaire.generator.GeneratorSolitaireInstance;
+import org.secuso.privacyfriendlysolitaire.model.CardDrawMode;
 import org.secuso.privacyfriendlysolitaire.model.DeckAndWaste;
 import org.secuso.privacyfriendlysolitaire.model.Move;
+import org.secuso.privacyfriendlysolitaire.model.ScoreMode;
 import org.secuso.privacyfriendlysolitaire.model.Tableaus;
 
 /**
