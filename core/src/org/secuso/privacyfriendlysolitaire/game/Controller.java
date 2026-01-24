@@ -54,8 +54,12 @@ public record Controller(SolitaireGame game, View view) implements GestureDetect
         y = invertHeight(y);
 
         Action actionForClick = view.getActionForTap(x, y);
+        if (actionForClick == null) {
+            return false;
+        }
 
-        if (actionForClick != null && TABLEAU == actionForClick.getLocation()) {
+
+        if (TABLEAU == actionForClick.getLocation()) {
             int index = actionForClick.getStackIndex();
             Tableau tableau = game.getTableauAtPos(index);
             int cardIndex = actionForClick.getCardIndex();
