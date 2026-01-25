@@ -71,7 +71,7 @@ public class View2 implements GameListener {
     // describes the y at which the given tableau is positioned at the smallest
     private final HashMap<Integer, Float> smallestYForTableau = new HashMap<>(7);
 
-    private final Map<Card, ImageWrapper> cardToImageMap = new HashMap<>(Constants.NR_CARDS);
+    private final Map<Card, CardImageWrapper> cardToImageMap = new HashMap<>(Constants.NR_CARDS);
 
     public View2(final SolitaireGame game, final Stage stage, final boolean useDragAndDrop) {
         this.stage = stage;
@@ -171,7 +171,7 @@ public class View2 implements GameListener {
             final Vector<Card> faceUpCards = t.faceUp();
 
             for (int j = 0; j < faceUpCards.size(); j++) {
-                final ImageWrapper faceUpCardImage = cardToImageMap.get(faceUpCards.get(j));
+                final CardImageWrapper faceUpCardImage = cardToImageMap.get(faceUpCards.get(j));
                 // y position is dependant on nr in faceDown-Vector
                 float y = 10.5f * ViewConstants.heightOneSpace - ((faceDownSize + j) * ViewConstants.offsetHeightBetweenCards);
 
@@ -292,15 +292,15 @@ public class View2 implements GameListener {
 
     // ---------------------------- ACTIONS ----------------------------
     private void markCards(final List<Card> cards) {
-        final List<ImageWrapper> cardsToBeMarked = cards.stream().map(cardToImageMap::get).collect(Collectors.toList());
+        final List<CardImageWrapper> cardsToBeMarked = cards.stream().map(cardToImageMap::get).collect(Collectors.toList());
 
         if (cardsToBeMarked.isEmpty()) {
             throw new RuntimeException("Card to be marked could not be found! Should not happen! Probably an error in the view.");
         }
 
         // move marker to correct position and make visible
-        final ImageWrapper topElement = cardsToBeMarked.get(cardsToBeMarked.size() - 1);
-        final ImageWrapper bottomElement = cardsToBeMarked.get(0);
+        final CardImageWrapper topElement = cardsToBeMarked.get(cardsToBeMarked.size() - 1);
+        final CardImageWrapper bottomElement = cardsToBeMarked.get(0);
         final float height = Math.abs(topElement.getY() - bottomElement.getTop()) + 10;
 
         markerImage.setPosition(topElement.getX() - 4, topElement.getY() - 5);
@@ -493,7 +493,7 @@ public class View2 implements GameListener {
         final Vector<Card> waste = deckAndWaste.getWaste();
         for (int i = 0; i < waste.size() - deckAndWaste.getFanSize(); i++) {
             final Card wasteCard = waste.get(i);
-            final ImageWrapper wasteCardImage = cardToImageMap.get(wasteCard);
+            final CardImageWrapper wasteCardImage = cardToImageMap.get(wasteCard);
 
             if (isInitialization) {
                 setImageScalingAndPositionAndStackCardIndicesAndAddToStage(wasteCardImage, WASTE, ViewConstants.WasteX1Fan, ViewConstants.WasteDeckFoundationY, -1, 5);
@@ -504,19 +504,19 @@ public class View2 implements GameListener {
 
         // get nr of open cards in fan
         final int fanSize = deckAndWaste.getFanSize();
-        final Vector<ImageWrapper> fanImages = new Vector<>(3);
+        final Vector<CardImageWrapper> fanImages = new Vector<>(3);
 
 
         // draw fan if it is bigger than 0
         if (fanSize > 0) {
             for (int i = fanSize - 1; i >= 0; i--) {
                 final Card turnedCard = waste.get(waste.size() - i - 1);
-                final ImageWrapper turnedCardImage = cardToImageMap.get(turnedCard);
+                final CardImageWrapper turnedCardImage = cardToImageMap.get(turnedCard);
                 fanImages.add(turnedCardImage);
             }
 
             if (fanSize == 1) {
-                final ImageWrapper cardImage = fanImages.get(0);
+                final CardImageWrapper cardImage = fanImages.get(0);
 
                 if (fanCardsToBeRearranged) {
                     moveCard(ViewConstants.WasteX1Fan, ViewConstants.WasteDeckFoundationY, cardImage, 5, true);
@@ -525,8 +525,8 @@ public class View2 implements GameListener {
                 }
 
             } else if (fanSize == 2) {
-                final ImageWrapper cardImage0 = fanImages.get(0);
-                final ImageWrapper cardImage1 = fanImages.get(1);
+                final CardImageWrapper cardImage0 = fanImages.get(0);
+                final CardImageWrapper cardImage1 = fanImages.get(1);
 
                 if (fanCardsToBeRearranged) {
                     moveCard(ViewConstants.WasteX2Fan1, ViewConstants.WasteDeckFoundationY, cardImage0, 5, true);
@@ -536,9 +536,9 @@ public class View2 implements GameListener {
                     setImageScalingAndPositionAndStackCardIndicesAndAddToStage(cardImage1, WASTE, ViewConstants.WasteX2Fan2, ViewConstants.WasteDeckFoundationY, 5, -1);
                 }
             } else if (fanSize == 3) {
-                final ImageWrapper cardImage0 = fanImages.get(0);
-                final ImageWrapper cardImage1 = fanImages.get(1);
-                final ImageWrapper cardImage2 = fanImages.get(2);
+                final CardImageWrapper cardImage0 = fanImages.get(0);
+                final CardImageWrapper cardImage1 = fanImages.get(1);
+                final CardImageWrapper cardImage2 = fanImages.get(2);
 
                 if (fanCardsToBeRearranged) {
                     moveCard(ViewConstants.WasteX3Fan1, ViewConstants.WasteDeckFoundationY, cardImage0, 5, true);
@@ -612,8 +612,8 @@ public class View2 implements GameListener {
      * @param nrOfFaceDownInTargetTableau the number of face-down cards in the target tableau
      */
     private void makeMoveWasteToTableau(final Card sourceCard, final Card targetCard, int targetStack, int targetCardIndex, int nrOfFaceDownInTargetTableau) {
-        final ImageWrapper sourceCardImage = cardToImageMap.get(sourceCard);
-        ImageWrapper targetCardImage = null;
+        final CardImageWrapper sourceCardImage = cardToImageMap.get(sourceCard);
+        CardImageWrapper targetCardImage = null;
         if (targetCard != null) {
             targetCardImage = cardToImageMap.get(targetCard);
         }
@@ -643,7 +643,7 @@ public class View2 implements GameListener {
      * @param targetStack the index of the target stack (in [0,6])
      */
     private void makeMoveWasteToFoundation(final Card card, final int targetStack) {
-        final ImageWrapper cardImage = cardToImageMap.get(card);
+        final CardImageWrapper cardImage = cardToImageMap.get(card);
 
         if (cardImage == null) {
             throw new RuntimeException("source or target of move could not be found");
@@ -677,13 +677,13 @@ public class View2 implements GameListener {
      */
     private void makeMoveTableauToTableau(final List<Card> sourceCards, final boolean wasTurnOver, final Card targetCard, final Card beneathSourceCard, final int sourceStack, final int sourceCardIndex, final int targetStack, final int targetCardIndex, final int nrOfFaceDownInSourceTableau, final int nrOfFaceDownInTargetTableau) {
         // find correct card that should be moved and card to move it to
-        final List<ImageWrapper> sourceCardImages = new ArrayList<>(sourceCards.size());
+        final List<CardImageWrapper> sourceCardImages = new ArrayList<>(sourceCards.size());
         for (int i = 0; i < sourceCards.size(); i++) {
             sourceCardImages.add(cardToImageMap.get(sourceCards.get(i)));
         }
-        final ImageWrapper targetCardImage = cardToImageMap.get(targetCard);
+        final CardImageWrapper targetCardImage = cardToImageMap.get(targetCard);
         // and maybe (if it exists), the card beneath
-        ImageWrapper beneathSourceCardImage = null;
+        CardImageWrapper beneathSourceCardImage = null;
         if (beneathSourceCard != null) {
             beneathSourceCardImage = cardToImageMap.get(beneathSourceCard);
         }
@@ -718,7 +718,7 @@ public class View2 implements GameListener {
             }
 
             // set meta-information
-            for (final ImageWrapper sourceCardImage : sourceCardImages) {
+            for (final CardImageWrapper sourceCardImage : sourceCardImages) {
                 sourceCardImage.setCardIndex(nrOfFaceDownInTargetTableau + targetCardIndex + 1);
             }
 
@@ -770,9 +770,9 @@ public class View2 implements GameListener {
      */
     private void makeMoveTableauToFoundation(final Card sourceCard, final Card beneathSourceCard, int sourceStack, int sourceCardIndex, int targetStack, int nrOfFaceDownInSourceTableau) {
         // find correct card that should be moved and card to move it to
-        final ImageWrapper sourceCardImage = cardToImageMap.get(sourceCard);
+        final CardImageWrapper sourceCardImage = cardToImageMap.get(sourceCard);
         // and maybe (if it exists), the card beneath
-        ImageWrapper beneathSourceCardImage = null;
+        CardImageWrapper beneathSourceCardImage = null;
         if (beneathSourceCard != null) {
             beneathSourceCardImage = cardToImageMap.get(beneathSourceCard);
         }
@@ -827,8 +827,8 @@ public class View2 implements GameListener {
      */
     private void makeMoveFoundationToTableau(final Card sourceCard, boolean wasTurnOver, final Card tableauTargetCard, int targetStack, int targetCardIndex, int nrOfFaceDownInTargetTableau) {
         // find correct card that should be moved and card to move it to
-        final ImageWrapper sourceCardImage = cardToImageMap.get(sourceCard);
-        ImageWrapper targetCardImage = null;
+        final CardImageWrapper sourceCardImage = cardToImageMap.get(sourceCard);
+        CardImageWrapper targetCardImage = null;
         if (tableauTargetCard != null) {
             targetCardImage = cardToImageMap.get(tableauTargetCard);
         }
@@ -880,7 +880,7 @@ public class View2 implements GameListener {
      */
     private void makeUndoMoveXToWaste(final Card sourceCard) {
         // find correct card that should be moved and card to move it to
-        final ImageWrapper sourceCardImage = cardToImageMap.get(sourceCard);
+        final CardImageWrapper sourceCardImage = cardToImageMap.get(sourceCard);
 
         if (sourceCardImage == null) {
             throw new RuntimeException("source or target of move could not be found");
@@ -1280,13 +1280,13 @@ public class View2 implements GameListener {
      * @param card the card whose ImageWrapper is added as a source to DragAndDrop
      */
     private void addCardToDragAndDrop(final Card card) {
-        final ImageWrapper cardImage = cardToImageMap.get(card);
+        final CardImageWrapper cardImage = cardToImageMap.get(card);
         dragAndDrop.addSource(new DragAndDrop.Source(cardImage) {
             @Override
             public DragAndDrop.Payload dragStart(final InputEvent event, final float x, final float y, final int pointer) {
                 originalActors.clear();
                 final DragAndDrop.Payload payload = new DragAndDrop.Payload();
-                final ImageWrapper cardImage = cardToImageMap.get(card);
+                final CardImageWrapper cardImage = cardToImageMap.get(card);
 
                 if (cardImage != null) {
                     cardImage.setWidth(ViewConstants.scalingWidthCard * ViewConstants.widthOneSpace);
@@ -1299,7 +1299,7 @@ public class View2 implements GameListener {
                         final Tableau tableau = game.getTableauAtPos(stackIndex);
                         int currWrapperCardIndex = tableau.getFaceDownCardsSize();
                         for (final Card faceUpCard : tableau.faceUp()) {
-                            final ImageWrapper faceUpCardImage = cardToImageMap.get(faceUpCard);
+                            final CardImageWrapper faceUpCardImage = cardToImageMap.get(faceUpCard);
                             faceUpCardImage.setCardIndex(currWrapperCardIndex);
                             currWrapperCardIndex++;
                         }
@@ -1311,7 +1311,7 @@ public class View2 implements GameListener {
                                 originalActors.add(cardImage);
                             } else {
                                 final Card additionalCard = tableau.faceUp().get(i);
-                                final ImageWrapper additionalCardImage = cardToImageMap.get(additionalCard);
+                                final CardImageWrapper additionalCardImage = cardToImageMap.get(additionalCard);
                                 additionalCardImage.setWidth(ViewConstants.scalingWidthCard * ViewConstants.widthOneSpace);
                                 additionalCardImage.setHeight(ViewConstants.scalingHeightCard * ViewConstants.heightOneSpace);
                                 additionalCardImage.moveBy(0, -ViewConstants.offsetHeightBetweenCards * (i - faceUpIndex));
