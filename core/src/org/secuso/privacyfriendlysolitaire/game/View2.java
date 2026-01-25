@@ -1348,7 +1348,8 @@ public class View2 implements GameListener {
                 final boolean dragStopResult = createActionAndSendToModelForStop((ImageWrapper) originalActor);
                 if (!dragStartResult || !dragStopResult) {
                     for (int i = 0; i < originalActors.size(); i++) {
-                        moveCard(originalX, originalY - (i * ViewConstants.offsetHeightBetweenCards), (ImageWrapper) originalActors.get(i), ((ImageWrapper) originalActors.get(i)).getStackIndex(), true);
+                        final ImageWrapper image = (ImageWrapper) originalActors.get(i);
+                        moveCard(originalX, originalY - (i * ViewConstants.offsetHeightBetweenCards), image, (image).getStackIndex(), true);
                     }
                 }
                 for (final Actor a : originalActors) {
