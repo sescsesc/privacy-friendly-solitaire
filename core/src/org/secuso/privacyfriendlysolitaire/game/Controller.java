@@ -33,15 +33,7 @@ import org.secuso.privacyfriendlysolitaire.model.Tableau;
  * </ul>
  */
 
-class Controller implements GestureDetector.GestureListener {
-
-    private final SolitaireGame game;
-    private final View view;
-
-    Controller(SolitaireGame initialGame, View initialView) {
-        game = initialGame;
-        view = initialView;
-    }
+public record Controller(SolitaireGame game, View view) implements GestureDetector.GestureListener {
 
 
     @Override
@@ -62,8 +54,12 @@ class Controller implements GestureDetector.GestureListener {
         y = invertHeight(y);
 
         Action actionForClick = view.getActionForTap(x, y);
+        if (actionForClick == null) {
+            return false;
+        }
 
-        if (actionForClick != null && TABLEAU == actionForClick.getLocation()) {
+
+        if (TABLEAU == actionForClick.getLocation()) {
             int index = actionForClick.getStackIndex();
             Tableau tableau = game.getTableauAtPos(index);
             int cardIndex = actionForClick.getCardIndex();

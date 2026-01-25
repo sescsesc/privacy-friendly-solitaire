@@ -5,12 +5,12 @@ import static org.secuso.privacyfriendlysolitaire.game.Constants.MAX_NR_IN_TABLE
 import static org.secuso.privacyfriendlysolitaire.model.Rank.ACE;
 import static org.secuso.privacyfriendlysolitaire.model.Rank.values;
 
-import org.secuso.privacyfriendlysolitaire.game.CardDrawMode;
-import org.secuso.privacyfriendlysolitaire.game.ScoreMode;
 import org.secuso.privacyfriendlysolitaire.game.SolitaireGame;
 import org.secuso.privacyfriendlysolitaire.model.Card;
+import org.secuso.privacyfriendlysolitaire.model.CardDrawMode;
 import org.secuso.privacyfriendlysolitaire.model.DeckAndWaste;
 import org.secuso.privacyfriendlysolitaire.model.Rank;
+import org.secuso.privacyfriendlysolitaire.model.ScoreMode;
 import org.secuso.privacyfriendlysolitaire.model.Suit;
 import org.secuso.privacyfriendlysolitaire.model.Tableaus;
 

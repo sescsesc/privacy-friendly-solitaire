@@ -17,9 +17,8 @@ This program is free software: you can redistribute it and/or modify
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
-import static org.secuso.privacyfriendlysolitaire.game.CardDrawMode.ONE;
-import static org.secuso.privacyfriendlysolitaire.game.CardDrawMode.THREE;
-import static org.secuso.privacyfriendlysolitaire.game.ScoreMode.STANDARD;
+import static org.secuso.privacyfriendlysolitaire.model.CardDrawMode.ONE;
+import static org.secuso.privacyfriendlysolitaire.model.CardDrawMode.THREE;
 import static org.secuso.privacyfriendlysolitaire.model.Rank.EIGHT;
 import static org.secuso.privacyfriendlysolitaire.model.Rank.JACK;
 import static org.secuso.privacyfriendlysolitaire.model.Rank.KING;
@@ -27,6 +26,7 @@ import static org.secuso.privacyfriendlysolitaire.model.Rank.NINE;
 import static org.secuso.privacyfriendlysolitaire.model.Rank.QUEEN;
 import static org.secuso.privacyfriendlysolitaire.model.Rank.TEN;
 import static org.secuso.privacyfriendlysolitaire.model.Rank.values;
+import static org.secuso.privacyfriendlysolitaire.model.ScoreMode.STANDARD;
 import static org.secuso.privacyfriendlysolitaire.model.Suit.CLUBS;
 
 import org.junit.Before;
