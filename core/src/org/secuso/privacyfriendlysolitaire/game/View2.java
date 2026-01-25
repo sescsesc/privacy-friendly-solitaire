@@ -222,12 +222,12 @@ public class View2 implements GameListener {
                         final Vector<Move> moves = game.getMoves();
                         if (game.wasUndoMove()) {
                             // undo move
-                            Move undoMove = moves.elementAt(game.getMovePointer() + 1);
+                            final Move undoMove = moves.elementAt(game.getMovePointer() + 1);
                             handleUndoMove(undoMove, game);
                         } else {
                             // usual move
-                            Move prevMove = moves.elementAt(game.getMovePointer());
-                            handleMove(prevMove, game);
+                            final Move move = moves.elementAt(game.getMovePointer());
+                            handleMove(move, game);
                         }
                     }
                 } catch (Exception e) {
@@ -238,13 +238,13 @@ public class View2 implements GameListener {
         } else {
             // get whether this was a marking action
             if (prevAction != null) {
-                int stackIndex = prevAction.getStackIndex();
+                final int stackIndex = prevAction.getStackIndex();
 
                 final Vector<Card> cardsToBeMarked = new Vector<>();
 
                 switch (prevAction.getLocation()) {
                     case TABLEAU:
-                        Vector<Card> faceUpVector = game.getTableauAtPos(stackIndex).faceUp();
+                        final Vector<Card> faceUpVector = game.getTableauAtPos(stackIndex).faceUp();
                         cardsToBeMarked.addAll(faceUpVector.subList(prevAction.getCardIndex(), faceUpVector.size()));
                         break;
                     case FOUNDATION:
@@ -267,12 +267,12 @@ public class View2 implements GameListener {
                         final Vector<Move> moves = game.getMoves();
                         if (game.wasUndoMove()) {
                             // undo move
-                            Move undoMove = moves.elementAt(game.getMovePointer() + 1);
+                            final Move undoMove = moves.elementAt(game.getMovePointer() + 1);
                             handleUndoMove(undoMove, game);
                         } else {
                             // usual move
-                            Move prevMove = moves.elementAt(game.getMovePointer());
-                            handleMove(prevMove, game);
+                            final Move move = moves.elementAt(game.getMovePointer());
+                            handleMove(move, game);
                         }
                     }
                 } catch (Exception e) {
@@ -291,8 +291,8 @@ public class View2 implements GameListener {
 
 
     // ---------------------------- ACTIONS ----------------------------
-    private void markCards(final List<Card> cards) {
-        final List<CardImageWrapper> cardsToBeMarked = cards.stream().map(cardToImageMap::get).collect(Collectors.toList());
+    private void markCards(final Vector<Card> cards) {
+        final Vector<CardImageWrapper> cardsToBeMarked = cards.stream().map(cardToImageMap::get).collect(Collectors.toCollection(Vector::new));
 
         if (cardsToBeMarked.isEmpty()) {
             throw new RuntimeException("Card to be marked could not be found! Should not happen! Probably an error in the view.");
@@ -314,12 +314,12 @@ public class View2 implements GameListener {
 
 
     // ---------------------------- MOVES ----------------------------
-    private void handleMove(Move move, SolitaireGame game) {
-        Action ac1 = move.sourceAction();
-        Action ac2 = move.targetAction();
+    private void handleMove(final Move move, final SolitaireGame game) {
+        final Action ac1 = move.sourceAction();
+        final Action ac2 = move.targetAction();
 
-        int sourceStack = ac1.getStackIndex();
-        int sourceCard = ac1.getCardIndex();
+        final int sourceStack = ac1.getStackIndex();
+        final int sourceCard = ac1.getCardIndex();
         int targetStack = -1, targetCard = -1, nrOfFaceDownInSourceTableauAfterChange;
         if (ac2 != null) {
             targetStack = ac2.getStackIndex();
@@ -455,13 +455,13 @@ public class View2 implements GameListener {
     }
 
 
-    private void turnOrUnturnDeckCard(SolitaireGame game) {
+    private void turnOrUnturnDeckCard(final SolitaireGame game) {
         turnOrUnturnDeckCard(game, null);
     }
 
 
-    private void turnOrUnturnDeckCard(SolitaireGame game, Vector<Card> cardsToBeUnturned) {
-        DeckAndWaste deckAndWaste = game.getDeckWaste();
+    private void turnOrUnturnDeckCard(final SolitaireGame game, final Vector<Card> cardsToBeUnturned) {
+        final DeckAndWaste deckAndWaste = game.getDeckWaste();
 
         paintWaste(deckAndWaste, false, false);
 
