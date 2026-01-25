@@ -97,7 +97,7 @@ public class Application extends ApplicationAdapter implements ScoreListener {
 
     private void initVC() {
         stage.clear();
-        View view = new View(game, stage, dragAndDrop);
+        View2 view = new View2(game, stage, dragAndDrop);
         game.registerGameListener(view);
 
         final Scorer scorer = scoreMode.getScorer();
