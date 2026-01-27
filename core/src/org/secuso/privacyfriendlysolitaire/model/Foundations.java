@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -14,38 +15,39 @@ public class Foundations {
 
     private final EnumMap<Suit, Foundation> suitToFoundationMap;
 
-    private final EnumMap<Suit, Integer> suitToPositionMap;
-
     public Foundations() {
         suitToFoundationMap = new EnumMap<>(Suit.class);
-        suitToPositionMap = new EnumMap<>(Suit.class);
     }
 
     public boolean canAddCard(final Card card) {
         if (card == null) {
             return false;
         }
-        return suitToFoundationMap.getOrDefault(card.suit(), new Foundation()).canAddCard(card);
+        if (suitToFoundationMap.containsKey(card.suit())) {
+            return suitToFoundationMap.get(card.suit()).canAddCard(card);
+        }
+        // can add to empty / new foundation?
+        return new Foundation(Integer.MIN_VALUE).canAddCard(card);
     }
 
     private boolean canAddCardToPosition(final Card card, final int position) {
-        if (!canAddCard(card)) {
+        if (card == null) {
             return false;
         }
-
-        if (suitToPositionMap.containsKey(card.suit())) {
-            return suitToPositionMap.get(card.suit()) == position;
+        if (suitToFoundationMap.containsKey(card.suit())) {
+            final Foundation foundation = suitToFoundationMap.get(card.suit());
+            return foundation.getPosition() == position && foundation.canAddCard(card);
         }
 
-        return !suitToPositionMap.containsValue(position) && position >= 0 && position < NR_OF_FOUNDATIONS;
+        final Set<Integer> alreadyUsedPositions = getAlreadyUsedPositions();
+        return !alreadyUsedPositions.contains(position) && position >= 0 && position < NR_OF_FOUNDATIONS;
     }
 
     public boolean addCard(final Card card, final int position) {
         if (!canAddCardToPosition(card, position)) {
             return false;
         }
-        suitToFoundationMap.putIfAbsent(card.suit(), new Foundation());
-        suitToPositionMap.putIfAbsent(card.suit(), position);
+        suitToFoundationMap.putIfAbsent(card.suit(), new Foundation(position));
         return suitToFoundationMap.get(card.suit()).addCard(card);
     }
 
@@ -54,14 +56,23 @@ public class Foundations {
     }
 
     public Card removeTopCardAtPosition(final int position) {
-        return getSuitForPosition(position).map(suit -> suitToFoundationMap.get(suit).removeTopCard()).orElse(null);
+        return getSuitForPosition(position).map(this::removeTopCardForSuit).orElse(null);
+    }
+
+    private Card removeTopCardForSuit(final Suit suit) {
+        if (!suitToFoundationMap.containsKey(suit)) {
+            return null;
+        }
+        final Foundation f = suitToFoundationMap.get(suit);
+        final Card topCard = f.removeTopCard();
+        if (f.isEmpty()) {
+            suitToFoundationMap.remove(suit);
+        }
+        return topCard;
     }
 
     private Optional<Suit> getSuitForPosition(final int position) {
-        if (!suitToPositionMap.containsValue(position)) {
-            return Optional.empty();
-        }
-        return suitToPositionMap.entrySet().stream().filter(e -> e.getValue() == position).map(Map.Entry::getKey).findFirst();
+        return suitToFoundationMap.entrySet().stream().filter(e -> e.getValue().getPosition() == position).map(Map.Entry::getKey).findFirst();
     }
 
     public boolean allFull() {
@@ -73,11 +84,13 @@ public class Foundations {
             throw new IllegalStateException("suit is null");
         }
 
-        if (suitToPositionMap.containsKey(suit)) {
-            return suitToPositionMap.get(suit);
+        if (suitToFoundationMap.containsKey(suit)) {
+            return suitToFoundationMap.get(suit).getPosition();
         }
 
-        final List<Integer> possibleIndex = IntStream.range(0, NR_OF_FOUNDATIONS).filter(i -> !suitToPositionMap.containsValue(i)).sorted().boxed().collect(Collectors.toList());
+        final Set<Integer> alreadyUsedPositions = getAlreadyUsedPositions();
+
+        final List<Integer> possibleIndex = IntStream.range(0, NR_OF_FOUNDATIONS).filter(i -> !alreadyUsedPositions.contains(i)).sorted().boxed().collect(Collectors.toList());
 
         if (possibleIndex.isEmpty()) {
             throw new IllegalStateException("no foundation found for suit " + suit);
@@ -90,6 +103,10 @@ public class Foundations {
         return possibleIndex.get(0);
     }
 
+    private Set<Integer> getAlreadyUsedPositions() {
+        return suitToFoundationMap.values().stream().map(Foundation::getPosition).collect(Collectors.toSet());
+    }
+
     public List<Card> getTopCards() {
         return suitToFoundationMap.values().stream().map(Foundation::getTopCard).filter(Objects::nonNull).collect(Collectors.toList());
     }
@@ -97,12 +114,12 @@ public class Foundations {
     @Override
     public boolean equals(final Object o) {
         if (!(o instanceof Foundations that)) return false;
-        return Objects.equals(suitToFoundationMap, that.suitToFoundationMap) && Objects.equals(suitToPositionMap, that.suitToPositionMap);
+        return Objects.equals(suitToFoundationMap, that.suitToFoundationMap);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(suitToFoundationMap, suitToPositionMap);
+        return Objects.hash(suitToFoundationMap);
     }
 
     @Override
