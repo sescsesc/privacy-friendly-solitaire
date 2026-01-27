@@ -159,6 +159,19 @@ public class Application extends ApplicationAdapter implements ScoreListener {
         }
     }
 
+    public void startNew() {
+        if (clickPossible) {
+            clickPossible = false;
+            Gdx.app.postRunnable(() -> {
+                won = false;
+                practicallyWon = false;
+                initMVC(GeneratorSolitaireInstance.buildPlayableSolitaireInstance(cardDrawMode, scoreMode));
+                scheduleEnableClick();
+            });
+        }
+    }
+
+
     private void scheduleEnableClick() {
         Timer.schedule(new Timer.Task() {
             @Override
