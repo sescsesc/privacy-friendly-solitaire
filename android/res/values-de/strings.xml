@@ -131,7 +131,7 @@
     <string name="warning_box_negative_answer">Nein</string>
 
     <!-- ### Hardcoded Strings -->
-    <string name="hardcoded_points">0</string>
+    <string name="hardcoded_points">000</string>
     <string name="hardcoded_time">00:00</string>
 
     <!-- ### Image Description Strings -->
@@ -140,6 +140,7 @@
     <string name="string_descr_secuso_blue">Secuso Logo Blau</string>
     <string name="string_descr_icon_main_menu">Icon Hauptmenü</string>
     <string name="string_descr_restart_button">Restart Button Asset</string>
+    <string name="string_descr_start_button">Start New Button Asset</string>
     <string name="string_descr_undo_button">Undo Button Asset</string>
     <string name="string_descr_redo_button">Redo Button Asset</string>
     <string name="string_descr_hint_button">Hinweis Button Asset</string>

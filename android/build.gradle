@@ -50,7 +50,7 @@ dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
 //    testCompile 'junit:junit:4.12'
     implementation 'androidx.appcompat:appcompat:1.7.1'
-    implementation 'com.google.android.material:material:1.0.0'
+    implementation 'com.google.android.material:material:1.13.0'
 
     constraints {
         implementation("org.jetbrains.kotlin:kotlin-stdlib:2.3.0") {
