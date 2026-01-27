@@ -131,7 +131,7 @@
     <string name="warning_box_negative_answer">Nein</string>
 
     <!-- ### Hardcoded Strings -->
-    <string name="hardcoded_points">000</string>
+    <string name="hardcoded_points">0</string>
     <string name="hardcoded_time">00:00</string>
 
     <!-- ### Image Description Strings -->
