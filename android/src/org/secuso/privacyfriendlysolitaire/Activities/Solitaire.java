@@ -145,6 +145,11 @@ public class Solitaire extends AndroidApplication implements NavigationView.OnNa
         restart.setVisibility(View.GONE);
         restart.setOnClickListener(v -> application.restart());
 
+        // start new game button in game panel
+        final ImageButton start = findViewById(R.id.startNew);
+        start.setVisibility(View.VISIBLE);
+        start.setOnClickListener(v -> application.startNew());
+
         //undo Button in game panel
         final ImageButton undo = findViewById(R.id.undo);
         undo.setVisibility(View.GONE);

@@ -38,12 +38,12 @@ public class FoundationTest {
 
     @Test
     public void testGetSuitReturnsNullWhenEmptyInitially() {
-        assertNull("suit of new foundation should be null", new Foundation().getSuit());
+        assertNull("suit of new foundation should be null", new Foundation(0).getSuit());
     }
 
     @Test
     public void testGetSuitReturnsNullWhenEmptyAfterRemove() {
-        final Foundation f = new Foundation();
+        final Foundation f = new Foundation(0);
         f.addCard(new Card(ACE, SPADES));
         f.removeTopCard();
         assertNull("suit of new foundation should be null", f.getSuit());
@@ -51,7 +51,7 @@ public class FoundationTest {
 
     @Test
     public void testGetSuitReturnsSuitWhenMultipleCardsAdded() {
-        final Foundation f = new Foundation();
+        final Foundation f = new Foundation(0);
         for (final Rank r : Rank.values()) {
             f.addCard(new Card(r, SPADES));
         }
@@ -61,7 +61,7 @@ public class FoundationTest {
     @Test
     public void testGetSuit() {
         for (final Suit s : Suit.values()) {
-            final Foundation f = new Foundation();
+            final Foundation f = new Foundation(0);
             f.addCard(new Card(ACE, s));
             assertEquals(s, f.getSuit());
         }
@@ -69,12 +69,12 @@ public class FoundationTest {
 
     @Test
     public void testIsEmptyReturnsTrueWhenEmptyInitially() {
-        assertTrue(new Foundation().isEmpty());
+        assertTrue(new Foundation(0).isEmpty());
     }
 
     @Test
     public void testIsEmptyReturnsFalseWhenCardAdded() {
-        final Foundation f = new Foundation();
+        final Foundation f = new Foundation(0);
         f.addCard(new Card(ACE, SPADES));
         assertFalse(f.isEmpty());
     }
@@ -82,7 +82,7 @@ public class FoundationTest {
 
     @Test
     public void testIsEmptyReturnsTrueWhenCardedAndRemoved() {
-        final Foundation f = new Foundation();
+        final Foundation f = new Foundation(0);
         f.addCard(new Card(ACE, SPADES));
         f.removeTopCard();
         assertTrue(f.isEmpty());
@@ -90,22 +90,22 @@ public class FoundationTest {
 
     @Test
     public void testCanAddCardReturnsFalseWhenCardIsNull() {
-        assertFalse(new Foundation().canAddCard(null));
+        assertFalse(new Foundation(0).canAddCard(null));
     }
 
     @Test
     public void testCanAddCardReturnsTrueWhenFoundationIsEmptyAndCardIsAce() {
-        assertTrue(new Foundation().canAddCard(new Card(ACE, SPADES)));
+        assertTrue(new Foundation(0).canAddCard(new Card(ACE, SPADES)));
     }
 
     @Test
     public void testCanAddCardReturnsFalseWhenFoundationIsEmptyButCardIsNotAce() {
-        assertFalse(new Foundation().canAddCard(new Card(TWO, SPADES)));
+        assertFalse(new Foundation(0).canAddCard(new Card(TWO, SPADES)));
     }
 
     @Test
     public void testCanAddCardReturnsFalseWhenSuitDoesNotMatch() {
-        final Foundation f = new Foundation();
+        final Foundation f = new Foundation(0);
         f.addCard(new Card(ACE, SPADES));
 
         assertFalse(f.canAddCard(new Card(TWO, CLUBS)));
@@ -116,7 +116,7 @@ public class FoundationTest {
 
     @Test
     public void testCanAddCardReturnsFalseWhenSuitDoesMatchButNotPredecessor() {
-        final Foundation f = new Foundation();
+        final Foundation f = new Foundation(0);
         f.addCard(new Card(ACE, SPADES));
 
         assertFalse(f.canAddCard(new Card(THREE, SPADES)));
@@ -124,14 +124,14 @@ public class FoundationTest {
 
     @Test
     public void testAddCardReturnsFalseWhenCardIsNull() {
-        final Foundation f = new Foundation();
+        final Foundation f = new Foundation(0);
         assertFalse(f.addCard(null));
         assertTrue(f.isEmpty());
     }
 
     @Test
     public void testAddCardReturnsFalseWhenSuitDoesNotMatch() {
-        final Foundation f = new Foundation();
+        final Foundation f = new Foundation(0);
         final Card card = new Card(ACE, SPADES);
         f.addCard(card);
         assertEquals(card, f.getTopCard());
@@ -142,12 +142,12 @@ public class FoundationTest {
 
     @Test
     public void testGetTopCardReturnsNullWhenEmpty() {
-        assertNull(new Foundation().getTopCard());
+        assertNull(new Foundation(0).getTopCard());
     }
 
     @Test
     public void testGetTopCardReturnsCardWhenOneCardAdded() {
-        final Foundation f = new Foundation();
+        final Foundation f = new Foundation(0);
         final Card c = new Card(ACE, SPADES);
         f.addCard(c);
         assertEquals(c, f.getTopCard());
@@ -155,7 +155,7 @@ public class FoundationTest {
 
     @Test
     public void testGetTopCardReturnsCardWhenMultipleCardsAdded() {
-        final Foundation f = new Foundation();
+        final Foundation f = new Foundation(0);
         for (final Rank r : Rank.values()) {
             f.addCard(new Card(r, SPADES));
         }
@@ -165,12 +165,12 @@ public class FoundationTest {
 
     @Test
     public void testRemoveTopCardReturnsNullWhenEmpty() {
-        assertNull(new Foundation().removeTopCard());
+        assertNull(new Foundation(0).removeTopCard());
     }
 
     @Test
     public void testRemoveTopCardReturnsCardWhenOneCardAdded() {
-        final Foundation f = new Foundation();
+        final Foundation f = new Foundation(0);
         final Card c = new Card(ACE, SPADES);
         f.addCard(c);
         assertEquals(c, f.removeTopCard());
@@ -178,7 +178,7 @@ public class FoundationTest {
 
     @Test
     public void testRemoveTopCardWhenMultipleCardsAdded() {
-        final Foundation f = new Foundation();
+        final Foundation f = new Foundation(0);
         for (final Rank r : Rank.values()) {
             f.addCard(new Card(r, SPADES));
         }
@@ -188,12 +188,12 @@ public class FoundationTest {
 
     @Test
     public void testIsFullReturnsFalseWhenEmpty() {
-        assertFalse(new Foundation().isFull());
+        assertFalse(new Foundation(0).isFull());
     }
 
     @Test
     public void testIsFull() {
-        final Foundation f = new Foundation();
+        final Foundation f = new Foundation(0);
 
         for (final Rank r : Rank.values()) {
             f.addCard(new Card(r, SPADES));

@@ -29,6 +29,11 @@ public class Foundation {
      */
     private final TreeSet<Card> cards = new TreeSet<>(Comparator.comparing(Card::rank));
 
+    private final int position;
+
+    public Foundation(final int position) {
+        this.position = position;
+    }
 
     /**
      * @return the Suit of the Foundation
@@ -102,17 +107,21 @@ public class Foundation {
         return !cards.isEmpty() && cards.last().rank() == Rank.KING;
     }
 
+    public int getPosition() {
+        return position;
+    }
+
     @Override
     public boolean equals(final Object o) {
         if (!(o instanceof Foundation that)) {
             return false;
         }
-        return Objects.equals(cards, that.cards);
+        return position == that.position && Objects.equals(cards, that.cards);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hashCode(cards);
+        return Objects.hash(cards, position);
     }
 
     @Override
@@ -120,6 +129,6 @@ public class Foundation {
         if (cards.isEmpty()) {
             return "Foundation is empty";
         }
-        return "Foundation " + getSuit() + " = " + cards;
+        return "Foundation #" + position + " " + getSuit() + " = " + cards;
     }
 }
