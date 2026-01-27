@@ -42,25 +42,25 @@
                     android:weightSum="14">
 
                     <ImageButton
-                        android:contentDescription="@string/string_descr_restart_button"
                         android:id="@+id/restart"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:minHeight="50sp"
                         android:layout_marginEnd="64dp"
+                        android:background="@null"
                         android:clickable="true"
-                        android:src="@android:drawable/ic_media_previous"
-                        android:background="@null"/>
+                        android:contentDescription="@string/string_descr_restart_button"
+                        android:minHeight="50sp"
+                        android:src="@android:drawable/ic_media_previous" />
 
                     <ImageButton
-                        android:contentDescription="@string/string_descr_undo_button"
                         android:id="@+id/undo"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:minHeight="50sp"
+                        android:background="@null"
                         android:clickable="true"
-                        android:src="@android:drawable/ic_media_rew"
-                        android:background="@null"/>
+                        android:contentDescription="@string/string_descr_undo_button"
+                        android:minHeight="50sp"
+                        android:src="@android:drawable/ic_media_rew" />
 
                     <RelativeLayout
                         android:layout_width="0dp"
@@ -86,10 +86,10 @@
                             android:id="@+id/timerView"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_weight="0.73"
                             android:layout_marginStart="80px"
-                            android:text="@string/hardcoded_time"
-                            android:layout_toEndOf="@id/point"/>
+                            android:layout_toEndOf="@id/point"
+                            android:layout_weight="0.73"
+                            android:text="@string/hardcoded_time" />
 
 
                     </RelativeLayout>
@@ -99,30 +99,29 @@
                         android:layout_height="wrap_content"
                         android:layout_weight="6">
 
-                    <ImageButton
-                        android:contentDescription="@string/string_descr_hint_button"
-                        android:id="@+id/hint"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:minHeight="50sp"
-                        android:clickable="true"
-                        android:src="@android:drawable/ic_menu_view"
-                        android:layout_centerInParent="true"
-                        android:background="@null"/>
+                        <ImageButton
+                            android:id="@+id/hint"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_centerInParent="true"
+                            android:background="@null"
+                            android:clickable="true"
+                            android:contentDescription="@string/string_descr_hint_button"
+                            android:minHeight="50sp"
+                            android:src="@android:drawable/ic_menu_view" />
 
 
-                    <ImageButton
-                        android:contentDescription="@string/string_descr_redo_button"
-                        android:id="@+id/redo"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:minHeight="50sp"
-                        android:layout_gravity="start"
-                        android:clickable="true"
-                        android:src="@android:drawable/ic_media_ff"
-                        android:layout_alignParentEnd="true"
-                        android:background="@null"
-                        />
+                        <ImageButton
+                            android:id="@+id/redo"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_alignParentEnd="true"
+                            android:layout_gravity="start"
+                            android:background="@null"
+                            android:clickable="true"
+                            android:contentDescription="@string/string_descr_redo_button"
+                            android:minHeight="50sp"
+                            android:src="@android:drawable/ic_media_ff" />
                     </RelativeLayout>
                 </LinearLayout>
             </androidx.appcompat.widget.Toolbar>
