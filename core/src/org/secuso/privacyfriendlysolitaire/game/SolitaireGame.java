@@ -85,7 +85,7 @@ public class SolitaireGame {
     /**
      * the vector of listeners to be notified in case the game changes
      */
-    private Vector<GameListener> gameListeners = new Vector<GameListener>();
+    private Vector<GameListener> gameListeners = new Vector<>();
 
     /**
      * a CallBackListener residing in the android part of the app
@@ -510,6 +510,11 @@ public class SolitaireGame {
             callBackListener.updateUndoPossible(canUndo());
             callBackListener.updateRedoPossible(canRedo());
         }
+    }
+
+    void notifyAllListeners() {
+        notifyGameListeners();
+        notifyCallBackListener();
     }
 
     /**

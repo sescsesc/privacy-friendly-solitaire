@@ -287,6 +287,8 @@ public class View2 implements GameListener {
         for (final Tableau t : game.getListOfTableaus()) {
             t.faceUp().forEach(faceUpCard -> cardToImageMap.get(faceUpCard).toFront());
         }
+
+        game.getTopCardsOfFoundations().forEach(foundationTopCard -> cardToImageWrapperMap.get(foundationTopCard).toFront());
     }
 
 

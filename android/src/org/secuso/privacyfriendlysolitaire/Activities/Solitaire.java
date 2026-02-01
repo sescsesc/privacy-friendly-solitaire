@@ -141,24 +141,28 @@ public class Solitaire extends AndroidApplication implements NavigationView.OnNa
         final Color backgroundColor = getBackgroundColorFromPreferences();
 
         // restart button in game panel
-        final ImageButton restart = findViewById(R.id.restart);
-        restart.setVisibility(View.GONE);
-        restart.setOnClickListener(v -> application.restart());
+        final ImageButton restartButton = findViewById(R.id.restart);
+        restartButton.setVisibility(View.VISIBLE);
+        restartButton.setOnClickListener(v -> application.restart());
+        setAlphaAndEnabledOfButton(R.id.restart, false);
 
         // start new game button in game panel
-        final ImageButton start = findViewById(R.id.startNew);
-        start.setVisibility(View.VISIBLE);
-        start.setOnClickListener(v -> application.startNew());
+        final ImageButton startNewGameButton = findViewById(R.id.startNew);
+        startNewGameButton.setVisibility(View.VISIBLE);
+        startNewGameButton.setOnClickListener(v -> application.startNew());
 
         //undo Button in game panel
-        final ImageButton undo = findViewById(R.id.undo);
-        undo.setVisibility(View.GONE);
-        undo.setOnClickListener(v -> application.undo());
+        final ImageButton undoButton = findViewById(R.id.undo);
+        undoButton.setVisibility(View.VISIBLE);
+        undoButton.setOnClickListener(v -> application.undo());
+        setAlphaAndEnabledOfButton(R.id.undo, false);
+
 
         //redo button in game panel
-        final ImageButton redo = findViewById(R.id.redo);
-        redo.setVisibility(View.GONE);
-        redo.setOnClickListener(v -> application.redo());
+        final ImageButton redoButton = findViewById(R.id.redo);
+        redoButton.setVisibility(View.VISIBLE);
+        redoButton.setOnClickListener(v -> application.redo());
+        setAlphaAndEnabledOfButton(R.id.redo, false);
 
         //hint button in game panel
         final ImageButton hint = findViewById(R.id.hint);
@@ -395,17 +399,24 @@ public class Solitaire extends AndroidApplication implements NavigationView.OnNa
     @Override
     public void updateUndoPossible(boolean newUndoPossible) {
         runOnUiThread(() -> {
-            findViewById(R.id.restart).setVisibility(newUndoPossible ? View.VISIBLE : View.GONE);
-            findViewById(R.id.undo).setVisibility(newUndoPossible ? View.VISIBLE : View.GONE);
+            setAlphaAndEnabledOfButton(R.id.restart, newUndoPossible);
+            setAlphaAndEnabledOfButton(R.id.undo, newUndoPossible);
         });
     }
 
     @Override
     public void updateRedoPossible(boolean newRedoPossible) {
         runOnUiThread(() -> {
-            findViewById(R.id.redo).setVisibility(newRedoPossible ? View.VISIBLE : View.GONE);
+            setAlphaAndEnabledOfButton(R.id.redo, newRedoPossible);
         });
     }
+
+    private void setAlphaAndEnabledOfButton(final int id, final boolean enabled) {
+        final View button = findViewById(id);
+        button.setAlpha(enabled ? 1f : 0.1f);
+        button.setEnabled(enabled);
+    }
+
 
     @Override
     public void updateScore(final int newScore) {
