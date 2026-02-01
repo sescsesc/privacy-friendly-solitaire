@@ -54,6 +54,5 @@ public class ImageLoader {
             e.printStackTrace();
             return null;
         }
-
     }
 }

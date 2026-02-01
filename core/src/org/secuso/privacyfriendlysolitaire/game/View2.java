@@ -143,7 +143,9 @@ public class View2 implements GameListener {
     private void paintInitialFoundations() {
         IntStream.range(0, NR_OF_FOUNDATIONS).forEachOrdered(i -> {
             // paint empty spaces
-            setImageScalingAndPositionAndStackCardIndicesAndAddToStage(ImageLoader.getEmptySpaceImageWithoutLogo(), FOUNDATION, ViewConstants.TableauFoundationX[i], ViewConstants.WasteDeckFoundationY, i, -1);
+            final ImageWrapper placeholderImage = ImageLoader.getEmptySpaceImageWithoutLogo();
+            setImageScalingAndPositionAndStackCardIndicesAndAddToStage(placeholderImage, FOUNDATION, ViewConstants.TableauFoundationX[i], ViewConstants.WasteDeckFoundationY, i, -1);
+            dragAndDrop.addTarget(new DragAndDropTarget(placeholderImage));
         });
     }
 
@@ -156,7 +158,9 @@ public class View2 implements GameListener {
             float x = ViewConstants.TableauFoundationX[i];
 
             // add empty space beneath
-            setImageScalingAndPositionAndStackCardIndicesAndAddToStage(ImageLoader.getEmptySpaceImageWithoutLogo(), TABLEAU, x, 10.5f * ViewConstants.heightOneSpace, i, -1);
+            final ImageWrapper placeholderImage = ImageLoader.getEmptySpaceImageWithoutLogo();
+            setImageScalingAndPositionAndStackCardIndicesAndAddToStage(placeholderImage, TABLEAU, x, 10.5f * ViewConstants.heightOneSpace, i, -1);
+            dragAndDrop.addTarget(new DragAndDropTarget(placeholderImage));
 
             // add face-down cards
             final int faceDownSize = t.getFaceDownCardsSize();
@@ -176,6 +180,7 @@ public class View2 implements GameListener {
                 final CardImageWrapper faceUpCardImage = cardToImageMap.get(faceUpCards.get(j));
                 float y = 10.5f * ViewConstants.heightOneSpace - ((faceDownSize + j) * ViewConstants.offsetHeightBetweenCards);
                 setImageScalingAndPositionAndStackCardIndicesAndAddToStage(faceUpCardImage, TABLEAU, x, y, i, faceDownSize + j);
+                dragAndDrop.addTarget(new DragAndDropTarget(faceUpCardImage));
             });
 
             setNewSmallestYForTableau(i, t.getCardsSize());
@@ -1091,7 +1096,11 @@ public class View2 implements GameListener {
         }
 
         // return Action if click was somewhere sensible or null else
-        return location == null ? null : new Action(location, stackIndex, cardIndex);
+        final Action result = location == null ? null : new Action(location, stackIndex, cardIndex);
+
+        System.out.println("getActionForTap: " + x + ", " + y + " -> " + result);
+
+        return result;
     }
 
 
@@ -1129,18 +1138,18 @@ public class View2 implements GameListener {
     /**
      * set the scaling, position and add the card to the stage, so every image is svaled the same
      *
-     * @param cardImage image whose parameters are set and which is added to the stage
-     * @param x         the x-coordinate of the position
-     * @param y         the y-coordinate of the position
+     * @param image image whose parameters are set and which is added to the stage
+     * @param x     the x-coordinate of the position
+     * @param y     the y-coordinate of the position
      */
-    private void setImageScalingAndPositionAndStackCardIndicesAndAddToStage(final ImageWrapper cardImage, final Location location, final float x, final float y, final int stackIndex, final int cardIndex) {
-        cardImage.setPosition(x, y);
-        cardImage.setWidth(ViewConstants.scalingWidthCard * ViewConstants.widthOneSpace);
-        cardImage.setHeight(ViewConstants.scalingHeightCard * ViewConstants.heightOneSpace);
-        cardImage.setStackIndex(stackIndex);
-        cardImage.setCardIndex(cardIndex);
-        cardImage.setLocation(location);
-        stage.addActor(cardImage);
+    private void setImageScalingAndPositionAndStackCardIndicesAndAddToStage(final ImageWrapper image, final Location location, final float x, final float y, final int stackIndex, final int cardIndex) {
+        image.setPosition(x, y);
+        image.setWidth(ViewConstants.scalingWidthCard * ViewConstants.widthOneSpace);
+        image.setHeight(ViewConstants.scalingHeightCard * ViewConstants.heightOneSpace);
+        image.setStackIndex(stackIndex);
+        image.setCardIndex(cardIndex);
+        image.setLocation(location);
+        stage.addActor(image);
 
         if (!widthHeightOfCardSet) {
             ViewConstants.widthCard = ViewConstants.scalingWidthCard * ViewConstants.widthOneSpace;
@@ -1299,6 +1308,9 @@ public class View2 implements GameListener {
                 final Actor originalActor = getActor();
                 originalActor.setVisible(true);
                 originalActor.toFront();
+
+                System.out.println("dragStop of Actor: " + originalActor);
+
                 //store original position in case of invalid move
                 final float originalX = originalActor.getX();
                 final float originalY = originalActor.getY();
@@ -1307,6 +1319,9 @@ public class View2 implements GameListener {
                     originalActors.get(i).setPosition(dragActor.getX(), dragActor.getY() - (i * ViewConstants.offsetHeightBetweenCards));
                 }
                 final boolean dragStopResult = createActionAndSendToModelForStop((ImageWrapper) originalActor);
+
+                System.out.println("dragStopResult = " + dragStopResult);
+
                 if (!dragStartResult || !dragStopResult) {
                     for (int i = 0; i < originalActors.size(); i++) {
                         final ImageWrapper image = (ImageWrapper) originalActors.get(i);
@@ -1330,7 +1345,7 @@ public class View2 implements GameListener {
             dragAndDrop.clear();
 
             game.getTopCardsOfFoundations().forEach(this::addCardToDragAndDrop);
-            game.getTableaus().getAllLastFaceUpCards().forEach(this::addCardToDragAndDrop);
+            game.getTableaus().getAllFaceUpCards().forEach(this::addCardToDragAndDrop);
 
             //add the top of the waste
             final DeckAndWaste deckAndWaste = game.getDeckWaste();
