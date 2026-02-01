@@ -80,7 +80,7 @@ public class MoveFinder {
                 //check if reversal of previous move
                 final int position = game.getOrCreateFoundationPosition(cardFromTableau.suit());
                 final Vector<Move> moves = game.getMoves();
-                if (!moves.isEmpty()) {
+                if (!moves.isEmpty() && game.getMovePointer() >= 0) {
                     final Move prevMove = moves.get(game.getMovePointer());
                     if (prevMove.sourceAction().getLocation() == FOUNDATION && prevMove.targetAction().getLocation() == TABLEAU && prevMove.sourceAction().getStackIndex() == position && prevMove.targetAction().getStackIndex() == tableauIndex) {
                         continue;
@@ -120,7 +120,7 @@ public class MoveFinder {
                 if (tableauTarget.isAddToFaceUpCardsPossible(toBeMoved)) {
                     //check if reversal of previous move
                     final Vector<Move> moves = game.getMoves();
-                    if (!moves.isEmpty()) {
+                    if (!moves.isEmpty() && game.getMovePointer() >= 0) {
                         Move prevMove = moves.get(game.getMovePointer());
                         if (prevMove.sourceAction().getLocation() == TABLEAU && prevMove.targetAction().getLocation() == TABLEAU && prevMove.sourceAction().getStackIndex() == tableauIndexTarget && prevMove.targetAction().getStackIndex() == tableauIndexSource && !game.isLastMoveturnedOverTableau()) {
                             continue;

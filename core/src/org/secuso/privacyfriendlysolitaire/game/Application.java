@@ -93,6 +93,8 @@ public class Application extends ApplicationAdapter implements ScoreListener {
         inputMultiplexer.addProcessor(inputProcessorStage);
         inputMultiplexer.addProcessor(inputProcessorController);
         Gdx.input.setInputProcessor(inputMultiplexer);
+
+        game.notifyAllListeners();
     }
 
     private void initVC() {
