@@ -17,6 +17,8 @@ public class DragAndDropTarget extends DragAndDrop.Target {
             return false;
         }
 
+        // FIXME
+
         final Vector<CardImageWrapper> sourceCardImages = dragAndDropPayload.getCardImages();
         if (sourceCardImages.isEmpty()) {
             return false;
@@ -40,5 +42,7 @@ public class DragAndDropTarget extends DragAndDrop.Target {
     @Override
     public void drop(final DragAndDrop.Source source, final DragAndDrop.Payload payload, final float x, final float y, final int pointer) {
         // do nothing
+
+        // FIXME
     }
 }

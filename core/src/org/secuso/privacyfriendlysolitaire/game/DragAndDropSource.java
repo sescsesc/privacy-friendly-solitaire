@@ -28,6 +28,10 @@ public class DragAndDropSource extends DragAndDrop.Source {
 
     @Override
     public DragAndDrop.Payload dragStart(final InputEvent event, final float x, final float y, final int pointer) {
+
+        // FIXME
+
+
         final Actor actor = getActor();
         actor.setVisible(true);
         actor.toFront();
@@ -46,6 +50,8 @@ public class DragAndDropSource extends DragAndDrop.Source {
             if (faceUpCards.contains(card)) {
                 relevantCards.addAll(faceUpCards.subList(faceUpCards.indexOf(card), faceUpCards.size()).stream().map(cardToImageMap::get).collect(Collectors.toCollection(Vector::new)));
             }
+            relevantCards.forEach(group::addActor);
+
             final DragAndDropPayload payload = new DragAndDropPayload(relevantCards);
             payload.setDragActor(group);
             return payload;
@@ -56,6 +62,8 @@ public class DragAndDropSource extends DragAndDrop.Source {
 
     @Override
     public void dragStop(final InputEvent event, final float x, final float y, final int pointer, final DragAndDrop.Payload payload, final DragAndDrop.Target target) {
+
+        // FIXME
 
         System.out.println(target);
 
