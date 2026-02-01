@@ -218,7 +218,7 @@ public class View2 implements GameListener {
         if (useDragAndDrop) {
             if (prevAction == null) {
                 try {
-                    if (game.wasValidMove()) {
+                    if (game.wasValidMove() && game.getMovePointer() >= 0) {
                         final Vector<Move> moves = game.getMoves();
                         if (game.wasUndoMove()) {
                             // undo move
@@ -263,7 +263,7 @@ public class View2 implements GameListener {
                 markerImage.setVisible(false);
 
                 try {
-                    if (game.wasValidMove()) {
+                    if (game.wasValidMove() && game.getMovePointer() >= 0) {
                         final Vector<Move> moves = game.getMoves();
                         if (game.wasUndoMove()) {
                             // undo move
@@ -1239,47 +1239,57 @@ public class View2 implements GameListener {
                 final DragAndDrop.Payload payload = new DragAndDrop.Payload();
                 final CardImageWrapper cardImage = cardToImageMap.get(card);
 
-                if (cardImage != null) {
-                    cardImage.setWidth(ViewConstants.scalingWidthCard * ViewConstants.widthOneSpace);
-                    cardImage.setHeight(ViewConstants.scalingHeightCard * ViewConstants.heightOneSpace);
-                    if (cardImage.getLocation() == TABLEAU) {
-                        final Group payloadGroup = new Group();
-                        final int stackIndex = cardImage.getStackIndex();
-                        //fix wrapperCardIndices -- START
-                        //ugly last minute fix, sorry :(
-                        final Tableau tableau = game.getTableauAtPos(stackIndex);
-                        int currWrapperCardIndex = tableau.getFaceDownCardsSize();
-                        for (final Card faceUpCard : tableau.faceUp()) {
-                            final CardImageWrapper faceUpCardImage = cardToImageMap.get(faceUpCard);
-                            faceUpCardImage.setCardIndex(currWrapperCardIndex);
-                            currWrapperCardIndex++;
-                        }
-                        //fix wrapperCardIndices -- END
-                        final int faceUpIndex = cardImage.getCardIndex() - tableau.getFaceDownCardsSize();
-                        for (int i = faceUpIndex; i < tableau.getFaceUpCardsSize(); i++) {
-                            if (i == faceUpIndex) {
-                                payloadGroup.addActor(cardImage);
-                                originalActors.add(cardImage);
-                            } else {
-                                final Card additionalCard = tableau.faceUp().get(i);
-                                final CardImageWrapper additionalCardImage = cardToImageMap.get(additionalCard);
-                                additionalCardImage.setWidth(ViewConstants.scalingWidthCard * ViewConstants.widthOneSpace);
-                                additionalCardImage.setHeight(ViewConstants.scalingHeightCard * ViewConstants.heightOneSpace);
-                                additionalCardImage.moveBy(0, -ViewConstants.offsetHeightBetweenCards * (i - faceUpIndex));
-                                payloadGroup.addActor(additionalCardImage);
-                                originalActors.add(additionalCardImage);
-                            }
-                        }
-                        payload.setDragActor(payloadGroup);
-                    } else {
-                        payload.setDragActor(cardImage);
-                        originalActors.add(cardImage);
-                    }
-                    for (final Actor a : originalActors) {
-                        a.setVisible(false);
-                    }
-                    dragStartResult = createActionAndSendToModelForStart(cardImage);
+                System.out.println("dragStart of CardImageWrapper: " + cardImage);
+
+                if (cardImage == null) {
+                    return payload;
                 }
+
+                cardImage.setWidth(ViewConstants.scalingWidthCard * ViewConstants.widthOneSpace);
+                cardImage.setHeight(ViewConstants.scalingHeightCard * ViewConstants.heightOneSpace);
+
+                if (cardImage.getLocation() == TABLEAU) {
+                    final Group payloadGroup = new Group();
+                    final int stackIndex = cardImage.getStackIndex();
+                    //fix wrapperCardIndices -- START
+                    //ugly last minute fix, sorry :(
+                    final Tableau tableau = game.getTableauAtPos(stackIndex);
+                    int currWrapperCardIndex = tableau.getFaceDownCardsSize();
+                    for (final Card faceUpCard : tableau.faceUp()) {
+                        final CardImageWrapper faceUpCardImage = cardToImageMap.get(faceUpCard);
+                        faceUpCardImage.setCardIndex(currWrapperCardIndex);
+                        currWrapperCardIndex++;
+                    }
+                    //fix wrapperCardIndices -- END
+                    final int faceUpIndex = cardImage.getCardIndex() - tableau.getFaceDownCardsSize();
+                    for (int i = faceUpIndex; i < tableau.getFaceUpCardsSize(); i++) {
+                        if (i == faceUpIndex) {
+                            payloadGroup.addActor(cardImage);
+                            originalActors.add(cardImage);
+                        } else {
+                            final Card additionalCard = tableau.faceUp().get(i);
+                            final CardImageWrapper additionalCardImage = cardToImageMap.get(additionalCard);
+                            additionalCardImage.setWidth(ViewConstants.scalingWidthCard * ViewConstants.widthOneSpace);
+                            additionalCardImage.setHeight(ViewConstants.scalingHeightCard * ViewConstants.heightOneSpace);
+                            additionalCardImage.moveBy(0, -ViewConstants.offsetHeightBetweenCards * (i - faceUpIndex));
+                            payloadGroup.addActor(additionalCardImage);
+                            originalActors.add(additionalCardImage);
+                        }
+                    }
+                    payload.setDragActor(payloadGroup);
+                } else {
+                    payload.setDragActor(cardImage);
+                    originalActors.add(cardImage);
+                }
+                for (final Actor a : originalActors) {
+                    a.setVisible(true);
+                }
+
+                System.out.println("dragStart originalActors = " + originalActors);
+
+                dragStartResult = createActionAndSendToModelForStart(cardImage);
+
+                System.out.println("dragStartResult = " + dragStartResult);
                 return payload;
             }
 
