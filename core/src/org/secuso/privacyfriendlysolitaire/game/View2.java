@@ -288,7 +288,7 @@ public class View2 implements GameListener {
             t.faceUp().forEach(faceUpCard -> cardToImageMap.get(faceUpCard).toFront());
         }
 
-        game.getTopCardsOfFoundations().forEach(foundationTopCard -> cardToImageWrapperMap.get(foundationTopCard).toFront());
+        game.getTopCardsOfFoundations().forEach(foundationTopCard -> cardToImageMap.get(foundationTopCard).toFront());
     }
 
 
