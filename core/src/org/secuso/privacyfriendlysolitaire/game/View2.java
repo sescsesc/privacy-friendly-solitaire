@@ -25,8 +25,6 @@ import static java.util.Optional.of;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.scenes.scene2d.Actor;
-import com.badlogic.gdx.scenes.scene2d.Group;
-import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.scenes.scene2d.utils.DragAndDrop;
@@ -43,9 +41,11 @@ import org.secuso.privacyfriendlysolitaire.model.Tableaus;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.Vector;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -76,6 +76,9 @@ public class View2 implements GameListener {
     private final HashMap<Integer, Float> smallestYForTableau = new HashMap<>(7);
 
     private final Map<Card, CardImageWrapper> cardToImageMap = new HashMap<>(Constants.NR_CARDS);
+
+    private final Set<ImageWrapper> placeholders = new HashSet<>(11);
+
 
     public View2(final SolitaireGame game, final Stage stage, final boolean useDragAndDrop) {
         this.stage = stage;
@@ -137,7 +140,7 @@ public class View2 implements GameListener {
         paintInitialFoundations();
         paintInitialTableaus();
         paintInitialDeckAndWaste();
-        addCurrentFaceUpCardsToDragAndDrop();
+        updateDragAndDropStartsAndTargets();
     }
 
     private void paintInitialFoundations() {
@@ -145,7 +148,8 @@ public class View2 implements GameListener {
             // paint empty spaces
             final ImageWrapper placeholderImage = ImageLoader.getEmptySpaceImageWithoutLogo();
             setImageScalingAndPositionAndStackCardIndicesAndAddToStage(placeholderImage, FOUNDATION, ViewConstants.TableauFoundationX[i], ViewConstants.WasteDeckFoundationY, i, -1);
-            dragAndDrop.addTarget(new DragAndDropTarget(placeholderImage));
+            dragAndDrop.addTarget(new DragAndDropTarget(placeholderImage, game));
+            placeholders.add(placeholderImage);
         });
     }
 
@@ -160,7 +164,8 @@ public class View2 implements GameListener {
             // add empty space beneath
             final ImageWrapper placeholderImage = ImageLoader.getEmptySpaceImageWithoutLogo();
             setImageScalingAndPositionAndStackCardIndicesAndAddToStage(placeholderImage, TABLEAU, x, 10.5f * ViewConstants.heightOneSpace, i, -1);
-            dragAndDrop.addTarget(new DragAndDropTarget(placeholderImage));
+            dragAndDrop.addTarget(new DragAndDropTarget(placeholderImage, game));
+            placeholders.add(placeholderImage);
 
             // add face-down cards
             final int faceDownSize = t.getFaceDownCardsSize();
@@ -180,7 +185,7 @@ public class View2 implements GameListener {
                 final CardImageWrapper faceUpCardImage = cardToImageMap.get(faceUpCards.get(j));
                 float y = 10.5f * ViewConstants.heightOneSpace - ((faceDownSize + j) * ViewConstants.offsetHeightBetweenCards);
                 setImageScalingAndPositionAndStackCardIndicesAndAddToStage(faceUpCardImage, TABLEAU, x, y, i, faceDownSize + j);
-                dragAndDrop.addTarget(new DragAndDropTarget(faceUpCardImage));
+                dragAndDrop.addTarget(new DragAndDropTarget(faceUpCardImage, game));
             });
 
             setNewSmallestYForTableau(i, t.getCardsSize());
@@ -238,7 +243,7 @@ public class View2 implements GameListener {
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
-                addCurrentFaceUpCardsToDragAndDrop();
+                updateDragAndDropStartsAndTargets();
             }
         } else {
             // get whether this was a marking action
@@ -379,7 +384,8 @@ public class View2 implements GameListener {
         final int nrOfFaceDownInSourceTableauAfterChange = sourceTableau.getFaceDownCardsSize();
         // the card beneath the sourceCardIndex,
         // it may be null if after the move, the tableau has become empty
-        final Optional<Card> oCardBeneathSource = sourceCardIndex >= 0 ? of(sourceTableau.faceUp().get(sourceCardIndex)) : empty();
+        final Vector<Card> sourceTableauFaceUps = sourceTableau.faceUp();
+        final Optional<Card> oCardBeneathSource = (sourceCardIndex >= 0 && sourceCardIndex < sourceTableauFaceUps.size()) ? of(sourceTableauFaceUps.get(sourceCardIndex)) : empty();
 
         if (targetAction.getLocation() == TABLEAU) {
             // ------------------------ T -> T ------------------------
@@ -1239,118 +1245,138 @@ public class View2 implements GameListener {
     /**
      * @param card the card whose ImageWrapper is added as a source to DragAndDrop
      */
-    private void addCardToDragAndDrop(final Card card) {
+    private void addCardToDragAndDropStart(final Card card) {
         final CardImageWrapper cardImage = cardToImageMap.get(card);
-        dragAndDrop.addSource(new DragAndDrop.Source(cardImage) {
-            @Override
-            public DragAndDrop.Payload dragStart(final InputEvent event, final float x, final float y, final int pointer) {
-                originalActors.clear();
-                final DragAndDrop.Payload payload = new DragAndDrop.Payload();
-                final CardImageWrapper cardImage = cardToImageMap.get(card);
+        dragAndDrop.addSource(new DragAndDropSource(cardImage, game, cardToImageMap));
 
-                System.out.println("dragStart of CardImageWrapper: " + cardImage);
+//        dragAndDrop.addSource(new DragAndDrop.Source(cardImage) {
+//        {
+//            @Override
+//            public DragAndDrop.Payload dragStart(final InputEvent event, final float x, final float y, final int pointer) {
+//                originalActors.clear();
+//                final DragAndDrop.Payload payload = new DragAndDrop.Payload();
+//                final CardImageWrapper cardImage = cardToImageMap.get(card);
+//
+//                System.out.println("dragStart of CardImageWrapper: " + cardImage);
+//
+//                if (cardImage == null) {
+//                    return payload;
+//                }
+//
+//                cardImage.setWidth(ViewConstants.scalingWidthCard * ViewConstants.widthOneSpace);
+//                cardImage.setHeight(ViewConstants.scalingHeightCard * ViewConstants.heightOneSpace);
+//
+//                if (cardImage.getLocation() == TABLEAU) {
+//                    final Group payloadGroup = new Group();
+//                    final int stackIndex = cardImage.getStackIndex();
+//                    //fix wrapperCardIndices -- START
+//                    //ugly last minute fix, sorry :(
+//                    final Tableau tableau = game.getTableauAtPos(stackIndex);
+//                    int currWrapperCardIndex = tableau.getFaceDownCardsSize();
+//                    for (final Card faceUpCard : tableau.faceUp()) {
+//                        final CardImageWrapper faceUpCardImage = cardToImageMap.get(faceUpCard);
+//                        faceUpCardImage.setCardIndex(currWrapperCardIndex);
+//                        currWrapperCardIndex++;
+//                    }
+//                    //fix wrapperCardIndices -- END
+//                    final int faceUpIndex = cardImage.getCardIndex() - tableau.getFaceDownCardsSize();
+//                    for (int i = faceUpIndex; i < tableau.getFaceUpCardsSize(); i++) {
+//                        if (i == faceUpIndex) {
+//                            payloadGroup.addActor(cardImage);
+//                            originalActors.add(cardImage);
+//                        } else {
+//                            final Card additionalCard = tableau.faceUp().get(i);
+//                            final CardImageWrapper additionalCardImage = cardToImageMap.get(additionalCard);
+//                            additionalCardImage.setWidth(ViewConstants.scalingWidthCard * ViewConstants.widthOneSpace);
+//                            additionalCardImage.setHeight(ViewConstants.scalingHeightCard * ViewConstants.heightOneSpace);
+//                            additionalCardImage.moveBy(0, -ViewConstants.offsetHeightBetweenCards * (i - faceUpIndex));
+//                            payloadGroup.addActor(additionalCardImage);
+//                            originalActors.add(additionalCardImage);
+//                        }
+//                    }
+//                    payload.setDragActor(payloadGroup);
+//                } else {
+//                    payload.setDragActor(cardImage);
+//                    originalActors.add(cardImage);
+//                }
+//                for (final Actor a : originalActors) {
+//                    a.setVisible(true);
+//                }
+//
+//                System.out.println("dragStart originalActors = " + originalActors);
+//
+//                dragStartResult = createActionAndSendToModelForStart(cardImage);
+//
+//                System.out.println("dragStartResult = " + dragStartResult);
+//                return payload;
+//            }
+//
+//            @Override
+//            public void dragStop(final InputEvent event, final float x, final float y, final int pointer, final DragAndDrop.Payload payload, final DragAndDrop.Target target) {
+//                final Actor dragActor = payload.getDragActor();
+//                final Actor originalActor = getActor();
+//                originalActor.setVisible(true);
+//                originalActor.toFront();
+//
+//                System.out.println("dragStop of Actor: " + originalActor);
+//
+//                //store original position in case of invalid move
+//                final float originalX = originalActor.getX();
+//                final float originalY = originalActor.getY();
+//                originalActor.setPosition(dragActor.getX(), dragActor.getY());
+//                for (int i = 0; i < originalActors.size(); i++) {
+//                    originalActors.get(i).setPosition(dragActor.getX(), dragActor.getY() - (i * ViewConstants.offsetHeightBetweenCards));
+//                }
+//                final boolean dragStopResult = createActionAndSendToModelForStop((ImageWrapper) originalActor);
+//
+//                System.out.println("dragStopResult = " + dragStopResult);
+//
+//                if (!dragStartResult || !dragStopResult) {
+//                    for (int i = 0; i < originalActors.size(); i++) {
+//                        final ImageWrapper image = (ImageWrapper) originalActors.get(i);
+//                        moveCard(originalX, originalY - (i * ViewConstants.offsetHeightBetweenCards), image, (image).getStackIndex(), true);
+//                    }
+//                }
+//                for (final Actor a : originalActors) {
+//                    a.setVisible(true);
+//                    a.toFront();
+//                }
+//                originalActors.clear();
+//            }
+//        });
+    }
 
-                if (cardImage == null) {
-                    return payload;
-                }
+    private void addCardToDragAndDropTarget(final Card card) {
+        final CardImageWrapper cardImage = cardToImageMap.get(card);
+//        dragAndDrop.addSource(new DragAndDrop.Source(cardImage) {
+        dragAndDrop.addTarget(new DragAndDropTarget(cardImage, game));
+    }
 
-                cardImage.setWidth(ViewConstants.scalingWidthCard * ViewConstants.widthOneSpace);
-                cardImage.setHeight(ViewConstants.scalingHeightCard * ViewConstants.heightOneSpace);
-
-                if (cardImage.getLocation() == TABLEAU) {
-                    final Group payloadGroup = new Group();
-                    final int stackIndex = cardImage.getStackIndex();
-                    //fix wrapperCardIndices -- START
-                    //ugly last minute fix, sorry :(
-                    final Tableau tableau = game.getTableauAtPos(stackIndex);
-                    int currWrapperCardIndex = tableau.getFaceDownCardsSize();
-                    for (final Card faceUpCard : tableau.faceUp()) {
-                        final CardImageWrapper faceUpCardImage = cardToImageMap.get(faceUpCard);
-                        faceUpCardImage.setCardIndex(currWrapperCardIndex);
-                        currWrapperCardIndex++;
-                    }
-                    //fix wrapperCardIndices -- END
-                    final int faceUpIndex = cardImage.getCardIndex() - tableau.getFaceDownCardsSize();
-                    for (int i = faceUpIndex; i < tableau.getFaceUpCardsSize(); i++) {
-                        if (i == faceUpIndex) {
-                            payloadGroup.addActor(cardImage);
-                            originalActors.add(cardImage);
-                        } else {
-                            final Card additionalCard = tableau.faceUp().get(i);
-                            final CardImageWrapper additionalCardImage = cardToImageMap.get(additionalCard);
-                            additionalCardImage.setWidth(ViewConstants.scalingWidthCard * ViewConstants.widthOneSpace);
-                            additionalCardImage.setHeight(ViewConstants.scalingHeightCard * ViewConstants.heightOneSpace);
-                            additionalCardImage.moveBy(0, -ViewConstants.offsetHeightBetweenCards * (i - faceUpIndex));
-                            payloadGroup.addActor(additionalCardImage);
-                            originalActors.add(additionalCardImage);
-                        }
-                    }
-                    payload.setDragActor(payloadGroup);
-                } else {
-                    payload.setDragActor(cardImage);
-                    originalActors.add(cardImage);
-                }
-                for (final Actor a : originalActors) {
-                    a.setVisible(true);
-                }
-
-                System.out.println("dragStart originalActors = " + originalActors);
-
-                dragStartResult = createActionAndSendToModelForStart(cardImage);
-
-                System.out.println("dragStartResult = " + dragStartResult);
-                return payload;
-            }
-
-            @Override
-            public void dragStop(final InputEvent event, final float x, final float y, final int pointer, final DragAndDrop.Payload payload, final DragAndDrop.Target target) {
-                final Actor dragActor = payload.getDragActor();
-                final Actor originalActor = getActor();
-                originalActor.setVisible(true);
-                originalActor.toFront();
-
-                System.out.println("dragStop of Actor: " + originalActor);
-
-                //store original position in case of invalid move
-                final float originalX = originalActor.getX();
-                final float originalY = originalActor.getY();
-                originalActor.setPosition(dragActor.getX(), dragActor.getY());
-                for (int i = 0; i < originalActors.size(); i++) {
-                    originalActors.get(i).setPosition(dragActor.getX(), dragActor.getY() - (i * ViewConstants.offsetHeightBetweenCards));
-                }
-                final boolean dragStopResult = createActionAndSendToModelForStop((ImageWrapper) originalActor);
-
-                System.out.println("dragStopResult = " + dragStopResult);
-
-                if (!dragStartResult || !dragStopResult) {
-                    for (int i = 0; i < originalActors.size(); i++) {
-                        final ImageWrapper image = (ImageWrapper) originalActors.get(i);
-                        moveCard(originalX, originalY - (i * ViewConstants.offsetHeightBetweenCards), image, (image).getStackIndex(), true);
-                    }
-                }
-                for (final Actor a : originalActors) {
-                    a.setVisible(true);
-                    a.toFront();
-                }
-                originalActors.clear();
-            }
-        });
+    private void addPlaceholderToDragAndDropTarget(final ImageWrapper image) {
+        dragAndDrop.addTarget(new DragAndDropTarget(image, game));
     }
 
     /**
      * all cards that are currently face up are added as sources to the DragAndDrop Object
      */
-    private void addCurrentFaceUpCardsToDragAndDrop() {
+    private void updateDragAndDropStartsAndTargets() {
         if (useDragAndDrop) {
             dragAndDrop.clear();
 
-            game.getTopCardsOfFoundations().forEach(this::addCardToDragAndDrop);
-            game.getTableaus().getAllFaceUpCards().forEach(this::addCardToDragAndDrop);
+            final List<Card> topCardsOfFoundations = game.getTopCardsOfFoundations();
+            topCardsOfFoundations.forEach(this::addCardToDragAndDropStart);
+            topCardsOfFoundations.forEach(this::addCardToDragAndDropTarget);
+
+            final Tableaus tableaus = game.getTableaus();
+            tableaus.getAllFaceUpCards().forEach(this::addCardToDragAndDropStart);
+            tableaus.getAllLastFaceUpCards().forEach(this::addCardToDragAndDropTarget);
+
+            placeholders.forEach(this::addPlaceholderToDragAndDropTarget);
 
             //add the top of the waste
             final DeckAndWaste deckAndWaste = game.getDeckWaste();
             if (!deckAndWaste.isWasteEmpty()) {
-                addCardToDragAndDrop(deckAndWaste.getWasteTop());
+                addCardToDragAndDropStart(deckAndWaste.getWasteTop());
             }
         }
     }

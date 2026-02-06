@@ -1,5 +1,6 @@
 package org.secuso.privacyfriendlysolitaire.game;
 
+import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.utils.DragAndDrop;
 
 import java.util.Objects;
@@ -11,10 +12,15 @@ public class DragAndDropPayload extends DragAndDrop.Payload {
 
     public DragAndDropPayload(final CardImageWrapper cardImage) {
         this.cardImages.add(cardImage);
+        setDragActor(cardImage);
     }
 
     public DragAndDropPayload(final Vector<CardImageWrapper> cardImages) {
         this.cardImages.addAll(cardImages);
+
+        final Group group = new Group();
+        cardImages.forEach(group::addActor);
+        setDragActor(group);
     }
 
     public Vector<CardImageWrapper> getCardImages() {
@@ -36,6 +42,6 @@ public class DragAndDropPayload extends DragAndDrop.Payload {
 
     @Override
     public String toString() {
-        return super.toString() + ",  cardImages: " + cardImages;
+        return "DragAndDropPayload: " + cardImages;
     }
 }
