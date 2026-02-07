@@ -16,11 +16,19 @@ public class DragAndDropPayload extends DragAndDrop.Payload {
     }
 
     public DragAndDropPayload(final Vector<CardImageWrapper> cardImages) {
-        this.cardImages.addAll(cardImages);
-
-        final Group group = new Group();
-        cardImages.forEach(group::addActor);
-        setDragActor(group);
+        if (cardImages == null || cardImages.isEmpty()) {
+            return;
+        }
+        if (cardImages.size() == 1) {
+            final CardImageWrapper cardImage = cardImages.get(0);
+            this.cardImages.add(cardImage);
+            setDragActor(cardImage);
+        } else {
+            this.cardImages.addAll(cardImages);
+            final Group group = new Group();
+            cardImages.forEach(group::addActor);
+            setDragActor(group);
+        }
     }
 
     public Vector<CardImageWrapper> getCardImages() {

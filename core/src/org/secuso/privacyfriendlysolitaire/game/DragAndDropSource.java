@@ -39,8 +39,8 @@ public class DragAndDropSource extends DragAndDrop.Source {
         cardImage.setVisible(true);
         cardImage.toFront();
 
-        System.out.println(cardImage.getCard() + " pos alt = " + cardImage.getX() + ", " + cardImage.getY());
-        System.out.println(cardImage.getCard() + " pos dnd = " + x + ", " + y);
+//        System.out.println(cardImage.getCard() + " pos alt = " + cardImage.getX() + ", " + cardImage.getY());
+//        System.out.println(cardImage.getCard() + " pos dnd = " + x + ", " + y);
 
         if (cardImage.getLocation() == TABLEAU) {
             final Tableau tableau = game.getTableauAtPos(cardImage.getStackIndex());
@@ -50,6 +50,8 @@ public class DragAndDropSource extends DragAndDrop.Source {
             if (faceUpCards.contains(card)) {
                 relevantCards.addAll(faceUpCards.subList(faceUpCards.indexOf(card), faceUpCards.size()).stream().map(cardToImageMap::get).collect(Collectors.toCollection(Vector::new)));
             }
+
+            System.out.println("relevantCards " + relevantCards);
 
             final DragAndDropPayload payload = new DragAndDropPayload(relevantCards);
 
@@ -98,8 +100,9 @@ public class DragAndDropSource extends DragAndDrop.Source {
             final Action sourceAction = new Action(cardImage.getLocation(), cardImage.getStackIndex(), cardImage.getCardIndex());
             System.out.println("dragStop handleAction source " + sourceAction);
             game.handleAction(sourceAction, false);
-            final Action targetAction = new Action(targetActor.getLocation(), targetActor.getStackIndex(), targetActor.getCardIndex());
+            final Action targetAction = new Action(targetActor.getLocation(), targetActor.getStackIndex(), targetActor.getCardIndex() + 1);
             System.out.println("dragStop handleAction target " + targetAction);
+
             game.handleAction(targetAction, false);
         }
 
