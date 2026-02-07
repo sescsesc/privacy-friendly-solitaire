@@ -63,7 +63,6 @@ public class View2 implements GameListener {
     private final SolitaireGame game;
 
     private final DragAndDrop dragAndDrop = new DragAndDrop();
-    private final boolean useDragAndDrop;
     private boolean dragStartResult = false;
     private final Vector<Actor> originalActors = new Vector<>();
 
@@ -73,10 +72,9 @@ public class View2 implements GameListener {
 
     private final Map<Card, ImageWrapper> cardToImageWrapperMap = new HashMap<>(Constants.NR_CARDS);
 
-    public View2(final SolitaireGame game, final Stage stage, final boolean useDragAndDrop) {
+    public View2(final SolitaireGame game, final Stage stage) {
         this.stage = stage;
         this.game = game;
-        this.useDragAndDrop = useDragAndDrop;
         initialiseViewConstants();
 
         initCardsMap();
@@ -133,9 +131,7 @@ public class View2 implements GameListener {
         paintInitialFoundations();
         paintInitialTableaus();
         paintInitialDeckAndWaste();
-        if (useDragAndDrop) {
-            addCurrentFaceUpCardsToDragAndDrop();
-        }
+        addCurrentFaceUpCardsToDragAndDrop();
     }
 
     private void paintInitialFoundations() {
@@ -217,70 +213,24 @@ public class View2 implements GameListener {
     public void update(SolitaireGame game) {
         Action prevAction = game.getPrevAction();
 
-        if (useDragAndDrop) {
-            if (prevAction == null) {
-                try {
-                    if (game.wasValidMove()) {
-                        final Vector<Move> moves = game.getMoves();
-                        if (game.wasUndoMove()) {
-                            // undo move
-                            Move undoMove = moves.elementAt(game.getMovePointer() + 1);
-                            handleUndoMove(undoMove, game);
-                        } else {
-                            // usual move
-                            Move prevMove = moves.elementAt(game.getMovePointer());
-                            handleMove(prevMove, game);
-                        }
+        if (prevAction == null) {
+            try {
+                if (game.wasValidMove()) {
+                    final Vector<Move> moves = game.getMoves();
+                    if (game.wasUndoMove()) {
+                        // undo move
+                        Move undoMove = moves.elementAt(game.getMovePointer() + 1);
+                        handleUndoMove(undoMove, game);
+                    } else {
+                        // usual move
+                        Move prevMove = moves.elementAt(game.getMovePointer());
+                        handleMove(prevMove, game);
                     }
-                } catch (Exception e) {
-                    e.printStackTrace();
                 }
-                addCurrentFaceUpCardsToDragAndDrop();
+            } catch (Exception e) {
+                e.printStackTrace();
             }
-        } else {
-            // get whether this was a marking action
-            if (prevAction != null) {
-                int stackIndex = prevAction.getStackIndex();
-
-                final Vector<Card> cardsToBeMarked = new Vector<>();
-
-                switch (prevAction.getLocation()) {
-                    case TABLEAU:
-                        Vector<Card> faceUpVector = game.getTableauAtPos(stackIndex).faceUp();
-                        cardsToBeMarked.addAll(faceUpVector.subList(prevAction.getCardIndex(), faceUpVector.size()));
-                        break;
-                    case FOUNDATION:
-                        cardsToBeMarked.add(game.getTopCardOfFoundation(stackIndex));
-                        break;
-                    case WASTE:
-                        cardsToBeMarked.add(game.getDeckWaste().getWasteTop());
-                        break;
-                }
-
-                markCards(cardsToBeMarked);
-            }
-            // or a move
-            else {
-                // with successful or invalid move, remove marker
-                marker.setVisible(false);
-
-                try {
-                    if (game.wasValidMove()) {
-                        final Vector<Move> moves = game.getMoves();
-                        if (game.wasUndoMove()) {
-                            // undo move
-                            Move undoMove = moves.elementAt(game.getMovePointer() + 1);
-                            handleUndoMove(undoMove, game);
-                        } else {
-                            // usual move
-                            Move prevMove = moves.elementAt(game.getMovePointer());
-                            handleMove(prevMove, game);
-                        }
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
+            addCurrentFaceUpCardsToDragAndDrop();
         }
         setAllFaceUpCardsToCorrectOrder(game);
     }

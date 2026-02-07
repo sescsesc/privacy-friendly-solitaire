@@ -62,7 +62,6 @@ public class View implements GameListener {
     private SolitaireGame game;
 
     private DragAndDrop dragAndDrop = new DragAndDrop();
-    private boolean useDragAndDrop;
     private boolean dragStartResult = false;
     private Vector<Actor> originalActors = new Vector<Actor>();
 
@@ -71,10 +70,9 @@ public class View implements GameListener {
     // describes the y at which the given tableau is positioned at the smallest
     private final HashMap<Integer, Float> smallestYForTableau = new HashMap<Integer, Float>(7);
 
-    public View(SolitaireGame game, Stage stage, boolean useDragAndDrop) {
+    public View(SolitaireGame game, Stage stage) {
         this.stage = stage;
         this.game = game;
-        this.useDragAndDrop = useDragAndDrop;
         initialiseViewConstants();
 
         // add mark and make it invisible
@@ -124,9 +122,7 @@ public class View implements GameListener {
         paintInitialFoundations();
         paintInitialTableaus(game.getListOfTableaus());
         paintInitialDeckWaste(game.getDeckWaste());
-        if (useDragAndDrop) {
-            addCurrentFaceUpCardsToDragAndDrop();
-        }
+        addCurrentFaceUpCardsToDragAndDrop();
     }
 
     private void paintInitialFoundations() {
@@ -203,76 +199,24 @@ public class View implements GameListener {
     public void update(SolitaireGame game) {
         Action prevAction = game.getPrevAction();
 
-        if (!useDragAndDrop) {
-            // get whether this was a marking action
-            if (prevAction != null) {
-                int stackIndex = prevAction.getStackIndex();
-
-                List<Card> cardsToBeMarked = new ArrayList<Card>();
-
-                switch (prevAction.getLocation()) {
-                    case TABLEAU:
-                        Vector<Card> faceUpList = game.getTableauAtPos(stackIndex).faceUp();
-                        cardsToBeMarked = faceUpList.subList(prevAction.getCardIndex(), faceUpList.size());
-                        break;
-                    case FOUNDATION:
-                        cardsToBeMarked.add(game.getTopCardOfFoundation(stackIndex));
-                        break;
-                    case WASTE:
-                        cardsToBeMarked.add(game.getDeckWaste().getWasteTop());
-                        break;
-                }
-
-                List<String> textureStrings = new ArrayList<String>(cardsToBeMarked.size());
-                for (Card c : cardsToBeMarked) {
-                    textureStrings.add(loader.getCardTextureName(c));
-                }
-
-                markCards(textureStrings);
-            }
-            // or a move
-            else {
-                // with successful or invalid move, remove marker
-                marker.setVisible(false);
-
-                try {
-                    if (game.wasValidMove()) {
-                        final Vector<Move> moves = game.getMoves();
-                        if (game.wasUndoMove()) {
-                            // undo move
-                            Move undoMove = moves.elementAt(game.getMovePointer() + 1);
-                            handleUndoMove(undoMove, game);
-                        } else {
-                            // usual move
-                            Move prevMove = moves.elementAt(game.getMovePointer());
-                            handleMove(prevMove, game);
-                        }
+        if (prevAction == null) {
+            try {
+                if (game.wasValidMove()) {
+                    final Vector<Move> moves = game.getMoves();
+                    if (game.wasUndoMove()) {
+                        // undo move
+                        Move undoMove = moves.elementAt(game.getMovePointer() + 1);
+                        handleUndoMove(undoMove, game);
+                    } else {
+                        // usual move
+                        Move prevMove = moves.elementAt(game.getMovePointer());
+                        handleMove(prevMove, game);
                     }
-                } catch (Exception e) {
-                    e.printStackTrace();
                 }
+            } catch (Exception e) {
+                e.printStackTrace();
             }
-            //drag and drop is used
-        } else {
-            if (prevAction == null) {
-                try {
-                    if (game.wasValidMove()) {
-                        final Vector<Move> moves = game.getMoves();
-                        if (game.wasUndoMove()) {
-                            // undo move
-                            Move undoMove = moves.elementAt(game.getMovePointer() + 1);
-                            handleUndoMove(undoMove, game);
-                        } else {
-                            // usual move
-                            Move prevMove = moves.elementAt(game.getMovePointer());
-                            handleMove(prevMove, game);
-                        }
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-                addCurrentFaceUpCardsToDragAndDrop();
-            }
+            addCurrentFaceUpCardsToDragAndDrop();
         }
         setAllFaceUpCardsToCorrectOrder(game);
     }
