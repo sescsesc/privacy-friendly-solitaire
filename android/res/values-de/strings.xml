@@ -82,10 +82,6 @@
 
 
     <!-- ###SETTINGS### -->
-    <string name="pref_dnd_switch_summary_on">An</string>
-    <string name="pref_dnd_switch_summary_off">Aus</string>
-
-
     <string name="pref_count_point">Punkte</string>
 
     <string name="pref_waste">Karten pro Zug</string>

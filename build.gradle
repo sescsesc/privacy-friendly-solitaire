@@ -21,7 +21,7 @@ allprojects {
 
     version = '1.0'
     ext {
-        appName = "Solitaire"
+        appName = "Solitaire2"
         gdxVersion = '1.14.0'
         roboVMVersion = '2.3.0'
         box2DLightsVersion = '1.4'
