@@ -11,13 +11,6 @@
             android:summaryOn="@string/pref_time_summary_on"
             android:title="@string/pref_time" />
 
-        <!-- DragAndDrop-Switch -->
-        <SwitchPreference
-            android:key="@string/pref_dnd_switch"
-            android:summaryOff="@string/pref_dnd_switch_summary_off"
-            android:summaryOn="@string/pref_dnd_switch_summary_on"
-            android:title="@string/pref_dnd_switch" />
-
         <!-- Waste-List -->
         <ListPreference
             android:defaultValue="1"
@@ -26,7 +19,7 @@
             android:key="@string/pref_waste"
             android:title="@string/pref_waste" />
 
-     <!-- Points-List -->
+        <!-- Points-List -->
         <ListPreference
             android:defaultValue="1"
             android:entries="@array/point_screen"

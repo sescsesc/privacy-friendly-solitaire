@@ -121,8 +121,6 @@ public class Solitaire extends AndroidApplication implements NavigationView.OnNa
         // settings, which were set by the player,
         // if the setting could not be found, set it to false
         countTime = mSharedPreferences.getBoolean(getString(R.string.pref_time), false);
-        final boolean dragAndDrop = mSharedPreferences.getBoolean(getString(R.string.pref_dnd_switch), true);
-
 
         //start timer for game if it is selected in setting by the player
         if (countTime) {
@@ -169,7 +167,7 @@ public class Solitaire extends AndroidApplication implements NavigationView.OnNa
         hint.setOnClickListener(v -> application.autoMove());
 
         // start game
-        application.customConstructor(cardDrawMode, scoreMode, backgroundColor, dragAndDrop);
+        application.customConstructor(cardDrawMode, scoreMode, backgroundColor);
     }
 
     private Color getBackgroundColorFromPreferences() {

@@ -2,8 +2,8 @@
 <resources>
 
 
-    <string name="app_name">Solitaire</string>
-    <string name="app_name_long">Privacy Friendly Solitaire</string>
+    <string name="app_name">Solitaire2</string>
+    <string name="app_name_long">Privacy Friendly Solitaire2</string>
 
     <string name="okay">Okay</string>
 
@@ -47,7 +47,7 @@
     <string name="help_hint_summary">Hint for a possible move</string>
 
     <string name="help_save">Saving a game</string>
-    <string name="help_save_summary">In the current version of Privacy Friendly Solitaire games cannot be saved, but we will integrate this function in version 2.</string>
+    <string name="help_save_summary">In the current version of Privacy Friendly Solitaire2 games cannot be saved, but we will integrate this function in version 2.</string>
 
     <!--###Play-Rules###-->
     <string name="rules">Rules</string>
@@ -59,7 +59,7 @@
         \nThe cards of the deck are faced up one by one or three cards simultaneously, depending on the settings, and sent to the Waste.
     </string>
 
-    <string name="rules_point">Counting points - Solitaire</string>
+    <string name="rules_point">Counting points - Solitaire2</string>
     <string name="rules_point_desc">There are two possibilities to count points: Standard or Vegas.
         In Standard mode, the rules are as follows: \n</string>
 
@@ -67,7 +67,7 @@
     </string>
 
     <string name="help_permission">Permissions</string>
-    <string name="help_permission_answer">Privacy Friendly App Solitaire does not require any permission.</string>
+    <string name="help_permission_answer">Privacy Friendly App Solitaire2 does not require any permission.</string>
 
 
     <!--###ABOUT###-->
@@ -80,9 +80,6 @@
     <string name="more_info">More information can be found on:</string>
 
     <!-- ###SETTINGS### -->
-    <string name="pref_dnd_switch_summary_on">On</string>
-    <string name="pref_dnd_switch_summary_off">Off</string>
-
     <string name="pref_count_point">Points</string>
 
     <string name="pref_waste">Cards per draw</string>
@@ -101,11 +98,11 @@
     <string name="next">NEXT</string>
 
     <string name="slide_1_title">Welcome!</string>
-    <string name="slide_1_desc">Privacy Friendly Solitaire is a basic Klondike Solitaire Game.</string>
+    <string name="slide_1_desc">Privacy Friendly Solitaire2 is a basic Klondike Solitaire Game.</string>
 
     <string name="slide_2_title">Play</string>
-    <string name="slide_2_desc_one">Play Solitaire by selecting \"New Game\". </string>
-    <string name="slide_2_desc_two">In the current version of Privacy Friendly Solitaire games cannot be saved, but we will integrate this function in version 2.</string>
+    <string name="slide_2_desc_one">Play Solitaire2 by selecting \"New Game\". </string>
+    <string name="slide_2_desc_two">In the current version of Privacy Friendly Solitaire2 games cannot be saved, but we will integrate this function in version 2.</string>
 
     <!-- ### WON DIALOG ### -->
     <string name="alert_box_won">Congratulations! You won!</string>
