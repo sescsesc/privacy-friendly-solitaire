@@ -135,7 +135,6 @@ public class View2 implements GameListener {
             // paint empty spaces
             final ImageWrapper placeholderImage = ImageLoader.getEmptySpaceImageWithoutLogo();
             setImageScalingAndPositionAndStackCardIndicesAndAddToStage(placeholderImage, FOUNDATION, ViewConstants.TableauFoundationX[i], ViewConstants.WasteDeckFoundationY, i, -1);
-            dragAndDrop.addTarget(new DragAndDropTarget(placeholderImage, game));
             placeholders.add(placeholderImage);
         });
     }
@@ -151,7 +150,6 @@ public class View2 implements GameListener {
             // add empty space beneath
             final ImageWrapper placeholderImage = ImageLoader.getEmptySpaceImageWithoutLogo();
             setImageScalingAndPositionAndStackCardIndicesAndAddToStage(placeholderImage, TABLEAU, x, 10.5f * ViewConstants.heightOneSpace, i, -1);
-            dragAndDrop.addTarget(new DragAndDropTarget(placeholderImage, game));
             placeholders.add(placeholderImage);
 
             // add face-down cards
@@ -172,7 +170,6 @@ public class View2 implements GameListener {
                 final CardImageWrapper faceUpCardImage = cardToImageMap.get(faceUpCards.get(j));
                 float y = 10.5f * ViewConstants.heightOneSpace - ((faceDownSize + j) * ViewConstants.offsetHeightBetweenCards);
                 setImageScalingAndPositionAndStackCardIndicesAndAddToStage(faceUpCardImage, TABLEAU, x, y, i, faceDownSize + j);
-                dragAndDrop.addTarget(new DragAndDropTarget(faceUpCardImage, game));
             });
 
             setNewSmallestYForTableau(i, t.getCardsSize());
