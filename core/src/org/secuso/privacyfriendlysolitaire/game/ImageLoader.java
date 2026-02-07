@@ -15,10 +15,6 @@ public class ImageLoader {
         return getImageForPath("cards/backside.png");
     }
 
-    public static ImageWrapper getMarkImage() {
-        return getImageForPath("cards/mark.png");
-    }
-
     public static CardImageWrapper getCardImage(final Card card) {
         if (card == null) {
             return null;

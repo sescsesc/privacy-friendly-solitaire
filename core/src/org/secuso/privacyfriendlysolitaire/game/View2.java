@@ -20,9 +20,10 @@ import static org.secuso.privacyfriendlysolitaire.model.Location.DECK;
 import static org.secuso.privacyfriendlysolitaire.model.Location.FOUNDATION;
 import static org.secuso.privacyfriendlysolitaire.model.Location.TABLEAU;
 import static org.secuso.privacyfriendlysolitaire.model.Location.WASTE;
+import static java.util.Optional.empty;
+import static java.util.Optional.of;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.scenes.scene2d.utils.DragAndDrop;
@@ -42,6 +43,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.Vector;
 import java.util.stream.Collectors;
@@ -59,13 +61,10 @@ public class View2 implements GameListener {
     private boolean widthHeightOfCardSet = false;
 
     private final Stage stage;
-    private final ImageWrapper markerImage;
     private final ImageWrapper backsideCardOnDeckImage;
     private final SolitaireGame game;
 
     private final DragAndDrop dragAndDrop = new DragAndDrop();
-    private boolean dragStartResult = false;
-    private final Vector<Actor> originalActors = new Vector<>();
 
     private final List<ImageWrapper> faceDownCards = new ArrayList<>(21);
     // describes the y at which the given tableau is positioned at the smallest
@@ -82,13 +81,6 @@ public class View2 implements GameListener {
         initialiseViewConstants();
 
         initCardsMap();
-
-        // add mark and make it invisible
-        markerImage = ImageLoader.getMarkImage();
-        markerImage.setWidth(ViewConstants.scalingWidthMarker * ViewConstants.widthOneSpace);
-        markerImage.setHeight(ViewConstants.scalingHeightMarker * ViewConstants.heightOneSpace);
-        markerImage.setVisible(false);
-        this.stage.addActor(markerImage);
 
         // add emptySpaceForDeck and make it invisible
         backsideCardOnDeckImage = ImageLoader.getBacksideImage();
@@ -249,30 +241,6 @@ public class View2 implements GameListener {
 
         game.getTopCardsOfFoundations().forEach(foundationTopCard -> cardToImageMap.get(foundationTopCard).toFront());
     }
-
-
-    // ---------------------------- ACTIONS ----------------------------
-    private void markCards(final Vector<Card> cards) {
-        final Vector<CardImageWrapper> cardsToBeMarked = cards.stream().map(cardToImageMap::get).collect(Collectors.toCollection(Vector::new));
-
-        if (cardsToBeMarked.isEmpty()) {
-            throw new RuntimeException("Card to be marked could not be found! Should not happen! Probably an error in the view.");
-        }
-
-        // move marker to correct position and make visible
-        final CardImageWrapper topElement = cardsToBeMarked.get(cardsToBeMarked.size() - 1);
-        final CardImageWrapper bottomElement = cardsToBeMarked.get(0);
-        final float height = Math.abs(topElement.getY() - bottomElement.getTop()) + 10;
-
-        markerImage.setPosition(topElement.getX() - 4, topElement.getY() - 5);
-        markerImage.setHeight(height);
-        markerImage.setVisible(true);
-        markerImage.toFront();
-
-        // move the card to the front
-        cardsToBeMarked.forEach(Actor::toFront);
-    }
-
 
     // ---------------------------- MOVES ----------------------------
     private void handleMove(final Move move, final SolitaireGame game) {
@@ -1131,8 +1099,6 @@ public class View2 implements GameListener {
 
         private static final float scalingWidthCard = 2.3f;
         private static final float scalingHeightCard = 4f;
-        private static final float scalingWidthMarker = 2.45f;
-        private static final float scalingHeightMarker = 4.5f;
 
         private static float DeckX;
 
