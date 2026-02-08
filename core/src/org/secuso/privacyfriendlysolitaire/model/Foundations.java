@@ -51,6 +51,18 @@ public class Foundations {
         return suitToFoundationMap.get(card.suit()).addCard(card);
     }
 
+    public int getSize(final int position) {
+        final Optional<Suit> oSuitForPosition = getSuitForPosition(position);
+        if (oSuitForPosition.isEmpty()) {
+            return 0;
+        }
+        final Foundation foundation = suitToFoundationMap.get(oSuitForPosition.get());
+        if (foundation == null) {
+            return 0;
+        }
+        return foundation.size();
+    }
+
     public Card getTopCardAtPosition(final int position) {
         return getSuitForPosition(position).map(suit -> suitToFoundationMap.get(suit).getTopCard()).orElse(null);
     }

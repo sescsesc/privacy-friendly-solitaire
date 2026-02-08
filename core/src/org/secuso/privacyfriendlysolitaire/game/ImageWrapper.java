@@ -43,7 +43,9 @@ public class ImageWrapper extends Image {
 
     @Override
     public boolean equals(final Object o) {
-        if (!(o instanceof ImageWrapper that)) return false;
+        if (!(o instanceof ImageWrapper that)) {
+            return false;
+        }
         return stackIndex == that.stackIndex && cardIndex == that.cardIndex && location == that.location;
     }
 
@@ -54,9 +56,6 @@ public class ImageWrapper extends Image {
 
     @Override
     public String toString() {
-        return super.toString() +
-                ", stackIndex: " + stackIndex +
-                ", cardIndex: " + cardIndex +
-                ", location: " + location;
+        return super.toString() + ", stackIndex: " + stackIndex + ", cardIndex: " + cardIndex + ", location: " + location;
     }
 }
