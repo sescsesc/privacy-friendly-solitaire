@@ -1,21 +1,23 @@
-package org.secuso.privacyfriendlysolitaire.game;
+package org.secuso.privacyfriendlysolitaire.game.dragAndDrop;
 
 import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.utils.DragAndDrop;
 
+import org.secuso.privacyfriendlysolitaire.game.CardImageWrapper;
+
 import java.util.Objects;
 import java.util.Vector;
 
-public class DragAndDropPayload extends DragAndDrop.Payload {
+public class Payload extends DragAndDrop.Payload {
 
     private final Vector<CardImageWrapper> cardImages = new Vector<>();
 
-    public DragAndDropPayload(final CardImageWrapper cardImage) {
+    public Payload(final CardImageWrapper cardImage) {
         this.cardImages.add(cardImage);
         setDragActor(cardImage);
     }
 
-    public DragAndDropPayload(final Vector<CardImageWrapper> cardImages) {
+    public Payload(final Vector<CardImageWrapper> cardImages) {
         if (cardImages == null || cardImages.isEmpty()) {
             return;
         }
@@ -37,7 +39,7 @@ public class DragAndDropPayload extends DragAndDrop.Payload {
 
     @Override
     public boolean equals(Object o) {
-        if (!(o instanceof DragAndDropPayload that)) {
+        if (!(o instanceof Payload that)) {
             return false;
         }
         return Objects.equals(cardImages, that.cardImages);
@@ -50,6 +52,6 @@ public class DragAndDropPayload extends DragAndDrop.Payload {
 
     @Override
     public String toString() {
-        return "DragAndDropPayload: " + cardImages;
+        return "Payload: " + cardImages;
     }
 }

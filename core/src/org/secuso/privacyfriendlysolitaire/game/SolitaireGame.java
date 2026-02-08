@@ -179,7 +179,7 @@ public class SolitaireGame {
      * @param action the action that shall be handled
      * @return true if the action was valid and succesfully handled
      */
-    boolean handleAction(Action action, boolean redoMove) {
+    public boolean handleAction(Action action, boolean redoMove) {
         if (action != null) {
             return switch (action.getLocation()) {
                 case DECK -> handleDeck(action, redoMove);
@@ -690,5 +690,9 @@ public class SolitaireGame {
 
     public List<Card> getTopCardsOfFoundations() {
         return foundations.getTopCards();
+    }
+
+    public int getSizeOfFoundation(final int position) {
+        return foundations.getSize(position);
     }
 }

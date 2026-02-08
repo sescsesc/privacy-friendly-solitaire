@@ -24,11 +24,15 @@ import static java.util.Optional.empty;
 import static java.util.Optional.of;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.scenes.scene2d.utils.DragAndDrop;
 
 import org.secuso.privacyfriendlysolitaire.GameListener;
+import org.secuso.privacyfriendlysolitaire.game.dragAndDrop.Source;
+import org.secuso.privacyfriendlysolitaire.game.dragAndDrop.ZoneTarget;
+import org.secuso.privacyfriendlysolitaire.game.dragAndDrop.ZoneTargetActor;
 import org.secuso.privacyfriendlysolitaire.generator.GeneratorSolitaireInstance;
 import org.secuso.privacyfriendlysolitaire.model.Action;
 import org.secuso.privacyfriendlysolitaire.model.Card;
@@ -71,8 +75,7 @@ public class View2 implements GameListener {
     private final HashMap<Integer, Float> smallestYForTableau = new HashMap<>(7);
 
     private final Map<Card, CardImageWrapper> cardToImageMap = new HashMap<>(Constants.NR_CARDS);
-
-    private final Set<ImageWrapper> placeholders = new HashSet<>(11);
+    private final Set<ZoneTarget> zoneTargets = new HashSet<>(11);
 
 
     public View2(final SolitaireGame game, final Stage stage) {
@@ -124,18 +127,30 @@ public class View2 implements GameListener {
 
     // ------------------------------------ Initial ------------------------------------
     private void arrangeInitialView() {
+        System.out.println("widthScreen = " + ViewConstants.widthScreen + ", heightScreen = " + ViewConstants.heightScreen);
+        System.out.println("widthOneSpace = " + ViewConstants.widthOneSpace + ", heightOneSpace = " + ViewConstants.heightOneSpace);
+
         paintInitialFoundations();
         paintInitialTableaus();
         paintInitialDeckAndWaste();
-        updateDragAndDropStartsAndTargets();
     }
 
     private void paintInitialFoundations() {
         IntStream.range(0, NR_OF_FOUNDATIONS).forEachOrdered(i -> {
+            final ZoneTargetActor zoneTargetActor = new ZoneTargetActor(FOUNDATION, i);
+            zoneTargetActor.setPosition(i * 4 * ViewConstants.widthOneSpace, ViewConstants.WasteDeckFoundationY);
+            zoneTargetActor.setWidth(4 * ViewConstants.widthOneSpace);
+            zoneTargetActor.setHeight(ViewConstants.WasteDeckFoundationY - (10.5f * ViewConstants.heightOneSpace));
+            zoneTargetActor.setColor(Color.GOLD);
+            stage.addActor(zoneTargetActor);
+            zoneTargets.add(new ZoneTarget(zoneTargetActor, game));
+            zoneTargetActor.toFront();
+
             // paint empty spaces
             final ImageWrapper placeholderImage = ImageLoader.getEmptySpaceImageWithoutLogo();
             setImageScalingAndPositionAndStackCardIndicesAndAddToStage(placeholderImage, FOUNDATION, ViewConstants.TableauFoundationX[i], ViewConstants.WasteDeckFoundationY, i, -1);
-            placeholders.add(placeholderImage);
+
+            System.out.println("Foundation " + i + " : x = " + ViewConstants.TableauFoundationX[i] + ", y = " + ViewConstants.WasteDeckFoundationY);
         });
     }
 
@@ -147,10 +162,20 @@ public class View2 implements GameListener {
 
             float x = ViewConstants.TableauFoundationX[i];
 
+            final ZoneTargetActor zoneTargetActor = new ZoneTargetActor(TABLEAU, i);
+            zoneTargetActor.setPosition(i * 4 * ViewConstants.widthOneSpace, 10.5f * ViewConstants.heightOneSpace);
+            zoneTargetActor.setWidth(4 * ViewConstants.widthOneSpace);
+            zoneTargetActor.setHeight(ViewConstants.heightScreen - (10.5f * ViewConstants.heightOneSpace));
+            zoneTargetActor.setColor(Color.WHITE);
+            stage.addActor(zoneTargetActor);
+            zoneTargets.add(new ZoneTarget(zoneTargetActor, game));
+            zoneTargetActor.toFront();
+
             // add empty space beneath
             final ImageWrapper placeholderImage = ImageLoader.getEmptySpaceImageWithoutLogo();
             setImageScalingAndPositionAndStackCardIndicesAndAddToStage(placeholderImage, TABLEAU, x, 10.5f * ViewConstants.heightOneSpace, i, -1);
-            placeholders.add(placeholderImage);
+
+            System.out.println("Tableau " + i + " : x = " + x + ", y = " + 10.5f * ViewConstants.heightOneSpace);
 
             // add face-down cards
             final int faceDownSize = t.getFaceDownCardsSize();
@@ -187,6 +212,7 @@ public class View2 implements GameListener {
         // then draw the open fan
         paintWaste(deckAndWaste, true, false);
 
+        System.out.println("Waste: x = " + ViewConstants.WasteX1Fan + ", y = " + ViewConstants.WasteDeckFoundationY);
 
         // ----- deck -----
         final ImageWrapper emptySpaceDeck = ImageLoader.getEmptySpaceImageWithoutLogo();
@@ -195,6 +221,8 @@ public class View2 implements GameListener {
         if (deckAndWaste.getDeck().isEmpty()) {
             backsideCardOnDeckImage.setVisible(false);
         }
+
+        System.out.println("Deck: x = " + ViewConstants.DeckX + ", y = " + ViewConstants.WasteDeckFoundationY);
     }
 
 
@@ -1118,33 +1146,24 @@ public class View2 implements GameListener {
      */
     private void addCardToDragAndDropStart(final Card card) {
         final CardImageWrapper cardImage = cardToImageMap.get(card);
-        dragAndDrop.addSource(new DragAndDropSource(cardImage, game, cardToImageMap));
-    }
-
-    private void addCardToDragAndDropTarget(final Card card) {
-        final CardImageWrapper cardImage = cardToImageMap.get(card);
-        dragAndDrop.addTarget(new DragAndDropTarget(cardImage, game));
-    }
-
-    private void addPlaceholderToDragAndDropTarget(final ImageWrapper image) {
-        dragAndDrop.addTarget(new DragAndDropTarget(image, game));
+        dragAndDrop.addSource(new Source(cardImage, game, cardToImageMap));
     }
 
     /**
      * all cards that are currently face up are added as sources to the DragAndDrop Object
      */
     private void updateDragAndDropStartsAndTargets() {
+        System.out.println("update drag and drop");
         dragAndDrop.clear();
 
-        final List<Card> topCardsOfFoundations = game.getTopCardsOfFoundations();
-        topCardsOfFoundations.forEach(this::addCardToDragAndDropStart);
-        topCardsOfFoundations.forEach(this::addCardToDragAndDropTarget);
+//        zoneTargets.forEach(dragAndDrop::addTarget);
+        zoneTargets.stream().sorted().forEach(zoneTarget -> {
+            dragAndDrop.addTarget(zoneTarget);
+            System.out.println(zoneTarget);
+        });
 
-        final Tableaus tableaus = game.getTableaus();
-        tableaus.getAllFaceUpCards().forEach(this::addCardToDragAndDropStart);
-        tableaus.getAllLastFaceUpCards().forEach(this::addCardToDragAndDropTarget);
-
-        placeholders.forEach(this::addPlaceholderToDragAndDropTarget);
+        game.getTopCardsOfFoundations().forEach(this::addCardToDragAndDropStart);
+        game.getTableaus().getAllFaceUpCards().forEach(this::addCardToDragAndDropStart);
 
         //add the top of the waste
         final DeckAndWaste deckAndWaste = game.getDeckWaste();
