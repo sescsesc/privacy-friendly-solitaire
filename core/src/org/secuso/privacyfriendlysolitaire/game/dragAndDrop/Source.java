@@ -12,6 +12,7 @@ import org.secuso.privacyfriendlysolitaire.game.CardImageWrapper;
 import org.secuso.privacyfriendlysolitaire.game.SolitaireGame;
 import org.secuso.privacyfriendlysolitaire.model.Action;
 import org.secuso.privacyfriendlysolitaire.model.Card;
+import org.secuso.privacyfriendlysolitaire.model.Location;
 import org.secuso.privacyfriendlysolitaire.model.Tableau;
 
 import java.util.Map;
@@ -100,7 +101,28 @@ public class Source extends DragAndDrop.Source {
         final Actor originalActor = getActor();
         final Actor dragActor = payload.getDragActor();
 
+        System.out.println("originalActor " + originalActor);
+        System.out.println("dragActor " + dragActor);
+
+        System.out.println("originalActor pos alt = " + originalActor.getX() + ", " + originalActor.getY());
+
+        final Location targetLocation = zoneTargetActor.getLocation();
+        final int targetStackIndex = zoneTargetActor.getStackIndex();
+
+//        switch (targetLocation) {
+//            case FOUNDATION -> {
+//
+//            }
+//            case TABLEAU -> {
+//
+//            }
+//            default ->
+//
+//        }
+
+
         originalActor.setPosition(dragActor.getX(), dragActor.getY());
+        System.out.println("originalActor pos neu = " + originalActor.getX() + ", " + originalActor.getY());
 
         final Optional<Integer> oCardIndex = getCardIndexAtTarget(zoneTargetActor);
         if (oCardIndex.isEmpty()) {
@@ -114,7 +136,7 @@ public class Source extends DragAndDrop.Source {
             final Action sourceAction = new Action(cardImage.getLocation(), cardImage.getStackIndex(), cardImage.getCardIndex());
             System.out.println("dragStop handleAction source " + sourceAction);
             game.handleAction(sourceAction, false);
-            final Action targetAction = new Action(zoneTargetActor.getLocation(), zoneTargetActor.getStackIndex(), cardIndex);
+            final Action targetAction = new Action(targetLocation, targetStackIndex, cardIndex);
             System.out.println("dragStop handleAction target " + targetAction);
 
             game.handleAction(targetAction, false);
