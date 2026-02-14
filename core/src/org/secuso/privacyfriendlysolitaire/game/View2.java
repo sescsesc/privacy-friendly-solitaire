@@ -62,7 +62,6 @@ import java.util.stream.IntStream;
  */
 
 public class View2 implements GameListener {
-    private boolean widthHeightOfCardSet = false;
 
     private final Stage stage;
     private final ImageWrapper backsideCardOnDeckImage;
@@ -103,6 +102,9 @@ public class View2 implements GameListener {
         ViewConstants.widthOneSpace = ViewConstants.widthScreen / 31;
         ViewConstants.heightOneSpace = ViewConstants.heightScreen / 21;
 
+        ViewConstants.widthCard = ViewConstants.scalingWidthCard * ViewConstants.widthOneSpace;
+        ViewConstants.heightCard = ViewConstants.scalingHeightCard * ViewConstants.heightOneSpace;
+
         // positions
         ViewConstants.WasteDeckFoundationY = 16 * ViewConstants.heightOneSpace;
         // different x positions for different fanSizes in the waste
@@ -136,12 +138,17 @@ public class View2 implements GameListener {
     }
 
     private void paintInitialFoundations() {
+        final float spaceBetweenCards = ViewConstants.TableauFoundationX[1] - ViewConstants.TableauFoundationX[0] - ViewConstants.widthCard;
+        final float halfSpaceBetweenCards = spaceBetweenCards / 2f;
+
+        final float y = ViewConstants.heightCard + ViewConstants.TableauBaseY + ViewConstants.heightOneSpace;
+
         IntStream.range(0, NR_OF_FOUNDATIONS).forEachOrdered(i -> {
             final ZoneTargetActor zoneTargetActor = new ZoneTargetActor(FOUNDATION, i);
-            zoneTargetActor.setPosition(i * 4 * ViewConstants.widthOneSpace, ViewConstants.WasteDeckFoundationY);
-            zoneTargetActor.setWidth(4 * ViewConstants.widthOneSpace);
-            zoneTargetActor.setHeight(ViewConstants.WasteDeckFoundationY - (10.5f * ViewConstants.heightOneSpace));
-            zoneTargetActor.setColor(Color.GOLD);
+            zoneTargetActor.setPosition(ViewConstants.TableauFoundationX[i] - halfSpaceBetweenCards, y);
+            zoneTargetActor.setWidth(ViewConstants.widthCard + spaceBetweenCards);
+            zoneTargetActor.setHeight((ViewConstants.heightScreen - y) + ViewConstants.heightOneSpace);
+            zoneTargetActor.setColor((i % 2 == 0) ? Color.GOLD : Color.GRAY);
             stage.addActor(zoneTargetActor);
             zoneTargets.add(new ZoneTarget(zoneTargetActor, game));
             zoneTargetActor.toFront();
@@ -157,33 +164,34 @@ public class View2 implements GameListener {
     private void paintInitialTableaus() {
         final Tableaus tableaus = game.getTableaus();
 
+        final float spaceBetweenCards = ViewConstants.TableauFoundationX[1] - ViewConstants.TableauFoundationX[0] - ViewConstants.widthCard;
+        final float halfSpaceBetweenCards = spaceBetweenCards / 2f;
+
         IntStream.range(0, NR_OF_TABLEAUS).forEachOrdered(i -> {
             final Tableau t = tableaus.getTableau(i);
 
-            float x = ViewConstants.TableauFoundationX[i];
-
             final ZoneTargetActor zoneTargetActor = new ZoneTargetActor(TABLEAU, i);
-            zoneTargetActor.setPosition(i * 4 * ViewConstants.widthOneSpace, 10.5f * ViewConstants.heightOneSpace);
-            zoneTargetActor.setWidth(4 * ViewConstants.widthOneSpace);
-            zoneTargetActor.setHeight(ViewConstants.heightScreen - (10.5f * ViewConstants.heightOneSpace));
-            zoneTargetActor.setColor(Color.WHITE);
+            zoneTargetActor.setPosition(ViewConstants.TableauFoundationX[i] - halfSpaceBetweenCards, 0);
+            zoneTargetActor.setWidth(ViewConstants.widthCard + spaceBetweenCards);
+            zoneTargetActor.setHeight(ViewConstants.heightCard + ViewConstants.TableauBaseY + ViewConstants.heightOneSpace);
+            zoneTargetActor.setColor((i % 2 == 0) ? Color.WHITE : Color.BLACK);
             stage.addActor(zoneTargetActor);
             zoneTargets.add(new ZoneTarget(zoneTargetActor, game));
             zoneTargetActor.toFront();
 
             // add empty space beneath
             final ImageWrapper placeholderImage = ImageLoader.getEmptySpaceImageWithoutLogo();
-            setImageScalingAndPositionAndStackCardIndicesAndAddToStage(placeholderImage, TABLEAU, x, 10.5f * ViewConstants.heightOneSpace, i, -1);
+            setImageScalingAndPositionAndStackCardIndicesAndAddToStage(placeholderImage, TABLEAU, ViewConstants.TableauFoundationX[i], ViewConstants.TableauBaseY, i, -1);
 
-            System.out.println("Tableau " + i + " : x = " + x + ", y = " + 10.5f * ViewConstants.heightOneSpace);
+            System.out.println("Tableau " + i + " : x = " + ViewConstants.TableauFoundationX[i] + ", y = " + ViewConstants.TableauBaseY);
 
             // add face-down cards
             final int faceDownSize = t.getFaceDownCardsSize();
             IntStream.range(0, faceDownSize).forEachOrdered(j -> {
                 // add to faceDownCards (so it can be destroyed later, when it the card is turned)
                 final ImageWrapper faceDownCardImage = ImageLoader.getBacksideImage();
-                float y = 10.5f * ViewConstants.heightOneSpace - (j * ViewConstants.offsetHeightBetweenCards);
-                setImageScalingAndPositionAndStackCardIndicesAndAddToStage(faceDownCardImage, TABLEAU, x, y, i, j);
+                float y = ViewConstants.TableauBaseY - (j * ViewConstants.offsetHeightBetweenCards);
+                setImageScalingAndPositionAndStackCardIndicesAndAddToStage(faceDownCardImage, TABLEAU, ViewConstants.TableauFoundationX[i], y, i, j);
                 faceDownCards.add(faceDownCardImage);
             });
 
@@ -193,8 +201,8 @@ public class View2 implements GameListener {
             IntStream.range(0, faceUpCards.size()).forEachOrdered(j -> {
                 // y position is dependant on nr in faceDown-Vector
                 final CardImageWrapper faceUpCardImage = cardToImageMap.get(faceUpCards.get(j));
-                float y = 10.5f * ViewConstants.heightOneSpace - ((faceDownSize + j) * ViewConstants.offsetHeightBetweenCards);
-                setImageScalingAndPositionAndStackCardIndicesAndAddToStage(faceUpCardImage, TABLEAU, x, y, i, faceDownSize + j);
+                float y = ViewConstants.TableauBaseY - ((faceDownSize + j) * ViewConstants.offsetHeightBetweenCards);
+                setImageScalingAndPositionAndStackCardIndicesAndAddToStage(faceUpCardImage, TABLEAU, ViewConstants.TableauFoundationX[i], y, i, faceDownSize + j);
             });
 
             setNewSmallestYForTableau(i, t.getCardsSize());
@@ -327,7 +335,7 @@ public class View2 implements GameListener {
         // the card beneath the sourceCardIndex,
         // it may be null if after the move, the tableau has become empty
         final Vector<Card> sourceTableauFaceUps = sourceTableau.faceUp();
-        final Optional<Card> oCardBeneathSource = (sourceTableauFaceUps.isEmpty() || sourceCardIndex < 1) ? empty() : of(sourceTableauFaceUps.get(sourceCardIndex - 2));
+        final Optional<Card> oCardBeneathSource = (sourceTableauFaceUps.isEmpty() || sourceCardIndex < 1) ? empty() : of(sourceTableauFaceUps.get(sourceCardIndex - 1));
 
         if (targetAction.getLocation() == TABLEAU) {
             // ------------------------ T -> T ------------------------
@@ -1098,12 +1106,6 @@ public class View2 implements GameListener {
         image.setCardIndex(cardIndex);
         image.setLocation(location);
         stage.addActor(image);
-
-        if (!widthHeightOfCardSet) {
-            ViewConstants.widthCard = ViewConstants.scalingWidthCard * ViewConstants.widthOneSpace;
-            ViewConstants.heightCard = ViewConstants.scalingHeightCard * ViewConstants.heightOneSpace;
-            widthHeightOfCardSet = true;
-        }
     }
 
 
@@ -1170,5 +1172,9 @@ public class View2 implements GameListener {
         if (!deckAndWaste.isWasteEmpty()) {
             addCardToDragAndDropStart(deckAndWaste.getWasteTop());
         }
+
+        zoneTargets.stream().sorted().forEach(zoneTarget -> {
+            zoneTarget.getActor().toFront();
+        });
     }
 }

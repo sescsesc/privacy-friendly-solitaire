@@ -19,8 +19,15 @@ public class ZoneTarget extends DragAndDrop.Target implements Comparable<ZoneTar
         this.game = game;
     }
 
+    public ZoneTarget(final ImageZoneTargetActor imageZoneTargetActor, final SolitaireGame game) {
+        super(imageZoneTargetActor);
+        this.game = game;
+    }
+
     @Override
     public boolean drag(final DragAndDrop.Source source, final DragAndDrop.Payload payload, final float x, final float y, final int pointer) {
+        System.out.println("drag: x=" + x + ", y=" + y);
+
         if (!(payload instanceof Payload dragAndDropPayload)) {
             return false;
         }
@@ -32,7 +39,7 @@ public class ZoneTarget extends DragAndDrop.Target implements Comparable<ZoneTar
 
         final Vector<Card> sourceCards = sourceCardImages.stream().map(CardImageWrapper::getCard).collect(Collectors.toCollection(Vector::new));
 
-        final ZoneTargetActor targetActor = (ZoneTargetActor) getActor();
+        final ITargetActor targetActor = (ITargetActor) getActor();
 
         final int stackIndex = targetActor.getStackIndex();
         switch (targetActor.getLocation()) {
@@ -66,7 +73,10 @@ public class ZoneTarget extends DragAndDrop.Target implements Comparable<ZoneTar
 
     @Override
     public int compareTo(final ZoneTarget o) {
-        return ((ZoneTargetActor) this.getActor()).compareTo((ZoneTargetActor) o.getActor());
+        if (getActor() instanceof ITargetActor zoneTargetActor && o.getActor() instanceof ITargetActor otherZoneTargetActor) {
+            return zoneTargetActor.compareTo(otherZoneTargetActor);
+        }
+        throw new IllegalStateException(getActor().getClass().getName() + " not supported");
     }
 
     @Override

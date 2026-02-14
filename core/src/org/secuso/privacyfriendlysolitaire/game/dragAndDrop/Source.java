@@ -85,7 +85,7 @@ public class Source extends DragAndDrop.Source {
             return;
         }
 
-        final ZoneTargetActor zoneTargetActor = (ZoneTargetActor) zoneTarget.getActor();
+        final ITargetActor zoneTargetActor = (ITargetActor) zoneTarget.getActor();
 
         System.out.println("payload " + payload);
         if (!(payload instanceof Payload dragAndDropPayload)) {
@@ -126,7 +126,7 @@ public class Source extends DragAndDrop.Source {
         cardImages.forEach(CardImageWrapper::toFront);
     }
 
-    private Optional<Integer> getCardIndexAtTarget(final ZoneTargetActor zoneTargetActor) {
+    private Optional<Integer> getCardIndexAtTarget(final ITargetActor zoneTargetActor) {
         if (zoneTargetActor == null) {
             return empty();
         }

@@ -1,18 +1,21 @@
 package org.secuso.privacyfriendlysolitaire.game.dragAndDrop;
 
-import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.scenes.scene2d.ui.Image;
 
 import org.secuso.privacyfriendlysolitaire.model.Location;
 
 import java.util.Objects;
 
-public class ZoneTargetActor extends Actor implements ITargetActor {
+public class ImageZoneTargetActor extends Image implements ITargetActor {
 
     private final Location location;
 
     private final int stackIndex;
 
-    public ZoneTargetActor(final Location location, final int stackIndex) {
+    public ImageZoneTargetActor(final Location location, final int stackIndex) {
+        super(new Texture(Gdx.files.internal("cards/zonetarget.png")));
         this.location = location;
         this.stackIndex = stackIndex;
     }
@@ -29,7 +32,7 @@ public class ZoneTargetActor extends Actor implements ITargetActor {
 
     @Override
     public boolean equals(final Object o) {
-        if (!(o instanceof ZoneTargetActor that)) {
+        if (!(o instanceof ImageZoneTargetActor that)) {
             return false;
         }
         return stackIndex == that.stackIndex && location == that.location;
@@ -43,6 +46,6 @@ public class ZoneTargetActor extends Actor implements ITargetActor {
     @Override
     public String toString() {
         final String suffix = ", x=" + getX() + ", y=" + getY() + ", width=" + getWidth() + ", height=" + getHeight();
-        return "ZoneTargetActor: location=" + location + ", stackIndex=" + stackIndex + suffix;
+        return "ImageZoneTargetActor: location=" + location + ", stackIndex=" + stackIndex + suffix;
     }
 }
