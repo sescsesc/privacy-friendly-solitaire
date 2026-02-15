@@ -243,6 +243,8 @@ public class View2 implements GameListener {
      */
     @Override
     public void update(SolitaireGame game) {
+        //FIXME update only when move?
+
         Action prevAction = game.getPrevAction();
 
         if (prevAction == null) {
@@ -961,6 +963,25 @@ public class View2 implements GameListener {
         }
     }
 
+    public void moveCardTo(final Location location, final int stackIndex, final CardImageWrapper cardImage) {
+        switch (location) {
+            case FOUNDATION ->
+                    moveCard(ViewConstants.TableauFoundationX[stackIndex], ViewConstants.WasteDeckFoundationY, cardImage, stackIndex, true);
+            case TABLEAU -> {
+                final Tableau tableau = game.getTableaus().getTableau(stackIndex);
+                final Vector<Card> faceUps = tableau.faceUp();
+                if (faceUps.isEmpty()) {
+                    moveCard(ViewConstants.TableauFoundationX[stackIndex], ViewConstants.TableauBaseY, cardImage, stackIndex, true);
+                } else {
+                    final CardImageWrapper targetImage = cardToImageMap.get(faceUps.lastElement());
+                    final float newX = targetImage.getX();
+                    final float newY = targetImage.getY() - ViewConstants.offsetHeightBetweenCards;
+                    moveCard(newX, newY, cardImage, stackIndex, true);
+                }
+            }
+            default -> throw new IllegalStateException("move card not supported to: " + location);
+        }
+    }
 
     /**
      * @param targetX   new x-position
@@ -968,7 +989,7 @@ public class View2 implements GameListener {
      * @param cardImage the ImageWrapper-object to be moved
      * @param animate   whether to animate the moving or not
      */
-    private void moveCard(final float targetX, final float targetY, final ImageWrapper cardImage, final int targetStack, final boolean animate) {
+    public void moveCard(final float targetX, final float targetY, final ImageWrapper cardImage, final int targetStack, final boolean animate) {
         if (animate) {
             cardImage.addAction(Actions.moveTo(targetX, targetY, 0.2f));
         } else {
@@ -987,6 +1008,7 @@ public class View2 implements GameListener {
      * @return an action containing whether the click was on deck, waste, foundation or tableau,
      * which foundation/tableau was tapped and which card in this tableau
      */
+    @Deprecated(forRemoval = true)
     Action getActionForTap(float x, float y) {
         Location location = null;
         int stackIndex = getStackIndexForX(x);      // caution can be -1
@@ -1061,6 +1083,7 @@ public class View2 implements GameListener {
 
 
     // ------------------------------------ Helper ------------------------------------
+    @Deprecated(forRemoval = true)
     private int getStackIndexForX(float x) {
         if (x >= 2 * ViewConstants.widthOneSpace && x <= 2 * ViewConstants.widthOneSpace + ViewConstants.widthCard) {
             return 0;
@@ -1081,6 +1104,7 @@ public class View2 implements GameListener {
         }
     }
 
+    @Deprecated(forRemoval = true)
     private ImageWrapper getBackSideCardForStackAndCardIndex(int stackIndex, int cardIndex) {
         for (ImageWrapper c : faceDownCards) {
             if (c.getStackIndex() == stackIndex && c.getCardIndex() == cardIndex) {
@@ -1148,7 +1172,7 @@ public class View2 implements GameListener {
      */
     private void addCardToDragAndDropStart(final Card card) {
         final CardImageWrapper cardImage = cardToImageMap.get(card);
-        dragAndDrop.addSource(new Source(cardImage, game, cardToImageMap));
+        dragAndDrop.addSource(new Source(cardImage, game, this, cardToImageMap));
     }
 
     /**

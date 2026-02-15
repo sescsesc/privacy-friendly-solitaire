@@ -10,6 +10,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.DragAndDrop;
 
 import org.secuso.privacyfriendlysolitaire.game.CardImageWrapper;
 import org.secuso.privacyfriendlysolitaire.game.SolitaireGame;
+import org.secuso.privacyfriendlysolitaire.game.View2;
 import org.secuso.privacyfriendlysolitaire.model.Action;
 import org.secuso.privacyfriendlysolitaire.model.Card;
 import org.secuso.privacyfriendlysolitaire.model.Location;
@@ -24,11 +25,14 @@ public class Source extends DragAndDrop.Source {
 
     private final SolitaireGame game;
 
+    private final View2 view;
+
     private final Map<Card, CardImageWrapper> cardToImageMap;
 
-    public Source(final CardImageWrapper cardImage, final SolitaireGame game, final Map<Card, CardImageWrapper> cardToImageMap) {
+    public Source(final CardImageWrapper cardImage, final SolitaireGame game, final View2 view, final Map<Card, CardImageWrapper> cardToImageMap) {
         super(cardImage);
         this.game = game;
+        this.view = view;
         this.cardToImageMap = cardToImageMap;
     }
 
@@ -78,51 +82,42 @@ public class Source extends DragAndDrop.Source {
     @Override
     public void dragStop(final InputEvent event, final float x, final float y, final int pointer, final DragAndDrop.Payload payload, final DragAndDrop.Target target) {
         System.out.println("Source#dragStop");
+
+        final CardImageWrapper originalActor = (CardImageWrapper) getActor();
+        System.out.println("originalActor " + originalActor);
+
+        System.out.println("payload " + payload);
+        if (!(payload instanceof Payload dragAndDropPayload)) {
+            System.out.println("no payload, no party");
+            return;
+        }
+
         System.out.println("target " + target);
-
-        // FIXME if failed : reset to original position
-
         if (!(target instanceof ZoneTarget zoneTarget)) {
+            final float originalX = dragAndDropPayload.getOriginalX();
+            final float originalY = dragAndDropPayload.getOriginalY();
+            final int originalStackIndex = dragAndDropPayload.getOriginalStackIndex();
+            System.out.println("move back to original position: x = " + originalX + ", y = " + originalY);
+            view.moveCard(originalX, originalY, originalActor, originalStackIndex, true);
             return;
         }
 
         final ITargetActor zoneTargetActor = (ITargetActor) zoneTarget.getActor();
+        final Location targetLocation = zoneTargetActor.getLocation();
+        final int targetStackIndex = zoneTargetActor.getStackIndex();
 
-        System.out.println("payload " + payload);
-        if (!(payload instanceof Payload dragAndDropPayload)) {
-            return;
-        }
+        System.out.println("adjust position to target");
+        view.moveCardTo(targetLocation, targetStackIndex, originalActor);
+
+        // FIXME update card index
 
         final Vector<CardImageWrapper> cardImages = dragAndDropPayload.getCardImages();
         if (cardImages.isEmpty()) {
             return;
         }
 
-        final Actor originalActor = getActor();
         final Actor dragActor = payload.getDragActor();
-
-        System.out.println("originalActor " + originalActor);
         System.out.println("dragActor " + dragActor);
-
-        System.out.println("originalActor pos alt = " + originalActor.getX() + ", " + originalActor.getY());
-
-        final Location targetLocation = zoneTargetActor.getLocation();
-        final int targetStackIndex = zoneTargetActor.getStackIndex();
-
-//        switch (targetLocation) {
-//            case FOUNDATION -> {
-//
-//            }
-//            case TABLEAU -> {
-//
-//            }
-//            default ->
-//
-//        }
-
-
-        originalActor.setPosition(dragActor.getX(), dragActor.getY());
-        System.out.println("originalActor pos neu = " + originalActor.getX() + ", " + originalActor.getY());
 
         final Optional<Integer> oCardIndex = getCardIndexAtTarget(zoneTargetActor);
         if (oCardIndex.isEmpty()) {

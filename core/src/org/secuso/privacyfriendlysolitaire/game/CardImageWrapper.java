@@ -37,6 +37,8 @@ public class CardImageWrapper extends ImageWrapper {
 
     @Override
     public String toString() {
-        return super.toString() + ", card: " + card;
+
+        final String suffix = ", x=" + getX() + ", y=" + getY();
+        return super.toString() + ", card: " + card + suffix;
     }
 }
