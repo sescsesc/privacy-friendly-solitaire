@@ -107,6 +107,11 @@ public class Foundation {
         return !cards.isEmpty() && cards.last().rank() == Rank.KING;
     }
 
+    public int size() {
+        return cards.size();
+    }
+
+
     public int getPosition() {
         return position;
     }

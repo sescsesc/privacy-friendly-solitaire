@@ -1,5 +1,7 @@
 package org.secuso.privacyfriendlysolitaire.model;
 
+import static java.util.function.Predicate.not;
+
 import org.secuso.privacyfriendlysolitaire.generator.GeneratorUtils;
 
 import java.util.ArrayList;
@@ -56,7 +58,7 @@ public record Tableaus(Map<Integer, Tableau> indexToTableauMap) {
     }
 
     public List<Card> getAllLastFaceUpCards() {
-        return indexToTableauMap.values().stream().map(Tableau::faceUp).map(Vector::lastElement).collect(Collectors.toList());
+        return indexToTableauMap.values().stream().map(Tableau::faceUp).filter(not(Vector::isEmpty)).map(Vector::lastElement).collect(Collectors.toList());
     }
 
     public List<Card> getAllFaceUpCards() {

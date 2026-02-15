@@ -33,7 +33,7 @@ import org.secuso.privacyfriendlysolitaire.model.Tableau;
  * </ul>
  */
 
-public record Controller(SolitaireGame game, View view) implements GestureDetector.GestureListener {
+public record Controller(SolitaireGame game, View2 view) implements GestureDetector.GestureListener {
 
 
     @Override

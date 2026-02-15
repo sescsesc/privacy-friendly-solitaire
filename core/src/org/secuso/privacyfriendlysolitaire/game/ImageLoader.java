@@ -15,16 +15,12 @@ public class ImageLoader {
         return getImageForPath("cards/backside.png");
     }
 
-    public static ImageWrapper getMarkImage() {
-        return getImageForPath("cards/mark.png");
-    }
-
-    public static ImageWrapper getCardImage(final Card card) {
+    public static CardImageWrapper getCardImage(final Card card) {
         if (card == null) {
             return null;
         }
         final String textureString = card.rank().toString().toLowerCase() + "_" + card.suit().toString().toLowerCase();
-        return ImageLoader.getImageForPath("cards/" + textureString + ".png");
+        return getCardImageForPath(card, "cards/" + textureString + ".png");
     }
 
 
@@ -34,9 +30,22 @@ public class ImageLoader {
      * @param path the relative path to the image
      * @return the image lying at this path
      */
-    public static ImageWrapper getImageForPath(final String path) {
+    private static ImageWrapper getImageForPath(final String path) {
         try {
-            return new ImageWrapper(new Texture(Gdx.files.internal(path)));
+            return new ImageWrapper(getTexture(path));
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    private static Texture getTexture(final String path) {
+        return new Texture(Gdx.files.internal(path));
+    }
+
+    private static CardImageWrapper getCardImageForPath(final Card card, final String path) {
+        try {
+            return new CardImageWrapper(card, getTexture(path));
         } catch (Exception e) {
             e.printStackTrace();
             return null;
